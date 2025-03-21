@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app metadata-complete="true" version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee            https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+    <listener>
+        <listener-class>jets.projects.listeners.AppStartupListener</listener-class>
+    </listener>
+    
+    <servlet>
+        <servlet-name>AdminLogin</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminLogin</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>AdminLogout</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminLogout</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>AdminSearchProducts</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminSearchProducts</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>AdminRootRedirect</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminRootRedirect</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>AdminRootRedirect</servlet-name>
+        <url-pattern>/Admin</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AdminDirector</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminDirector</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+        
+    <servlet-mapping>
+        <servlet-name>AdminDirector</servlet-name>
+        <url-pattern>/Admin/Home</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>AdminDirector</servlet-name>
+        <url-pattern>/Admin/Login</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>AdminDirector</servlet-name>
+        <url-pattern>/Admin/Logout</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>AdminDirector</servlet-name>
+        <url-pattern>/Admin/AdminSearchProducts</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>UserLogin</servlet-name>
+        <servlet-class>jets.projects.normal_user.UserLogin</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>UserRegister</servlet-name>
+        <servlet-class>jets.projects.normal_user.UserRegister</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>UserLogout</servlet-name>
+        <servlet-class>jets.projects.normal_user.UserLogout</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>UserSearchProducts</servlet-name>
+        <servlet-class>jets.projects.normal_user.UserSearchProducts</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>UserDirector</servlet-name>
+        <servlet-class>jets.projects.normal_user.UserDirector</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>UserDirector</servlet-name>
+        <url-pattern>/Home</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>UserDirector</servlet-name>
+        <url-pattern>/Login</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>UserDirector</servlet-name>
+        <url-pattern>/Register</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>UserDirector</servlet-name>
+        <url-pattern>/Logout</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>UserDirector</servlet-name>
+        <url-pattern>/SearchProducts</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ErrorHandler</servlet-name>
+        <jsp-file>/Error/error_page.jspx</jsp-file>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ErrorHandler</servlet-name>
+        <url-pattern>/Error</url-pattern>
+    </servlet-mapping>
+    
+    <welcome-file-list>
+        <welcome-file>Home</welcome-file>
+        <welcome-file>Error</welcome-file>
+    </welcome-file-list>
+</web-app>

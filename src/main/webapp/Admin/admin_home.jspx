@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+          xmlns:c="http://java.sun.com/jsp/jstl/core"
+          version="2.0">
+    <jsp:directive.page contentType="text/html; charset=UTF-8"
+                        pageEncoding="UTF-8"/>
+    
+    <!-- HTML5 -->
+    <jsp:output doctype-root-element="html" 
+                doctype-public="" 
+                doctype-system=""/>
+    
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Project 2 Demo</title>
+
+        <link rel="stylesheet" href="CSS/admin_style.css" />
+        
+        <jsp:directive.include file="Helpers/context_path.jsp" />
+        <script type="module" src="JavaScript/admin_home.js">
+            // This is a line added to prevent
+            // the automatic removal of the end on run.
+        </script>
+    </head>
+    <body>
+        <jsp:directive.include file="Helpers/validate_session.jsp" />
+        <header>
+            <img class="logo-img" src="Images/logo.png" alt="website-logo" />
+            <h1>Admin Home</h1>
+            <nav>
+                <input id="logoutButton" type="button" value="Logout" />
+            </nav>
+        </header>
+        <main>
+            <div class="error-div">
+                <!-- XML comment added to prevent the automatic
+                removal of the end tag. -->
+            </div>
+            
+            <form action="../Admin/AdminSearchProducts" id="form">
+                <div>
+                    <label for="searchKey">Search</label>
+                    <input type="text" id="searchKey"
+                    name="searchKey" required="required" />
+                    <input type="submit" value="Go" />
+                </div>
+            </form>
+            
+            <c:if test="${sessionScope.result != null}">
+                <c:choose>
+                    <c:when test="${empty sessionScope.result}">
+                        <p>No data was found for the provided key.</p>
+                    </c:when>
+                </c:choose>
+            </c:if>
+                        
+            <div class="products-list">
+                Products List goes Here.
+            </div>
+        </main>
+        <jsp:directive.include file="Helpers/footer.jsp" />
+    </body>
+    </html>
+</jsp:root>

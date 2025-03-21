@@ -1,3 +1,4 @@
+### Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,11 +8,42 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar  # Takari Maven Wrapper
 
-# Eclipse m2e generated files
-# Eclipse Core
+### Eclipse
 .project
-# JDT-specific (Eclipse Java Development Tools)
 .classpath
+.settings/
+.factorypath
+.checkstyle
+
+### VS Code
+.vscode/
+
+### NetBeans
+/nbproject/
+nb-configuration.xml
+nb-configuration-private.xml
+build/
+dist/
+.netbeans/
+
+### IntelliJ IDEA
+.idea/
+.idea/**  # Ignore everything inside .idea
+*.iml
+*.ipr
+*.iws
+out/
+
+### Web Application (Servlets, JSP)
+*.log
+*.war
+*.ear
+*.jar
+!src/main/webapp/WEB-INF/lib/*.jar  # Keep manually added JARs
+
+### OS-specific files
+.DS_Store  # macOS Finder
+Thumbs.db  # Windows Explorer
+*.swp      # Vim swap files
