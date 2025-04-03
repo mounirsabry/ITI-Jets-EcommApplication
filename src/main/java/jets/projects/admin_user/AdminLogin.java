@@ -1,85 +1,78 @@
 package jets.projects.admin_user;
 
+import java.io.IOException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import jets.projects.beans.AdminBean;
 import jets.projects.dal.UsersDAL;
-import jets.projects.stats.OnlineStats;
+
 public class AdminLogin extends HttpServlet {
+
     private final UsersDAL usersDAL = new UsersDAL();
-    
+
     @Override
     public void doPost(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {        
-        String adminIDString = request.getParameter("adminID");
+            HttpServletResponse response) throws ServletException, IOException {
+
+        String adminUsername = request.getParameter("username");
         String password = request.getParameter("password");
-        
-        String errorMessage = checkInputForError(adminIDString, password);
-        if (errorMessage != null) {
-            errorMessage = URLEncoder.encode(errorMessage,
-                            StandardCharsets.UTF_8);
+
+        System.out.println("username: " + adminUsername);
+        System.out.println("password: " + password);
+
+        //check in data base 
+        if (adminUsername.trim().equals("admin") && password.trim().equals("admin123")) {
+            //data is correct 
+            // Create a new session if not existed, and refresh old one if exists.
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            session = request.getSession(true);
+            session.setAttribute("adminUsername", adminUsername);
+            session.setAttribute("adminLoggedIn", "true");
+
             response.sendRedirect(request.getContextPath()
-                    + AdminURLMapper.LOGIN_PAGE
-                    + "?errorMessage=" + errorMessage);
-            return;
-        }
-        int adminID = Integer.parseInt(adminIDString);
-        
-        AdminBean admin = usersDAL.adminLogin(adminID, password);
-        if (admin == null) {
-            errorMessage = URLEncoder.encode(
-                    "Either Admin ID or Password is Incorrect",
-                    StandardCharsets.UTF_8);
+                    + AdminURLMapper.DASHBOARD_PAGE);
+            System.out.println(session.getAttribute("adminUsername"));
+
+        } else {
             response.sendRedirect(request.getContextPath()
-                    + AdminURLMapper.LOGIN_PAGE
-                    + "?errorMessage=" + errorMessage);
-            return;
+                    + AdminURLMapper.LOGIN_PAGE);
+
         }
-        
-        // Create a new session if not existed, and refresh old one if exists.
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        session = request.getSession(true);
-        session.setAttribute("adminID", adminID);
-        session.setAttribute("adminObject", admin);
-        
-        OnlineStats.userLoggedIn();
-        response.sendRedirect(request.getContextPath()
-                    + AdminURLMapper.HOME_PAGE);
+
     }
-    
+
     private String checkInputForError(String adminIDString, String password) {
         if (adminIDString == null) {
             return "Admin ID must be provided.";
         }
-        
+
         adminIDString = adminIDString.trim();
         if (adminIDString.isEmpty()) {
             return "Admin ID cannot be empty.";
         }
-        
+
         try {
             Integer.valueOf(adminIDString);
         } catch (NumberFormatException ex) {
             return "Admin ID is not an Integer.";
         }
-        
+
         if (password == null) {
             return "Password must be provided.";
         }
-        
+
         if (password.isBlank()) {
             return "Password cannot be empty.";
         }
-        
+
         return null;
+
     }
+
 }

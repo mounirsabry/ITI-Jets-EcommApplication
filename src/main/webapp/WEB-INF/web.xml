@@ -18,6 +18,8 @@
         <servlet-name>AdminSearchProducts</servlet-name>
         <servlet-class>jets.projects.admin_user.AdminSearchProducts</servlet-class>
     </servlet>
+
+    
     
     <servlet>
         <servlet-name>AdminRootRedirect</servlet-name>
@@ -53,6 +55,16 @@
     <servlet-mapping>
         <servlet-name>AdminDirector</servlet-name>
         <url-pattern>/Admin/AdminSearchProducts</url-pattern>
+    </servlet-mapping>
+
+ <servlet>
+        <servlet-name>AdminUsers</servlet-name>
+        <servlet-class>jets.projects.admin_user.AdminUsers</servlet-class>
+    </servlet>
+    
+       <servlet-mapping>
+        <servlet-name>AdminUsers</servlet-name>
+        <url-pattern>/Admin/AdminUsers</url-pattern>
     </servlet-mapping>
     
     <servlet>
@@ -115,9 +127,24 @@
         <servlet-name>ErrorHandler</servlet-name>
         <url-pattern>/Error</url-pattern>
     </servlet-mapping>
+
+    <!--filters-->
+      <filter>
+        <filter-name>userLoginCheckFilter</filter-name>
+        <filter-class>jets.projects.filters.UserLoginCheckFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>userLoginCheckFilter</filter-name>
+
+        <!-- <url-pattern>/*</url-pattern> -->
+        <url-pattern>/Admin/*</url-pattern>
+
+    </filter-mapping>
     
     <welcome-file-list>
         <welcome-file>Home</welcome-file>
         <welcome-file>Error</welcome-file>
     </welcome-file-list>
+
 </web-app>
