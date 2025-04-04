@@ -15,6 +15,14 @@ INSERT INTO `Genre` (`name`) VALUES
   ('Biography'),
   ('Childrens Books'),
   ('Religion');
+  
+CREATE TABLE PaymentMethod (
+    method VARCHAR(50) PRIMARY KEY
+);
+
+INSERT INTO PaymentMethod (`method`) VALUES 
+    ('credit_card'),
+    ('account_balance');
 
 CREATE TABLE `Admin` (
   `admin_ID` BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -22,7 +30,7 @@ CREATE TABLE `Admin` (
   `display_name` VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE `NormalUser` (
+CREATE TABLE `User` (
   `user_ID` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `username` VARCHAR(255) NOT NULL UNIQUE,
   `hash_password` VARCHAR(255) NOT NULL,
@@ -49,6 +57,7 @@ CREATE TABLE `Book` (
   `stock` INT DEFAULT 0,
   `price` DECIMAL(10,2) NOT NULL,
   `discount_percentage` DECIMAL(5,2) DEFAULT 0.00,
+  `soldCount` INT DEFAULT 0,
   `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`genre`) REFERENCES `Genre`(`name`) ON DELETE RESTRICT
 );
@@ -65,7 +74,7 @@ CREATE TABLE `UserInterest` (
   `interest_ID` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_ID` BIGINT NOT NULL,
   `genre` VARCHAR(100) NOT NULL,
-  FOREIGN KEY (`user_ID`) REFERENCES `NormalUser`(`user_ID`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_ID`) REFERENCES `User`(`user_ID`) ON DELETE CASCADE,
   FOREIGN KEY (`genre`) REFERENCES `Genre`(`name`) ON DELETE CASCADE,
   UNIQUE KEY `unique_user_genre` (`user_ID`, `genre`)
 );
@@ -74,7 +83,7 @@ CREATE TABLE `Wishlist` (
   `wishlist_ID` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_ID` BIGINT NOT NULL,
   `book_ID` BIGINT NOT NULL,
-  FOREIGN KEY (`user_ID`) REFERENCES `NormalUser`(`user_ID`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_ID`) REFERENCES `User`(`user_ID`) ON DELETE CASCADE,
   FOREIGN KEY (`book_ID`) REFERENCES `Book`(`book_ID`) ON DELETE CASCADE,
   UNIQUE KEY `unique_wishlist_item` (`user_ID`, `book_ID`)
 );
@@ -86,7 +95,9 @@ CREATE TABLE `BookOrder` (
   `address` TEXT NOT NULL,
   `payment_method` VARCHAR(50) NOT NULL,
   `shipping_cost` DECIMAL(10,2) DEFAULT 0.00,
-  FOREIGN KEY (`user_ID`) REFERENCES `NormalUser`(`user_ID`) ON DELETE RESTRICT
+  `status` ENUM('pending', 'confirmed', 'shipped', 'cancelled') DEFAULT 'pending',
+  FOREIGN KEY (`user_ID`) REFERENCES `User`(`user_ID`) ON DELETE RESTRICT,
+  FOREIGN KEY (payment_method) REFERENCES PaymentMethod(method) ON DELETE RESTRICT
 );
 
 CREATE TABLE `CartItem` (
@@ -94,7 +105,7 @@ CREATE TABLE `CartItem` (
   `user_ID` BIGINT NOT NULL,
   `book_ID` BIGINT NOT NULL,
   `quantity` INT NOT NULL DEFAULT 1,
-  FOREIGN KEY (`user_ID`) REFERENCES `NormalUser`(`user_ID`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_ID`) REFERENCES `User`(`user_ID`) ON DELETE CASCADE,
   FOREIGN KEY (`book_ID`) REFERENCES `Book`(`book_ID`) ON DELETE CASCADE,
   UNIQUE KEY `unique_cart_item` (`user_ID`, `book_ID`)
 );
@@ -116,5 +127,5 @@ CREATE TABLE `PurchaseHistory` (
   `purchase_datetime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `total_paid` DECIMAL(10,2) NOT NULL,
   `receipt_file_URL` VARCHAR(255) NOT NULL,
-  FOREIGN KEY (`user_ID`) REFERENCES `NormalUser`(`user_ID`) ON DELETE RESTRICT
+  FOREIGN KEY (`user_ID`) REFERENCES `User`(`user_ID`) ON DELETE RESTRICT
 );
