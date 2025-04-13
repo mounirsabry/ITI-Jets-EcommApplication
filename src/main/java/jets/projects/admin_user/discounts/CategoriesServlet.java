@@ -11,8 +11,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// @WebServlet("/Admin/CategoriesServlet")
-public class CategoriesServlet extends HttpServlet {
+public class CategoriesServlet extends HttpServlet 
+{
     private static final Gson gson = new Gson();
     private static final List<Category> categories = Arrays.asList(
         new Category("Fiction", "Fiction"),
@@ -28,7 +28,8 @@ public class CategoriesServlet extends HttpServlet {
     );
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -41,7 +42,8 @@ public class CategoriesServlet extends HttpServlet {
     }
 
     // DTO for Category
-    private static class Category {
+    private static class Category 
+    {
         private String id;
         private String name;
 
@@ -52,7 +54,8 @@ public class CategoriesServlet extends HttpServlet {
     }
 
     // DTO for Error Response
-    private static class ErrorResponse {
+    private static class ErrorResponse 
+    {
         private String error;
 
         public ErrorResponse(String error) {

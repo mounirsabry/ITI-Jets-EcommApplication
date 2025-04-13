@@ -19,16 +19,15 @@ import jets.projects.beans.ReceiptBean;
 import jets.projects.dto.PurchaseHistoryDTO;
 import jets.projects.dto.ReceiptDTO;
 
-public class PurchaseHistoryApiServlet extends HttpServlet {
+public class PurchaseHistoryApiServlet extends HttpServlet 
+{
     private static final int TOTAL_DUMMY_RECORDS = 50;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final Gson gson = new GsonBuilder().create();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("PurchaseHistoryApiServlet doGet, params: page=" + request.getParameter("page") +
-                ", size=" + request.getParameter("size") + ", dateFrom=" + request.getParameter("dateFrom") +
-                ", dateTo=" + request.getParameter("dateTo") + ", search=" + request.getParameter("search"));
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -71,14 +70,16 @@ public class PurchaseHistoryApiServlet extends HttpServlet {
         out.flush();
     }
 
-    private List<ReceiptBean> generateDummyReceipts() {
+    private List<ReceiptBean> generateDummyReceipts() 
+    {
         System.out.println("Generating " + TOTAL_DUMMY_RECORDS + " dummy receipts");
         List<ReceiptBean> receipts = new ArrayList<>();
         Random random = new Random();
         String[] userNames = {"John Doe", "Jane Smith", "Alice Johnson", "Bob Brown"};
         String[] userEmails = {"john@example.com", "jane@example.com", "alice@example.com", "bob@example.com"};
 
-        for (int i = 1; i <= TOTAL_DUMMY_RECORDS; i++) {
+        for (int i = 1; i <= TOTAL_DUMMY_RECORDS; i++) 
+        {
             ReceiptBean receipt = new ReceiptBean();
             receipt.setId(i);
             receipt.setUserId(random.nextInt(4) + 1);
@@ -90,38 +91,43 @@ public class PurchaseHistoryApiServlet extends HttpServlet {
             receipt.setTotalPaid(10 + (random.nextDouble() * 90));
             receipts.add(receipt);
         }
-        System.out.println("Generated receipts: " + receipts.size());
+         
         return receipts;
     }
 
-    private List<ReceiptBean> filterReceipts(List<ReceiptBean> receipts, String dateFrom, String dateTo, String search) {
+    private List<ReceiptBean> filterReceipts(List<ReceiptBean> receipts, String dateFrom, String dateTo, String search) 
+    {
         List<ReceiptBean> filtered = new ArrayList<>(receipts);
 
-        if (dateFrom != null && !dateFrom.isEmpty()) {
+        if (dateFrom != null && !dateFrom.isEmpty()) 
+        {
             try {
                 Date from = DATE_FORMAT.parse(dateFrom);
                 filtered.removeIf(r -> r.getDate().compareTo(from) < 0);
             } catch (Exception ignored) {
             }
         }
-        if (dateTo != null && !dateTo.isEmpty()) {
+        if (dateTo != null && !dateTo.isEmpty()) 
+        {
             try {
                 Date to = DATE_FORMAT.parse(dateTo);
                 filtered.removeIf(r -> r.getDate().compareTo(to) > 0);
             } catch (Exception ignored) {}
         }
-        if (search != null && !search.isEmpty()) {
+        if (search != null && !search.isEmpty()) 
+        {
             String searchLower = search.toLowerCase();
             filtered.removeIf(r ->
                     !r.getUserName().toLowerCase().contains(searchLower) &&
                             !String.valueOf(r.getId()).contains(searchLower)
             );
         }
-        System.out.println("Filtered receipts: " + filtered.size());
+
         return filtered;
     }
 
-    private ReceiptDTO mapToDTO(ReceiptBean bean) {
+    private ReceiptDTO mapToDTO(ReceiptBean bean) 
+    {
         if (bean == null) {
             System.out.println("ReceiptBean is null in mapToDTO");
             return new ReceiptDTO(0, 0, "Unknown", "N/A", null, 0.0);

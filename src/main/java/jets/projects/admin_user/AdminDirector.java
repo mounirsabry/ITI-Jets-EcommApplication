@@ -70,8 +70,8 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Orders Servlet
-        if (servletPath.equals("/Admin/OrdersServlet")) {
-            var dispatcher = getServletContext().getNamedDispatcher("jets.projects.admin_user.orders.OrdersServlet");
+        if (servletPath.equals(AdminURLMapper.ORDERS)) {
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.ORDERS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Orders Servlet not found.");
                 return;
@@ -138,12 +138,11 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Banners Servlet
-        if (servletPath.equals("/Admin/BannersServlet")) {
+        if (servletPath.equals(AdminURLMapper.BANNERS)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext()
-                    .getNamedDispatcher("jets.projects.admin_user.discounts.BannersServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.BANNERS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Banners Servlet not found.");
                 return;
@@ -153,11 +152,11 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Books Servlet
-        if (servletPath.equals("/Admin/BooksServlet")) {
+        if (servletPath.equals(AdminURLMapper.BOOKS)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext().getNamedDispatcher("jets.projects.admin_user.discounts.BooksServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.BOOKS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Books Servlet not found.");
                 return;
@@ -165,13 +164,13 @@ public class AdminDirector extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
+
         // Categories Servlet
-        if (servletPath.equals("/Admin/CategoriesServlet")) {
+        if (servletPath.equals(AdminURLMapper.CATEGORIES)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext()
-                    .getNamedDispatcher("jets.projects.admin_user.discounts.CategoriesServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.CATEGORIES_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Categories Servlet not found.");
                 return;
@@ -196,10 +195,9 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Update Order Status Servlet
-        if (servletPath.equals("/Admin/UpdateOrderStatusServlet")) {
+        if (servletPath.equals(AdminURLMapper.UPDATE_ORDER_STATUS)) {
             System.out.println("Forwarding to UpdateOrderStatusServlet");
-            var dispatcher = getServletContext()
-                    .getNamedDispatcher("jets.projects.admin_user.orders.UpdateOrderStatusServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.UPDATE_ORDER_STATUS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Update Order Status Servlet not found.");
                 return;
@@ -209,12 +207,11 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Banners Servlet
-        if (servletPath.equals("/Admin/BannersServlet")) {
+        if (servletPath.equals(AdminURLMapper.BANNERS)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext()
-                    .getNamedDispatcher("jets.projects.admin_user.discounts.BannersServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.BANNERS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Banners Servlet not found.");
                 return;
@@ -224,11 +221,11 @@ public class AdminDirector extends HttpServlet {
         }
 
         // Books Servlet
-        if (servletPath.equals("/Admin/BooksServlet")) {
+        if (servletPath.equals(AdminURLMapper.BOOKS)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext().getNamedDispatcher("jets.projects.admin_user.discounts.BooksServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.BOOKS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Books Servlet not found.");
                 return;
@@ -237,12 +234,12 @@ public class AdminDirector extends HttpServlet {
             return;
         }
 
-        if (servletPath.equals("/Admin/DiscountsServlet")) {
+        // Discounts Servlet
+        if (servletPath.equals(AdminURLMapper.DISCOUNTS)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
                 return;
             }
-            var dispatcher = getServletContext()
-                    .getNamedDispatcher("jets.projects.admin_user.discounts.DiscountsServlet");
+            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.DISCOUNTS_SERVLET);
             if (dispatcher == null) {
                 directToErrorPage(request, response, "Discounts Servlet not found.");
                 return;

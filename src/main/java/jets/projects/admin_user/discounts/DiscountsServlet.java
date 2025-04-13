@@ -12,22 +12,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// @WebServlet("/Admin/DiscountsServlet")
-public class DiscountsServlet extends HttpServlet {
+public class DiscountsServlet extends HttpServlet 
+{
     private static final Gson gson = new Gson();
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             String action = request.getParameter("action");
-            if ("removeAll".equals(action)) {
-                // Simulate removing all discounts
+            if ("removeAll".equals(action)) 
                 response.getWriter().write(gson.toJson(new SuccessResponse(true)));
-            } else {
-                // Apply discount
+            else 
+            {
                 StringBuilder sb = new StringBuilder();
                 try (BufferedReader reader = request.getReader()) {
                     String line;
@@ -65,7 +65,8 @@ public class DiscountsServlet extends HttpServlet {
     }
 
     // DTO for Discount Request
-    private static class DiscountRequest {
+    private static class DiscountRequest 
+    {
         private String discountType;
         private double discountValue;
         private String applyTo;
@@ -80,7 +81,8 @@ public class DiscountsServlet extends HttpServlet {
     }
 
     // DTO for Success Response
-    private static class SuccessResponse {
+    private static class SuccessResponse 
+    {
         private boolean success;
 
         public SuccessResponse(boolean success) {
@@ -89,7 +91,8 @@ public class DiscountsServlet extends HttpServlet {
     }
 
     // DTO for Error Response
-    private static class ErrorResponse {
+    private static class ErrorResponse 
+    {
         private String error;
 
         public ErrorResponse(String error) {

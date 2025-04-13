@@ -37,7 +37,8 @@ public class OrdersServlet extends HttpServlet
         }
     }
 
-    private List<Order> generateDummyOrders() {
+    private List<Order> generateDummyOrders() 
+    {
         Customer customer1 = new Customer("John Doe", "john@example.com", "123-456-7890", "123 Main St, City");
         Customer customer2 = new Customer("Jane Smith", "jane@example.com", "987-654-3210", "456 Oak Ave, Town");
 

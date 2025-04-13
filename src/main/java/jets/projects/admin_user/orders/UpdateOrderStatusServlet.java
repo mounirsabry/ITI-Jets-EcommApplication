@@ -9,8 +9,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-// @WebServlet("/Admin/UpdateOrderStatusServlet")
 public class UpdateOrderStatusServlet extends HttpServlet 
 {
     private static final Gson gson = new Gson();
@@ -39,11 +37,9 @@ public class UpdateOrderStatusServlet extends HttpServlet
                 return;
             }
 
-            // Simulate status update (dummy logic)
-            boolean success = true; // Assume update is successful
+            boolean success = true; 
             String message = null;
 
-            // For demo, reject updates for non-existent orders
             if (!"ORD001".equals(updateRequest.getOrderId()) && !"ORD002".equals(updateRequest.getOrderId())) {
                 success = false;
                 message = "Order not found";
@@ -57,7 +53,8 @@ public class UpdateOrderStatusServlet extends HttpServlet
     }
 
     // Request DTO
-    private static class UpdateRequest {
+    private static class UpdateRequest 
+    {
         private String orderId;
         private String status;
 
@@ -71,7 +68,8 @@ public class UpdateOrderStatusServlet extends HttpServlet
     }
 
     // Response DTO
-    private static class UpdateResponse {
+    private static class UpdateResponse 
+    {
         private boolean success;
         private String message;
 

@@ -22,16 +22,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import jets.projects.beans.ReceiptBean;
 import jets.projects.dto.ReceiptDTO;
 
-public class ReceiptDetailsApiServlet extends HttpServlet {
+public class ReceiptDetailsApiServlet extends HttpServlet 
+{
 
     private static final Gson GSON = new GsonBuilder().create();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         System.out.println("ReceiptDetailsApiServlet doGet, pathInfo: " + request.getPathInfo());
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.length() <= 1) {
+        if (pathInfo == null || pathInfo.length() <= 1) 
+        {
             System.out.println("Missing purchase ID");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing purchase ID");
             return;
@@ -85,7 +88,8 @@ public class ReceiptDetailsApiServlet extends HttpServlet {
         out.flush();
     }
 
-    private void serveDownload(HttpServletRequest request, HttpServletResponse response, int id) throws IOException {
+    private void serveDownload(HttpServletRequest request, HttpServletResponse response, int id) throws IOException 
+    {
         System.out.println("Serving download for receipt ID: " + id);
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=\"receipt-" + id + ".pdf\"");
@@ -116,9 +120,10 @@ public class ReceiptDetailsApiServlet extends HttpServlet {
         }
     }
 
-    private ReceiptBean generateDummyReceipt(int id) {
+    private ReceiptBean generateDummyReceipt(int id) 
+    {
         System.out.println("Generating dummy receipt for ID: " + id);
-        Random random = new Random(id); // Seed with ID for consistency
+        Random random = new Random(id);  
         String[] userNames = {"John Doe", "Jane Smith", "Alice Johnson", "Bob Brown"};
         String[] userEmails = {"john@example.com", "jane@example.com", "alice@example.com", "bob@example.com"};
         int userIndex = random.nextInt(userNames.length);
@@ -137,7 +142,8 @@ public class ReceiptDetailsApiServlet extends HttpServlet {
         return receipt;
     }
 
-    private byte[] generateReceiptPDF(ReceiptBean receipt) throws IOException {
+    private byte[] generateReceiptPDF(ReceiptBean receipt) throws IOException 
+    {
         System.out.println("Generating PDF for receipt ID: " + receipt.getId());
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
@@ -191,7 +197,8 @@ public class ReceiptDetailsApiServlet extends HttpServlet {
         }
     }
 
-    private ReceiptDTO mapToDTO(ReceiptBean bean) {
+    private ReceiptDTO mapToDTO(ReceiptBean bean) 
+    {
         if (bean == null) {
             System.out.println("ReceiptBean is null in mapToDTO");
             return new ReceiptDTO(0, 0, "Unknown", "N/A", null, 0.0);

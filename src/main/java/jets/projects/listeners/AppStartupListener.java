@@ -7,28 +7,48 @@ import java.util.Enumeration;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import jets.projects.db_connection.ConnectionManager;
+import jets.projects.utils.DataBaseInitializer;
+import jets.projects.utils.JpaUtil;
 
-public class AppStartupListener implements ServletContextListener {
+public class AppStartupListener implements ServletContextListener 
+{
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        boolean isInit = ConnectionManager.initDeviceManager();
-        if (!isInit) {
-            System.err.println("Failed to connect to DB.");
-            throw new RuntimeException(" Application will not start.");
+    public void contextInitialized(ServletContextEvent event) 
+    {
+        try {
+            EntityManagerFactory emf = JpaUtil.getEntityManagerFactory();
+
+            EntityManager em = emf.createEntityManager();
+            try {
+                em.getTransaction().begin();
+                em.getTransaction().commit();
+            } finally {
+                em.close();
+            }
+
+            System.out.println("Database connection established successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to connect to database: " + e.getMessage());
+            throw new RuntimeException("Application will not start due to database connection failure.", e);
         }
+
+        // Initialize database
+        DataBaseInitializer.initializeData();
     }
 
     @Override
-    @SuppressWarnings("CallToPrintStackTrace")
-    public void contextDestroyed(ServletContextEvent sce) {
-        // Explicitly deregister MySQL driver
+    public void contextDestroyed(ServletContextEvent sce) 
+    {
+        JpaUtil.closeEntityManagerFactory();
+        System.out.println("EntityManagerFactory closed.");
+
+        // Deregister MySQL driver and cleanup
         try {
             AbandonedConnectionCleanupThread.checkedShutdown();
-            // Alternative approach if the above doesn't work
-            // com.mysql.cj.jdbc.Driver.unloadDriver();
 
             // Deregister JDBC drivers
             Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -43,7 +63,7 @@ public class AppStartupListener implements ServletContextListener {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error shutting down MySQL cleanup thread");
+            System.err.println("Error shutting down MySQL cleanup thread or deregistering drivers.");
             e.printStackTrace();
         }
     }

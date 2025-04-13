@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// @WebServlet("/Admin/BooksServlet")
-public class BooksServlet extends HttpServlet {
+public class BooksServlet extends HttpServlet 
+{
     private static final Gson gson = new Gson();
     private static final List<Book> books = new ArrayList<>(Arrays.asList(
         new Book(1, "The Great Gatsby", "/images/gatsby.jpg", 20.00, "percentage", 10.0),
@@ -22,30 +22,33 @@ public class BooksServlet extends HttpServlet {
     ));
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             String discountedParam = request.getParameter("discounted");
-            if ("true".equals(discountedParam)) {
-                // Return discounted books
+            if ("true".equals(discountedParam)) 
+            {
                 List<Book> discountedBooks = books.stream()
                     .filter(b -> b.discountValue > 0)
                     .toList();
                 response.getWriter().write(gson.toJson(discountedBooks));
-            } else {
-                // Return all books
+            } 
+            else                
                 response.getWriter().write(gson.toJson(books));
-            }
-        } catch (Exception e) {
+
+        } catch (Exception e) 
+        {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(gson.toJson(new ErrorResponse("Failed to fetch books: " + e.getMessage())));
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -72,15 +75,17 @@ public class BooksServlet extends HttpServlet {
     }
 
     // DTO for Book
-    private static class Book {
+    private static class Book 
+    {
         private int id;
         private String title;
         private String bookImage;
         private double price;
-        private String discountType; // "percentage", "fixed", or null
+        private String discountType; 
         private double discountValue;
 
-        public Book(int id, String title, String bookImage, double price, String discountType, double discountValue) {
+        public Book(int id, String title, String bookImage, double price, String discountType, double discountValue) 
+        {
             this.id = id;
             this.title = title;
             this.bookImage = bookImage;
@@ -91,7 +96,8 @@ public class BooksServlet extends HttpServlet {
     }
 
     // DTO for Success Response
-    private static class SuccessResponse {
+    private static class SuccessResponse 
+    {
         private boolean success;
 
         public SuccessResponse(boolean success) {
@@ -100,7 +106,8 @@ public class BooksServlet extends HttpServlet {
     }
 
     // DTO for Error Response
-    private static class ErrorResponse {
+    private static class ErrorResponse 
+    {
         private String error;
 
         public ErrorResponse(String error) {

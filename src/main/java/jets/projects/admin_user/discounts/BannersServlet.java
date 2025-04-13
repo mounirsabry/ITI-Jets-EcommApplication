@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// @WebServlet("/Admin/BannersServlet")
-public class BannersServlet extends HttpServlet {
+public class BannersServlet extends HttpServlet 
+{
     private static final Gson gson = new Gson();
     private static final List<Banner> banners = new ArrayList<>(Arrays.asList(
         new Banner(1, "Summer Sale", "/images/summer_sale.jpg", "Up to 50% off!"),
@@ -21,72 +21,79 @@ public class BannersServlet extends HttpServlet {
     ));
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             String idParam = request.getParameter("id");
-            if (idParam == null) {
-                // Return all banners
+            if (idParam == null) 
                 response.getWriter().write(gson.toJson(banners));
-            } else {
-                // Return specific banner
+            else 
+            {
                 int id = Integer.parseInt(idParam);
                 Banner banner = banners.stream().filter(b -> b.id == id).findFirst()
                     .orElseThrow(() -> new Exception("Banner not found"));
                 response.getWriter().write(gson.toJson(banner));
             }
-        } catch (Exception e) {
+        } catch (Exception e) 
+        {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write(gson.toJson(new ErrorResponse("Failed to fetch banner: " + e.getMessage())));
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             String action = request.getParameter("action");
-            if ("update".equals(action)) {
-                // Update banner
+            if ("update".equals(action)) 
+            { 
                 String idParam = request.getParameter("id");
-                if (idParam == null) {
+                if (idParam == null) 
                     throw new Exception("Banner ID required");
-                }
+
                 int id = Integer.parseInt(idParam);
                 Banner banner = banners.stream().filter(b -> b.id == id).findFirst()
                     .orElseThrow(() -> new Exception("Banner not found"));
-                banner.title = "Updated Banner"; // Dummy update
+                banner.title = "Updated Banner";  
                 response.getWriter().write(gson.toJson(new SuccessResponse(true)));
-            } else if ("delete".equals(action)) {
-                // Delete banner
+            } 
+            else if ("delete".equals(action)) 
+            {
                 String idParam = request.getParameter("id");
-                if (idParam == null) {
+                if (idParam == null) 
                     throw new Exception("Banner ID required");
-                }
+                
                 int id = Integer.parseInt(idParam);
                 boolean removed = banners.removeIf(b -> b.id == id);
-                if (!removed) {
+
+                if (!removed) 
                     throw new Exception("Banner not found");
-                }
+                
                 response.getWriter().write(gson.toJson(new SuccessResponse(true)));
-            } else {
-                // Create banner
+            } 
+            else 
+            {    
                 int newId = banners.stream().mapToInt(b -> b.id).max().orElse(0) + 1;
                 banners.add(new Banner(newId, "New Banner", "/images/placeholder.jpg", ""));
                 response.getWriter().write(gson.toJson(new SuccessResponse(true)));
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(gson.toJson(new ErrorResponse("Failed to process banner request: " + e.getMessage())));
         }
     }
 
     // DTO for Banner
-    private static class Banner {
+    private static class Banner 
+    {
         private int id;
         private String title;
         private String image;
