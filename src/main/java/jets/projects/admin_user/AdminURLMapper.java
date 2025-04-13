@@ -22,4 +22,5 @@ public class AdminURLMapper {
     public static final String HOME_PAGE = "/Admin/admin_home.jspx";
 
     public static final String DASHBOARD_PAGE = "/Admin/dashboard.jsp";
+    public static final String BOOKS_PAGE = "/Admin/books.jsp";
 }

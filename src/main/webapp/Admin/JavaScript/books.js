@@ -1,6 +1,5 @@
+var booksString = [];
 document.addEventListener("DOMContentLoaded", () => {
-  // Load books data
-  loadBooks()
 
   // Add book button
   const addBookBtn = document.getElementById("addBookBtn")
@@ -8,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modalTitle").textContent = "Add New Book"
     document.getElementById("bookForm").reset()
     document.getElementById("bookId").value = ""
-    
+
     // Clear all image previews
     document.getElementById("mainImagePreview").style.backgroundImage = ""
     document.getElementById("image1Preview").style.backgroundImage = ""
@@ -99,131 +98,11 @@ function setupImagePreviews() {
 
 // Load books from localStorage or initialize with sample data
 function loadBooks() {
-  // AJAX call to get books data (commented out as backend is not ready)
-  /*
-  fetch('/api/books')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      // Store books in localStorage for offline use
-      localStorage.setItem("books", JSON.stringify(data));
-      displayBooks(data);
-    })
-    .catch(error => {
-      console.error('Error fetching books:', error);
-      // Fall back to localStorage if API call fails
-      const books = JSON.parse(localStorage.getItem("books")) || [];
-      displayBooks(books);
-    });
-  */
 
-  // For now, use dummy data
-  let books = JSON.parse(localStorage.getItem("books")) || []
 
-  // If no books in localStorage, initialize with sample data
-  if (books.length === 0) {
-    books = [
-      {
-        id: 1,
-        title: "To Kill a Mockingbird",
-        author: "Harper Lee",
-        publisher: "J. B. Lippincott & Co.",
-        isbn: "978-0446310789",
-        genre: "Fiction",
-        price: 12.99,
-        discount: 0,
-        quantity: 25,
-        status: "Available",
-        mainImage: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1433739169i/25685842.jpg",
-        images: [], // Additional images array
-        publicationDate: "1960-07-11",
-        language: "English",
-        pages: 281,
-        overview:
-          "To Kill a Mockingbird is a novel by Harper Lee published in 1960. It was immediately successful, winning the Pulitzer Prize, and has become a classic of modern American literature.",
-      },
-      {
-        id: 2,
-        title: "1984",
-        author: "George Orwell",
-        publisher: "Secker & Warburg",
-        isbn: "978-0451524935",
-        genre: "Science Fiction",
-        price: 10.99,
-        discount: 15,
-        quantity: 15,
-        status: "Available",
-        mainImage: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1433739169i/25685842.jpg",
-        images: [], // Additional images array
-        publicationDate: "1949-06-08",
-        language: "English",
-        pages: 328,
-        overview:
-          "1984 is a dystopian novel by George Orwell published in 1949. The novel is set in Airstrip One, a province of the superstate Oceania in a world of perpetual war, omnipresent government surveillance, and public manipulation.",
-      },
-      {
-        id: 3,
-        title: "The Great Gatsby",
-        author: "F. Scott Fitzgerald",
-        publisher: "Charles Scribner's Sons",
-        isbn: "978-0743273565",
-        genre: "Fiction",
-        price: 9.99,
-        discount: 0,
-        quantity: 10,
-        status: "Available",
-        mainImage: "https://placeholder.svg?height=150&width=100",
-        images: [], // Additional images array
-        publicationDate: "1925-04-10",
-        language: "English",
-        pages: 180,
-        overview:
-          "The Great Gatsby is a 1925 novel by American writer F. Scott Fitzgerald. Set in the Jazz Age on Long Island, the novel depicts narrator Nick Carraway's interactions with mysterious millionaire Jay Gatsby and Gatsby's obsession to reunite with his former lover, Daisy Buchanan.",
-      },
-      {
-        id: 4,
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        publisher: "T. Egerton",
-        isbn: "978-0141439518",
-        genre: "Romance",
-        price: 8.99,
-        discount: 10,
-        quantity: 5,
-        status: "Available",
-        mainImage: "https://placeholder.svg?height=150&width=100",
-        images: [], // Additional images array
-        publicationDate: "1813-01-28",
-        language: "English",
-        pages: 432,
-        overview:
-          "Pride and Prejudice is an 1813 romantic novel of manners written by Jane Austen. The novel follows the character development of Elizabeth Bennet, the dynamic protagonist of the book who learns about the repercussions of hasty judgments and comes to appreciate the difference between superficial goodness and actual goodness.",
-      },
-      {
-        id: 5,
-        title: "The Hobbit",
-        author: "J.R.R. Tolkien",
-        publisher: "George Allen & Unwin",
-        isbn: "978-0547928227",
-        genre: "Fantasy",
-        price: 14.99,
-        discount: 20,
-        quantity: 0,
-        status: "Not Available",
-        mainImage: "https://placeholder.svg?height=150&width=100",
-        images: [], // Additional images array
-        publicationDate: "1937-09-21",
-        language: "English",
-        pages: 310,
-        overview:
-          "The Hobbit, or There and Back Again is a children's fantasy novel by English author J. R. R. Tolkien. It was published on 21 September 1937 to wide critical acclaim, being nominated for the Carnegie Medal and awarded a prize from the New York Herald Tribune for best juvenile fiction.",
-      },
-    ]
-    localStorage.setItem("books", JSON.stringify(books))
-  }
+  //console.log("data to be loaded ---------->", booksString, "type ", typeof (booksString));
+
+  let books = JSON.parse(booksString) || []
 
   displayBooks(books)
 }
@@ -239,7 +118,7 @@ function displayBooks(books) {
 
     booksTable.innerHTML += `
       <tr>
-        <td><img src="${book.mainImage}" alt="${book.title}" class="book-cover"></td>
+        <td><img src="Images/${book.mainImage}" alt="${book.title}" class="book-cover"></td> 
         <td>${book.title}</td>
         <td>${book.author}</td>
         <td>${book.genre}</td>
@@ -260,31 +139,13 @@ function displayBooks(books) {
 
 // Search books
 function searchBooks(searchTerm) {
-  // AJAX call to search books (commented out as backend is not ready)
-  /*
-  fetch(`/api/books/search?term=${encodeURIComponent(searchTerm)}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      displayBooks(data);
-    })
-    .catch(error => {
-      console.error('Error searching books:', error);
-      // Fall back to client-side search
-      clientSideSearch(searchTerm);
-    });
-  */
 
-  // For now, use client-side search
   clientSideSearch(searchTerm)
 }
 
 // Client-side search fallback
 function clientSideSearch(searchTerm) {
-  const books = JSON.parse(localStorage.getItem("books")) || []
+  const books = JSON.parse(booksString) || []
 
   if (!searchTerm) {
     displayBooks(books)
@@ -303,30 +164,10 @@ function clientSideSearch(searchTerm) {
 
 // Edit book
 function editBook(id) {
-  // AJAX call to get book details (commented out as backend is not ready)
-  /*
-  fetch(`/api/books/${id}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(book => {
-      populateBookForm(book);
-    })
-    .catch(error => {
-      console.error('Error fetching book details:', error);
-      // Fall back to localStorage
-      const books = JSON.parse(localStorage.getItem("books")) || [];
-      const book = books.find((book) => book.id === id);
-      if (book) {
-        populateBookForm(book);
-      }
-    });
-  */
+
 
   // For now, use localStorage
-  const books = JSON.parse(localStorage.getItem("books")) || []
+  const books = JSON.parse(booksString) || []
   const book = books.find((book) => book.id === id)
 
   if (book) {
@@ -354,16 +195,24 @@ function populateBookForm(book) {
   document.getElementById("overview").value = book.overview || ""
 
   // Set main image preview
+
+
   if (book.mainImage) {
-    document.getElementById("mainImagePreview").style.backgroundImage = `url(${book.mainImage})`
+    document.getElementById("mainImagePreview").style.backgroundImage = `url('Images/${book.mainImage}')`;
+
+
   }
+
+
+
 
   // Set additional image previews
   if (book.images && book.images.length > 0) {
     const previewIds = ["image1Preview", "image2Preview", "image3Preview", "image4Preview"]
     book.images.forEach((imageUrl, index) => {
+
       if (index < previewIds.length) {
-        document.getElementById(previewIds[index]).style.backgroundImage = `url(${imageUrl})`
+        document.getElementById(previewIds[index]).style.backgroundImage = `url('Images/${imageUrl}')`
       }
     })
   }
@@ -381,49 +230,14 @@ function confirmDelete(id) {
 function deleteBook() {
   const id = Number.parseInt(document.getElementById("confirmDeleteBtn").getAttribute("data-id"))
 
-  // AJAX call to delete book (commented out as backend is not ready)
-  /*
-  fetch(`/api/books/${id}`, {
-    method: 'DELETE',
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Update localStorage after successful deletion
-      let books = JSON.parse(localStorage.getItem("books")) || [];
-      books = books.filter((book) => book.id !== id);
-      localStorage.setItem("books", JSON.stringify(books));
-      
-      closeModal(document.getElementById("deleteModal"));
-      loadBooks();
-    })
-    .catch(error => {
-      console.error('Error deleting book:', error);
-      // Fall back to client-side deletion
-      clientSideDelete(id);
-    });
-  */
+  deleteWebSocket.send(id);
+  closeModal(document.getElementById("deleteModal"));
 
-  // For now, use client-side deletion
-  clientSideDelete(id)
-}
-
-// Client-side delete fallback
-function clientSideDelete(id) {
-  let books = JSON.parse(localStorage.getItem("books")) || []
-  books = books.filter((book) => book.id !== id)
-  localStorage.setItem("books", JSON.stringify(books))
-
-  closeModal(document.getElementById("deleteModal"))
-  loadBooks()
 }
 
 // Save book
 function saveBook() {
+
   const bookId = document.getElementById("bookId").value
   const title = document.getElementById("title").value
   const author = document.getElementById("author").value
@@ -440,28 +254,85 @@ function saveBook() {
   const pages = Number.parseInt(document.getElementById("pages").value)
   const overview = document.getElementById("overview").value
 
-  // Get main image from preview
-  let mainImage = "https://placeholder.svg?height=150&width=100"
-  const mainImagePreview = document.getElementById("mainImagePreview")
-  if (mainImagePreview.style.backgroundImage) {
-    const bgImage = mainImagePreview.style.backgroundImage
-    mainImage = bgImage.replace(/url\(['"](.+)['"]\)/, "$1")
+
+  const mainImageInput = document.getElementById("mainImage");
+
+
+  let mainImage = "bookCover.jpg";
+  if (bookId) {
+    const books = JSON.parse(booksString) || [];
+    console.log("-----books ", booksString);
+    console.log(bookId);
+    const book = books.find((book) => book.id == bookId)
+    if (book) {
+      mainImage = book.mainImage;
+
+    }
   }
 
-  // Get additional images from previews
-  const imagePreviewIds = ["image1Preview", "image2Preview", "image3Preview", "image4Preview"]
+
+
+  if (mainImageInput.files && mainImageInput.files[0]) {
+    const file = mainImageInput.files[0];
+    mainImage = file.name; // Get the image filename
+
+
+    const formData = new FormData();
+    formData.append("file", file); // Matches the name in getPart("file")
+
+    //upload the file
+    fetch("uploadServlet", {
+      method: "POST",
+      body: formData
+    })
+      .then(response => response.text())
+      .then(data => {
+        //document.getElementById("result").innerText = data;
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        //   document.getElementById("result").innerText = "Upload failed!";
+      });
+
+  }
+
+
+
+  const imagePreviewIds = ["image1", "image2", "image3", "image4"]
   const images = []
-  
+
   imagePreviewIds.forEach(previewId => {
+
     const preview = document.getElementById(previewId)
-    if (preview.style.backgroundImage) {
-      const bgImage = preview.style.backgroundImage
-      const imageUrl = bgImage.replace(/url\(['"](.+)['"]\)/, "$1")
-      images.push(imageUrl)
+
+    if (preview.files && preview.files[0]) {
+      images.push(preview.files[0].name); // Get the actual uploaded file name
+      const file = preview.files[0];
+      const formData = new FormData();
+      formData.append("file", file); // Matches the name in getPart("file")
+
+      //upload the file
+      fetch("uploadServlet", {
+        method: "POST",
+        body: formData
+      })
+        .then(response => response.text())
+        .then(data => {
+          //document.getElementById("result").innerText = data;
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          //   document.getElementById("result").innerText = "Upload failed!";
+        });
     }
+
   })
 
+
+  id = -1;
+
   const bookData = {
+    id,
     title,
     author,
     publisher,
@@ -480,109 +351,50 @@ function saveBook() {
     overview,
   }
 
+
+
   if (bookId) {
     // Update existing book
     bookData.id = Number.parseInt(bookId)
 
-    // AJAX call to update book (commented out as backend is not ready)
-    /*
-    fetch(`/api/books/${bookId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(bookData),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Update localStorage after successful update
-        updateLocalStorageBook(bookData);
-        
-        closeModal(document.getElementById("bookModal"));
-        loadBooks();
-      })
-      .catch(error => {
-        console.error('Error updating book:', error);
-        // Fall back to client-side update
-        updateLocalStorageBook(bookData);
-        closeModal(document.getElementById("bookModal"));
-        loadBooks();
-      });
-    */
-
     // For now, use client-side update
     updateLocalStorageBook(bookData)
   } else {
-    // Add new book
-    // AJAX call to add book (commented out as backend is not ready)
-    /*
-    fetch('/api/books', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(bookData),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Update localStorage after successful addition
-        addLocalStorageBook(data);
-        
-        closeModal(document.getElementById("bookModal"));
-        loadBooks();
-      })
-      .catch(error => {
-        console.error('Error adding book:', error);
-        // Fall back to client-side addition
-        addLocalStorageBook(bookData);
-        closeModal(document.getElementById("bookModal"));
-        loadBooks();
-      });
-    */
 
     // For now, use client-side addition
-    addLocalStorageBook(bookData)
+    let books = JSON.parse(booksString) || [];
+    bookData.id = books.length;
+    addBook(bookData)
   }
 
   closeModal(document.getElementById("bookModal"))
   loadBooks()
+
 }
 
 // Update book in localStorage
 function updateLocalStorageBook(bookData) {
-  const books = JSON.parse(localStorage.getItem("books")) || []
-  const index = books.findIndex((book) => book.id === bookData.id)
+  var jsonString = JSON.stringify(bookData); //convert into a json string
 
-  if (index !== -1) {
-    books[index] = {
-      ...books[index],
-      ...bookData,
-    }
-    localStorage.setItem("books", JSON.stringify(books))
-  }
+
+  editBookWebSokcet.send(jsonString);
+
+
+
 }
 
 // Add book to localStorage
-function addLocalStorageBook(bookData) {
-  const books = JSON.parse(localStorage.getItem("books")) || []
-  const newId = books.length > 0 ? Math.max(...books.map((book) => book.id)) + 1 : 1
+function addBook(bookData) {
 
-  books.push({
-    id: newId,
-    ...bookData,
-  })
 
-  localStorage.setItem("books", JSON.stringify(books))
+  var jsonString = JSON.stringify(bookData); //convert into a json string
+
+
+  addBookWebSokcet.send(jsonString);
+
+
+
+
 }
 
 // Helper functions
@@ -600,3 +412,97 @@ function closeModal(modal) {
 function formatCurrency(number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(number)
 }
+
+
+//-----------------------------------------------------------------------
+
+
+var viewWebSocket;
+var deleteWebSocket;
+var addBookWebSokcet;
+var editBookWebSokcet;
+function connect() {
+
+  console.log("In connect in books.js");
+
+
+  viewWebSocket = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/ViewBooks");
+  viewWebSocket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  viewWebSocket.onopen = onOpen;
+  viewWebSocket.onmessage = viewOnMessage;
+
+  //delete book websocket implementation
+  deleteWebSocket = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/DeleteBook");
+  deleteWebSocket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  deleteWebSocket.onopen = onOpen;
+  deleteWebSocket.onmessage = deleteOnMessage;
+
+  //add book websocket implementation
+  addBookWebSokcet = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/AddBook");
+  addBookWebSokcet.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  addBookWebSokcet.onopen = onOpen;
+  addBookWebSokcet.onmessage = addOnMessage;
+
+  //edit book websocket implementation
+  editBookWebSokcet = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/EditBook");
+  editBookWebSokcet.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  editBookWebSokcet.onopen = onOpen;
+  editBookWebSokcet.onmessage = editOnMessage;
+
+}
+
+function onOpen() {
+  console.log("connection established in books.js");
+
+}
+
+function viewOnMessage(event) {
+
+
+  booksString = event.data;
+  loadBooks();
+
+}
+
+function deleteOnMessage(event) {
+
+
+  booksString = event.data;
+  loadBooks();
+
+}
+
+
+function addOnMessage(event) {
+
+
+  booksString = event.data;
+  loadBooks();
+
+}
+
+function editOnMessage(event) {
+
+
+  booksString = event.data;
+  loadBooks();
+
+}
+
+

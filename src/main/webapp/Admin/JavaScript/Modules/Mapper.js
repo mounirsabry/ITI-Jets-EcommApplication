@@ -9,6 +9,8 @@ export class Mapper {
     static LOGIN_SERVICE = '/AdminLogin';
     static LOGOUT_SERVICE = '/Admin/Logout';
     static SEARCH_PRODUCTS_SERVICE = '/Admin/SearchProducts';
+
+
 }
 
 

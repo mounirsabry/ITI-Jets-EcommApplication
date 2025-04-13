@@ -1,10 +1,5 @@
+var usersString = [];
 document.addEventListener("DOMContentLoaded", () => {
-
-  //startGetAllDataWorker();
-  // Load users data
-  //loadUsers()
-
-  /*
 
   // Search functionality
   const searchBtn = document.getElementById("searchBtn")
@@ -48,95 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   // Make edit and delete buttons work globally
-  window.editUser = editUser
   window.confirmDelete = confirmDelete
-  */
+
 })
 
 // Load users from localStorage or initialize with sample data
 function loadUsers() {
-  // AJAX call to get users data (commented out as backend is not ready)
-  /*
-  fetch('/api/users')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Store users in localStorage for offline use
-      localStorage.setItem("users", JSON.stringify(data));
-      displayUsers(data);
-    })
-    .catch(error => {
-      console.error('Error fetching users:', error);
-      // Fall back to localStorage if API call fails
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      displayUsers(users);
-    });
-  */
 
-  // For now, use dummy data
-  let users = JSON.parse(localStorage.getItem("users")) || []
-
-  // If no users in localStorage, initialize with sample data
-  if (users.length === 0) {
-    users = [
-      {
-        id: 1,
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        phone: "555-123-4567",
-        address: "123 Main St, Anytown, CA 12345",
-        registrationDate: "2023-01-15",
-        orders: 3,
-      },
-      {
-        id: 2,
-        firstName: "Jane",
-        lastName: "Smith",
-        email: "jane.smith@example.com",
-        phone: "555-987-6543",
-        address: "456 Oak Ave, Somewhere, NY 67890",
-        registrationDate: "2023-01-20",
-        orders: 2,
-      },
-      {
-        id: 3,
-        firstName: "Robert",
-        lastName: "Johnson",
-        email: "robert.johnson@example.com",
-        phone: "555-456-7890",
-        address: "789 Pine St, Elsewhere, TX 54321",
-        registrationDate: "2023-02-05",
-        orders: 1,
-      },
-      {
-        id: 4,
-        firstName: "Emily",
-        lastName: "Davis",
-        email: "emily.davis@example.com",
-        phone: "555-789-0123",
-        address: "321 Maple Rd, Nowhere, FL 98765",
-        registrationDate: "2023-02-10",
-        orders: 1,
-      },
-      {
-        id: 5,
-        firstName: "Michael",
-        lastName: "Brown",
-        email: "michael.brown@example.com",
-        phone: "555-321-6547",
-        address: "654 Cedar Ln, Anywhere, WA 13579",
-        registrationDate: "2023-02-15",
-        orders: 1,
-      },
-    ]
-    localStorage.setItem("users", JSON.stringify(users))
-  }
-
+  let users = JSON.parse(usersString) || []
   displayUsers(users)
 }
 
@@ -167,32 +81,26 @@ function displayUsers(users) {
 
 // Search users
 function searchUsers(searchTerm) {
-  // AJAX call to search users (commented out as backend is not ready)
-  /*
-  fetch(`/api/users/search?term=${encodeURIComponent(searchTerm)}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      displayUsers(data);
-    })
-    .catch(error => {
-      console.error('Error searching users:', error);
-      // Fall back to client-side search
-      clientSideSearch(searchTerm);
-    });
-  */
+  const users = JSON.parse(usersString) || []
 
-  // For now, use client-side search
-  clientSideSearch(searchTerm)
+
+  if (!searchTerm) {
+    displayUsers(users)
+    return
+  }
+
+  const filteredUsers = users.filter(
+    (user) =>
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm) ||
+      user.email.toLowerCase().includes(searchTerm),
+  )
+
+  displayUsers(filteredUsers)
 }
 
 // Client-side search fallback
 function clientSideSearch(searchTerm) {
-  const users = JSON.parse(localStorage.getItem("users")) || []
+  const users = JSON.parse(usersString) || []
 
   if (!searchTerm) {
     displayUsers(users)
@@ -210,31 +118,9 @@ function clientSideSearch(searchTerm) {
 
 // Edit user
 function viewUser(id) {
-  // AJAX call to get user details (commented out as backend is not ready)
-  /*
-  fetch(`/api/users/${id}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(user => {
-      populateUserForm(user);
-    })
-    .catch(error => {
-      console.error('Error fetching user details:', error);
-      // Fall back to localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const user = users.find((user) => user.id === id);
-      if (user) {
-        populateUserForm(user);
-      }
-    });
-  */
 
   // For now, use localStorage
-  const users = JSON.parse(localStorage.getItem("users")) || []
+  const users = JSON.parse(usersString) || []
   const user = users.find((user) => user.id === id)
 
   if (user) {
@@ -263,121 +149,11 @@ function confirmDelete(id) {
 
 // Delete user
 function deleteUser() {
-  const id = Number.parseInt(document.getElementById("confirmDeleteBtn").getAttribute("data-id"))
+  const id = Number.parseInt(document.getElementById("confirmDeleteBtn").getAttribute("data-id"));
+  deleteWebSocket.send(id);
+  closeModal(document.getElementById("deleteModal"));
 
-  // AJAX call to delete user (commented out as backend is not ready)
-  /*
-  fetch(`/api/users/${id}`, {
-    method: 'DELETE',
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Update localStorage after successful deletion
-      let users = JSON.parse(localStorage.getItem("users")) || [];
-      users = users.filter((user) => user.id !== id);
-      localStorage.setItem("users", JSON.stringify(users));
-      
-      closeModal(document.getElementById("deleteModal"));
-      loadUsers();
-    })
-    .catch(error => {
-      console.error('Error deleting user:', error);
-      // Fall back to client-side deletion
-      clientSideDelete(id);
-    });
-  */
 
-  // For now, use client-side deletion
-  clientSideDelete(id)
-}
-
-// Client-side delete fallback
-function clientSideDelete(id) {
-  let users = JSON.parse(localStorage.getItem("users")) || []
-  users = users.filter((user) => user.id !== id)
-  localStorage.setItem("users", JSON.stringify(users))
-
-  closeModal(document.getElementById("deleteModal"))
-  loadUsers()
-}
-
-// Save user
-function saveUser() {
-  const userId = document.getElementById("userId").value
-  const firstName = document.getElementById("firstName").value
-  const lastName = document.getElementById("lastName").value
-  const email = document.getElementById("email").value
-  const phone = document.getElementById("phone").value
-  const address = document.getElementById("address").value
-
-  const userData = {
-    firstName,
-    lastName,
-    email,
-    phone,
-    address,
-  }
-
-  if (userId) {
-    // Update existing user
-    userData.id = Number.parseInt(userId)
-
-    // AJAX call to update user (commented out as backend is not ready)
-    /*
-    fetch(`/api/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Update localStorage after successful update
-        updateLocalStorageUser(userData);
-        
-        closeModal(document.getElementById("userModal"));
-        loadUsers();
-      })
-      .catch(error => {
-        console.error('Error updating user:', error);
-        // Fall back to client-side update
-        updateLocalStorageUser(userData);
-        closeModal(document.getElementById("userModal"));
-        loadUsers();
-      });
-    */
-
-    // For now, use client-side update
-    updateLocalStorageUser(userData)
-  }
-
-  closeModal(document.getElementById("userModal"))
-  loadUsers()
-}
-
-// Update user in localStorage
-function updateLocalStorageUser(userData) {
-  const users = JSON.parse(localStorage.getItem("users")) || []
-  const index = users.findIndex((user) => user.id === userData.id)
-
-  if (index !== -1) {
-    users[index] = {
-      ...users[index],
-      ...userData,
-    }
-    localStorage.setItem("users", JSON.stringify(users))
-  }
 }
 
 // Helper functions
@@ -403,7 +179,50 @@ function formatDate(dateString) {
 //-----------------------------------------------------------------------
 
 
+var viewWebSocket;
+var deleteWebSocket;
+function connect() {
 
 
+  viewWebSocket = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/ViewUsers");
+  viewWebSocket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  viewWebSocket.onopen = onOpen;
+  viewWebSocket.onmessage = viewOnMessage;
+
+  //delete user websocket implementation
+  deleteWebSocket = new WebSocket("ws://" + window.location.host + "/ITI-Jets-EcommApplication/Admin/DeleteUser");
+  deleteWebSocket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+
+  deleteWebSocket.onopen = onOpen;
+  deleteWebSocket.onmessage = deleteOnMessage;
+}
+
+function onOpen() {
+  console.log("connection established in users.js");
+
+}
+
+function viewOnMessage(event) {
+
+  console.log(event.data);
+  usersString = event.data;
+  loadUsers();
+
+}
+
+function deleteOnMessage(event) {
+
+  console.log(event.data);
+  usersString = event.data;
+  loadUsers();
+
+}
 
 

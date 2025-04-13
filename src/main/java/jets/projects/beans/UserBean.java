@@ -24,4 +24,8 @@ public class UserBean {
         this.orders = orders;
     }
 
+    public int getId() {
+        return id;
+    }
+
 }

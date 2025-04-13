@@ -14,7 +14,7 @@
                 href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
         </head>
 
-        <body onload="startGetAllDataWorker()">
+        <body onload="connect()">
             <div class="admin-container">
                 <!-- Sidebar Navigation -->
                 <aside class="sidebar">
@@ -28,7 +28,7 @@
                     </div>
                     <nav class="sidebar-nav">
                         <ul>
-                            <li><a href="dashboard.jsp"><span class="icon">📊</span> Dashboard</a></li>
+                            <!-- <li><a href="dashboard.jsp"><span class="icon">📊</span> Dashboard</a></li> -->
                             <li><a href="books.jsp"><span class="icon">📚</span> Books</a></li>
                             <li><a href="orders.jsp"><span class="icon">📦</span> Orders</a></li>
                             <li class="active"><a href="users.jsp"><span class="icon">👥</span> Users</a></li>

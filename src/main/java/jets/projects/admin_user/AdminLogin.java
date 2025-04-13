@@ -36,7 +36,7 @@ public class AdminLogin extends HttpServlet {
             session.setAttribute("adminLoggedIn", "true");
 
             response.sendRedirect(request.getContextPath()
-                    + AdminURLMapper.DASHBOARD_PAGE);
+                    + AdminURLMapper.BOOKS_PAGE);
             System.out.println(session.getAttribute("adminUsername"));
 
         } else {

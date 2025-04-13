@@ -128,6 +128,17 @@
         <url-pattern>/Error</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>uploadServlet</servlet-name>
+        <servlet-class>jets.projects.admin_user.UploadServlet</servlet-class>
+        
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>uploadServlet</servlet-name>
+        <url-pattern>/Admin/uploadServlet</url-pattern>
+    </servlet-mapping>
+
     <!--filters-->
       <filter>
         <filter-name>userLoginCheckFilter</filter-name>

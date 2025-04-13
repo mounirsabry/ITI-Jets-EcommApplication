@@ -28,7 +28,7 @@
                     </div>
                     <nav class="sidebar-nav">
                         <ul>
-                            <li><a href="dashboard.jsp"><span class="icon">📊</span> Dashboard</a></li>
+                            <!--    <li><a href="dashboard.jsp"><span class="icon">📊</span> Dashboard</a></li> -->
                             <li><a href="books.jsp"><span class="icon">📚</span> Books</a></li>
                             <li class="active"><a href="orders.jsp"><span class="icon">📦</span> Orders</a></li>
                             <li><a href="users.jsp"><span class="icon">👥</span> Users</a></li>

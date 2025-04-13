@@ -85,11 +85,10 @@ function initChartPlaceholders() {
         display: true
       },
       scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
+        y: {
+          type: 'linear', // optional but recommended
+          beginAtZero: true
+        }
       }
     }
   })
