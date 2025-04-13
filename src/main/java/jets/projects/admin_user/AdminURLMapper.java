@@ -20,6 +20,18 @@ public class AdminURLMapper {
 
     public static final String LOGIN_PAGE = "/Admin/admin_login.jsp";
     public static final String HOME_PAGE = "/Admin/admin_home.jspx";
-
     public static final String DASHBOARD_PAGE = "/Admin/dashboard.jsp";
+
+    // Purchase History URLs
+    public static final String PURCHASE_HISTORY = "/Admin/PurchaseHistory";
+    public static final String PURCHASE_HISTORY_SERVLET = "jets.projects.admin_user.purchaseHistory.PurchaseHistoryServlet";
+    public static final String PURCHASE_HISTORY_PAGE = "/purchase-history.jsp";
+
+    public static final String PURCHASE_HISTORY_API = "/Admin/PurchaseHistory/api";
+    public static final String PURCHASE_HISTORY_API_SERVLET = "PurchaseHistoryApiServlet";
+
+    public static final String PURCHASE_HISTORY_RECEIPT_API = "/Admin/PurchaseHistory/api/*";
+    public static final String PURCHASE_HISTORY_RECEIPT_SERVLET = "jets.projects.admin_user.purchaseHistory.ReceiptDetailsApiServlet";
+
+
 }

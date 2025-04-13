@@ -1,0 +1,152 @@
+package jets.projects.admin_user.discounts;
+
+
+import jets.projects.dto.BannerDTO;
+import com.google.gson.Gson;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet("/api/banners/*")
+@MultipartConfig
+public class BannerServlet extends HttpServlet {
+    private Gson gson = new Gson();
+    private List<BannerDTO> dummyBanners = new ArrayList<>();
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        // Initialize dummy data
+        dummyBanners.add(new BannerDTO(1L, "Spring Sale", "Get 20% off on all books!", "/images/banners/spring-sale.jpg"));
+        dummyBanners.add(new BannerDTO(2L, "New Arrivals", "Check out our latest books", "/images/banners/new-arrivals.jpg"));
+        dummyBanners.add(new BannerDTO(3L, "Best Sellers", "Most popular books this month", "/images/banners/best-sellers.jpg"));
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/"))
+            out.print(gson.toJson(dummyBanners));
+        else {
+
+            try {
+                long id = Long.parseLong(pathInfo.substring(1));
+                BannerDTO banner = findBannerById(id);
+
+                if (banner != null)
+                    out.print(gson.toJson(banner));
+                else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.print(gson.toJson(Map.of("error", "Banner not found")));
+                }
+            } catch (NumberFormatException e) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print(gson.toJson(Map.of("error", "Invalid banner ID")));
+            }
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        BannerDTO newBanner = new BannerDTO(
+                Long.valueOf(dummyBanners.size() + 1),
+                "New Banner",
+                "Banner description",
+                "/images/banners/new-banner.jpg"
+        );
+
+        dummyBanners.add(newBanner);
+
+        out.print(gson.toJson(Map.of("success", true, "banner", newBanner)));
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print(gson.toJson(Map.of("error", "Banner ID is required")));
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(pathInfo.substring(1));
+            BannerDTO banner = findBannerById(id);
+
+            if (banner != null) {
+                // In a real application, you would update the banner with form data
+                banner.setTitle("Updated Banner");
+                banner.setText("Updated description");
+
+                out.print(gson.toJson(Map.of("success", true, "banner", banner)));
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.print(gson.toJson(Map.of("error", "Banner not found")));
+            }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print(gson.toJson(Map.of("error", "Invalid banner ID")));
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print(gson.toJson(Map.of("error", "Banner ID is required")));
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(pathInfo.substring(1));
+            BannerDTO banner = findBannerById(id);
+
+            if (banner != null) {
+                dummyBanners.remove(banner);
+                out.print(gson.toJson(Map.of("success", true)));
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.print(gson.toJson(Map.of("error", "Banner not found")));
+            }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print(gson.toJson(Map.of("error", "Invalid banner ID")));
+        }
+    }
+
+    private BannerDTO findBannerById(long id) {
+        return dummyBanners.stream()
+                .filter(banner -> banner.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+}

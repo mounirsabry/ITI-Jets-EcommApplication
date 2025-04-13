@@ -33,7 +33,6 @@
                             <li><a href="orders.jsp"><span class="icon">📦</span> Orders</a></li>
                             <li><a href="users.jsp"><span class="icon">👥</span> Users</a></li>
                             <li><a href="discounts.jsp"><span class="icon">🏷️</span> Discounts</a></li>
-                            <li><a href="purchase-history.jsp"><span class="icon">📝</span> Purchase History</a></li>
                             <li class="logout"><a href="#" id="logoutBtn"><span class="icon">🚪</span> Logout</a></li>
                         </ul>
                     </nav>

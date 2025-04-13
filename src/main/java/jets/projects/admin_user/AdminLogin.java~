@@ -19,8 +19,6 @@ public class AdminLogin extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("AdminLogin.doPost() called");
-
         String adminUsername = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -28,15 +26,11 @@ public class AdminLogin extends HttpServlet {
         System.out.println("password: " + password);
 
         String error = checkInputForError(adminUsername, password);
-        System.out.println("Error: " + error);
         if (error != null) {
             response.sendRedirect(request.getContextPath() + AdminURLMapper.LOGIN_PAGE +
                     "?errorMessage=" + URLEncoder.encode(error, "UTF-8"));
-            System.out.println("Redirected to login page");
             return;
         }
-
-        System.out.println("Inputs validated");
 
         if (adminUsername.trim().equals("admin") && password.trim().equals("admin123")) {
 
@@ -50,25 +44,19 @@ public class AdminLogin extends HttpServlet {
 
             System.out.println("Session adminID set to: " + session.getAttribute("adminID"));
             response.sendRedirect(request.getContextPath() + AdminURLMapper.DASHBOARD_PAGE);
-            System.out.println("Redirected to dashboard page");
         } else {
             response.sendRedirect(request.getContextPath() + AdminURLMapper.LOGIN_PAGE +
                     "?errorMessage=" + URLEncoder.encode("Invalid username or password", "UTF-8"));
-            System.out.println("Redirected to login page with error message");
         }
     }
 
     private String checkInputForError(String adminUsername, String password) {
-        System.out.println("Checking inputs for errors");
         if (adminUsername == null || adminUsername.trim().isEmpty()) {
-            System.out.println("Username cannot be empty");
             return "Username must be provided and cannot be empty.";
         }
         if (password == null || password.trim().isEmpty()) {
-            System.out.println("Password cannot be empty");
             return "Password must be provided and cannot be empty.";
         }
-        System.out.println("Inputs are valid");
         return null;
     }
 }

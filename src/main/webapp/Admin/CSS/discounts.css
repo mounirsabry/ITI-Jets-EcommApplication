@@ -215,17 +215,25 @@
   padding: 0.25rem 0.5rem;
 }
 
-.book-cover {
-  width: 50px;
-  height: 75px;
-  object-fit: cover;
+/* Add styles for the discount operation dropdown */
+#discountOperation {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
   transition: var(--transition);
 }
 
-.book-cover:hover {
-  transform: scale(1.2);
-  box-shadow: var(--shadow);
+#discountOperation:hover {
+  border-color: var(--gray-color);
+}
+
+#discountOperation:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
 }
 
 /* Responsive */
@@ -238,4 +246,3 @@
     flex-direction: row;
   }
 }
-
