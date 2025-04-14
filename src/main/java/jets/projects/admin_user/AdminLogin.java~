@@ -28,7 +28,7 @@ public class AdminLogin extends HttpServlet {
         // Check in database using AdminService
         AdminService adminService = new AdminService();
         Admin admin = adminService.getByUsername(adminUsername);
-        if (admin != null && admin.getHashPassword().equals(password.trim())) {
+        if (admin != null && admin.gethashPassword().equals(password.trim())) {
             // Data is correct
             // Create a new session if not existed, and refresh old one if exists.
             HttpSession session = request.getSession(false);

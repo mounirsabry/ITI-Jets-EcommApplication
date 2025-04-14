@@ -14,7 +14,7 @@
                 href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
         </head>
 
-        <body>
+        <body onload="connect()">
             <div class="admin-container">
                 <!-- Sidebar Navigation -->
                 <aside class="sidebar">
@@ -185,7 +185,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="mainImage">Main Image*</label>
-                                <input type="file" id="mainImage" name="mainImage" accept="image/*" required>
+                                <input type="file" id="mainImage" name="mainImage" accept="image/*">
                                 <div id="mainImagePreview" class="image-preview"></div>
                             </div>
                             <div class="form-group">
@@ -243,7 +243,7 @@
             </div>
 
             <script src="JavaScript/common.js"></script>
-            <script src="JavaScript/books.js"></script>
+            <script src="JavaScript/books_.js"></script>
         </body>
 
         </html>

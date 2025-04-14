@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 
 
+
+
+
   // Sidebar toggle
   const sidebarToggle = document.getElementById("sidebarToggle")
   const sidebar = document.querySelector(".sidebar")

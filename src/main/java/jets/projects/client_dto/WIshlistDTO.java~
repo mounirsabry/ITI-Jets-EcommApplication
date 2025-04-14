@@ -1,0 +1,46 @@
+package jets.projects.client_dto;
+
+import jakarta.persistence.*;
+import jets.projects.entity.Book;
+import jets.projects.entity.User;
+
+public class WIshlistDTO
+{
+    private Long wishlistId;
+
+    private UserDTO user;
+
+    private BookDTO book;
+
+    public WIshlistDTO() {}
+
+    public WIshlistDTO(Long wishlistId, UserDTO user, BookDTO book) {
+        this.wishlistId = wishlistId;
+        this.user = user;
+        this.book = book;
+    }
+
+    public Long getWishlistId() {
+        return wishlistId;
+    }
+
+    public void setWishlistId(Long wishlistId) {
+        this.wishlistId = wishlistId;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+    }
+
+    public BookDTO getBook() {
+        return book;
+    }
+
+    public void setBook(BookDTO book) {
+        this.book = book;
+    }
+}

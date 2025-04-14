@@ -56,4 +56,6 @@ public class AdminURLMapper {
     // Discounts URLs
     public static final String DISCOUNTS = "/Admin/DiscountsServlet";
     public static final String DISCOUNTS_SERVLET = "jets.projects.admin_user.discounts.DiscountsServlet";
+
+    public static final String BOOKS_PAGE = "/Admin/books.jsp";
 }

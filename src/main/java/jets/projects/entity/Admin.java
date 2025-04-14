@@ -18,6 +18,6 @@ public class Admin
     @Column(name = "hash_password", nullable = false, length = 255)
     private String hashPassword;
 
-    @Column(name = "display_name", nullable = false, length = 100)
-    private String displayName;
+    @Column(name = "username", nullable = false, unique = true, length = 100)
+    private String username;
 }

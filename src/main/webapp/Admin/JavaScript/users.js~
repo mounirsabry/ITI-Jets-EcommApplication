@@ -154,6 +154,18 @@ function deleteUser() {
   closeModal(document.getElementById("deleteModal"));
 
 
+// Update user in localStorage
+function updateLocalStorageUser(userData) {
+  const users = JSON.parse(localStorage.getItem("users")) || []
+  const index = users.findIndex((user) => user.id === userData.id)
+
+  if (index !== -1) {
+    users[index] = {
+      ...users[index],
+      ...userData,
+    }
+    localStorage.setItem("users", JSON.stringify(users))
+  }
 }
 
 // Helper functions

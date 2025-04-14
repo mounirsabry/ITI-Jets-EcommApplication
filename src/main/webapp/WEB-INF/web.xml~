@@ -9,6 +9,7 @@
     <listener-class>jets.projects.listeners.AppStartupListener</listener-class>
   </listener>
 
+
   <!-- Admin Servlets -->
   <servlet>
     <servlet-name>AdminRootRedirect</servlet-name>
@@ -41,6 +42,7 @@
     <servlet-class>jets.projects.admin_user.AdminUsers</servlet-class>
   </servlet>
 
+
   <!-- Admin Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>AdminRootRedirect</servlet-name>
@@ -72,6 +74,7 @@
     <url-pattern>/Admin/AdminUsers</url-pattern>
   </servlet-mapping>
 
+
   <!-- Orders Servlets -->
   <servlet>
     <servlet-name>OrdrersServlet</servlet-name>
@@ -83,6 +86,7 @@
     <servlet-class>jets.projects.admin_user.orders.UpdateOrderStatusServlet</servlet-class>
   </servlet>
 
+
   <!-- Orders Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>OrdrersServlet</servlet-name>
@@ -93,6 +97,7 @@
     <servlet-name>UpdateOrderStatusServlet</servlet-name>
     <url-pattern>/Admin/UpdateOrderStatusServlet</url-pattern>
   </servlet-mapping>
+
 
   <!-- Purchase History Servlets -->
   <servlet>
@@ -110,21 +115,23 @@
     <servlet-class>jets.projects.admin_user.purchaseHistory.ReceiptDetailsApiServlet</servlet-class>
   </servlet>
 
+
   <!-- Purchase History Servlet Mappings -->
   <servlet-mapping>
-    <servlet-name>PurchaseHistoryServlet</servlet-name>
+    <servlet-name>AdminDirector</servlet-name>
     <url-pattern>/Admin/PurchaseHistory</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>PurchaseHistoryApiServlet</servlet-name>
+    <servlet-name>AdminDirector</servlet-name>
     <url-pattern>/Admin/PurchaseHistory/api</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>ReceiptDetailsApiServlet</servlet-name>
+    <servlet-name>AdminDirector</servlet-name>
     <url-pattern>/Admin/PurchaseHistory/api/*</url-pattern>
   </servlet-mapping>
+
 
   <!-- Discounts Admin Servlets -->
   <servlet>
@@ -147,6 +154,7 @@
     <servlet-class>jets.projects.admin_user.discounts.DiscountsServlet</servlet-class>
   </servlet>
 
+
   <!-- Discounts Admin Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>BannersServlet</servlet-name>
@@ -167,6 +175,7 @@
     <servlet-name>DiscountsServlet</servlet-name>
     <url-pattern>/Admin/DiscountsServlet</url-pattern>
   </servlet-mapping>
+
 
   <!-- User Servlets -->
   <servlet>
@@ -195,6 +204,7 @@
     <servlet-class>jets.projects.normal_user.UserSearchProducts</servlet-class>
   </servlet>
 
+
   <!-- User Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>UserDirector</servlet-name>
@@ -221,6 +231,7 @@
     <url-pattern>/SearchProducts</url-pattern>
   </servlet-mapping>
 
+
   <!-- Error Handler -->
   <servlet>
     <servlet-name>ErrorHandler</servlet-name>
@@ -232,11 +243,10 @@
     <url-pattern>/Error</url-pattern>
   </servlet-mapping>
 
-  <!-- Upload Servlet -->
-  <servlet>
-    <servlet-name>uploadServlet</servlet-name>
-    <servlet-class>jets.projects.admin_user.UploadServlet</servlet-class>
-  </servlet>
+    <servlet>
+        <servlet-name>uploadServlet</servlet-name>
+        <servlet-class>jets.projects.admin_user.UploadServlet</servlet-class>
+    </servlet>
 
   <servlet-mapping>
     <servlet-name>uploadServlet</servlet-name>
@@ -253,6 +263,7 @@
     <filter-name>userLoginCheckFilter</filter-name>
     <url-pattern>/Admin/*</url-pattern>
   </filter-mapping>
+
 
   <!-- Welcome Files -->
   <welcome-file-list>
