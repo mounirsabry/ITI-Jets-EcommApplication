@@ -4,8 +4,8 @@ public class UserURLMapper {
 
     public static final String ERROR_PAGE = "/Error/error_page.jspx";
 
-    public static final String LOGIN = "/Login";
-    public static final String LOGIN_SERVLET = "UserLogin";
+    public static final String USER_LOGIN = "/userLogin";
+    public static final String USER_LOGIN_SERVLET = "UserLogin";
 
     public static final String REGISTER = "/Register";
     public static final String REGISTER_SERVLET = "UserRegister";
@@ -34,5 +34,50 @@ public class UserURLMapper {
 
     public static final String USER_GET_BOOK_DETAILS = "/userGetBookDetails";
     public static final String USER_GET_BOOK_DETAILS_SERVLET = "UserGetBookDetails";
+
+    public static final String USER_REGISTER = "/userRegister";
+    public static final String USER_REGISTER_SERVLET = "UserRegister";
+
+    // Get User Profile
+    public static final String USER_GET_PROFILE = "/userGetProfile";
+    public static final String USER_GET_PROFILE_SERVLET = "UserGetProfile";
+
+    // Update Email
+    public static final String USER_UPDATE_EMAIL = "/userUpdateEmail";
+    public static final String USER_UPDATE_EMAIL_SERVLET = "UserUpdateEmail";
+
+    // Update Password
+    public static final String USER_UPDATE_PASSWORD = "/userUpdatePassword";
+    public static final String USER_UPDATE_PASSWORD_SERVLET = "UserUpdatePassword";
+
+    // Update Personal Details
+    public static final String USER_UPDATE_PERSONAL_DETAILS = "/userUpdatePersonalDetails";
+    public static final String USER_UPDATE_PERSONAL_DETAILS_SERVLET = "UserUpdatePersonalDetails";
+
+    // Recharge Account Balance
+    public static final String USER_RECHARGE_ACCOUNT = "/userRechargeAccountBalanceUsingCreditCard";
+    public static final String USER_RECHARGE_ACCOUNT_SERVLET = "UserRechargeAccountBalanceUsingCreditCard";
+
+    // Cart Section
+    public static final String USER_GET_CART = "/userGetCart";
+    public static final String USER_GET_CART_SERVLET = "UserGetCart";
+
+    public static final String USER_VALIDATE_CART = "/userValidateCart";
+    public static final String USER_VALIDATE_CART_SERVLET = "UserValidateCart";
+
+    public static final String USER_GET_CART_SHIPPING_FEE = "/userGetCartShippingFee";
+    public static final String USER_GET_CART_SHIPPING_FEE_SERVLET = "UserGetCartShippingFee";
+
+    public static final String USER_ADD_ITEM_TO_CART = "/userAddItemToCart";
+    public static final String USER_ADD_ITEM_TO_CART_SERVLET = "UserAddItemToCart";
+
+    public static final String USER_UPDATE_CART_ITEM_QUANTITY = "/userUpdateCartItemQuantity";
+    public static final String USER_UPDATE_CART_ITEM_QUANTITY_SERVLET = "UserUpdateCartItemQuantity";
+
+    public static final String USER_REMOVE_CART_ITEM = "/userRemoveCartItem";
+    public static final String USER_REMOVE_CART_ITEM_SERVLET = "UserRemoveCartItem";
+
+    public static final String USER_TRUNCATE_CART = "/userTruncateCart";
+    public static final String USER_TRUNCATE_CART_SERVLET = "UserTruncateCart";
 
 }

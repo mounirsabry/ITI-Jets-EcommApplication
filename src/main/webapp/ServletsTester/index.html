@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Test</title>
+    <link rel="stylesheet" href="CSS/main.css" />
+    <link rel="stylesheet" href="CSS/PopupMessage.css" />
+</head>
+
+<body>
+<div class="container">
+    <h1>API Test Interface</h1>
+    <div class="manager-test">
+        <h2>Books Manager</h2>
+        <button id="getTopSellingBtn">Get Top Selling</button>
+        <pre id="booksTopSellingOutput" class="output"></pre>
+
+        <button id="getTopSellingGenresBtn">Get Top Selling in Genres</button>
+        <pre id="booksTopSellingGenresOutput" class="output"></pre>
+
+        <button id="getAllBooksBtn">Get All Books</button>
+        <pre id="booksAllOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="booksSearchInput">Enter keywords</label>
+            <input type="text" id="booksSearchInput" />
+        </div>
+        <button id="searchBooksBtn">Search Books</button>
+        <pre id="booksSearchOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="booksDetailsInput">Enter Book ID</label>
+            <input type="text" id="booksDetailsInput" />
+        </div>
+        <button id="getBookDetailsBtn">Get Book Details</button>
+        <pre id="booksDetailsOutput" class="output"></pre>
+    </div>
+    <div class="manager-test">
+        <h2>Cart Manager</h2>
+        <div class="input-wrapper">
+            <label for="cartUserId">Enter User ID</label>
+            <input type="text" id="cartUserId" />
+        </div>
+        <button id="getCartBtn">Get Cart</button>
+        <pre id="cartOutput" class="output"></pre>
+
+        <button id="validateCartBtn">Validate Cart</button>
+        <pre id="cartValidateOutput" class="output"></pre>
+
+        <button id="getShippingFeeBtn">Get Shipping Fee</button>
+        <pre id="cartShippingFeeOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="cartAddBookId">Enter Book ID</label>
+            <input type="text" id="cartAddBookId" />
+        </div>
+        <div class="input-wrapper">
+            <label for="cartAddQuantity">Enter Quantity</label>
+            <input type="number" id="cartAddQuantity" />
+        </div>
+        <button id="addToCartBtn">Add to Cart</button>
+        <pre id="cartAddOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="cartUpdateBookId">Enter Book ID</label>
+            <input type="text" id="cartUpdateBookId" />
+        </div>
+        <div class="input-wrapper">
+            <label for="cartUpdateQuantity">Enter New Quantity</label>
+            <input type="number" id="cartUpdateQuantity" />
+        </div>
+        <button id="updateCartBtn">Update Cart</button>
+        <pre id="cartUpdateOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="cartRemoveBookId">Enter Book ID</label>
+            <input type="text" id="cartRemoveBookId" />
+        </div>
+        <button id="removeFromCartBtn">Remove from Cart</button>
+        <pre id="cartRemoveOutput" class="output"></pre>
+
+        <button id="truncateCartBtn">Truncate Cart</button>
+        <pre id="cartTruncateOutput" class="output"></pre>
+    </div>
+    <div class="manager-test">
+        <h2>Orders Manager</h2>
+        <div class="input-wrapper">
+            <label for="ordersUserId">Enter User ID</label>
+            <input type="text" id="ordersUserId" />
+        </div>
+        <button id="getOrdersBtn">Get Orders</button>
+        <pre id="ordersOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="ordersOrderId">Enter Order ID</label>
+            <input type="text" id="ordersOrderId" />
+        </div>
+        <button id="getOrderDetailsBtn">Get Order Details</button>
+        <pre id="orderDetailsOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="ordersAddress">Enter Address</label>
+            <input type="text" id="ordersAddress" />
+        </div>
+        <button id="checkoutAccountBalanceBtn">Checkout Using Account Balance</button>
+        <pre id="ordersCheckoutAccountBalanceOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="ordersCreditCardName">Name on Card</label>
+            <input type="text" id="ordersCreditCardName" />
+        </div>
+        <div class="input-wrapper">
+            <label for="ordersCreditCardNumber">Card Number</label>
+            <input type="text" id="ordersCreditCardNumber" />
+        </div>
+        <div class="input-wrapper">
+            <label for="ordersCreditCardExpiryYear">Expiry Year</label>
+            <input type="text" id="ordersCreditCardExpiryYear" />
+        </div>
+        <div class="input-wrapper">
+            <label for="ordersCreditCardExpiryMonth">Expiry Month</label>
+            <input type="text" id="ordersCreditCardExpiryMonth" />
+        </div>
+        <div class="input-wrapper">
+            <label for="ordersCreditCardCvc">CVC</label>
+            <input type="text" id="ordersCreditCardCvc" />
+        </div>
+        <button id="checkoutCreditCardBtn">Checkout Using Credit Card</button>
+        <pre id="ordersCheckoutCreditCardOutput" class="output"></pre>
+    </div>
+    <div class="manager-test">
+        <h2>Profile Manager</h2>
+        <h3>Login</h3>
+        <div class="input-wrapper">
+            <label for="profileEmail">Enter Email</label>
+            <input type="email" id="profileEmail" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profilePassword">Enter Password</label>
+            <input type="password" id="profilePassword" />
+        </div>
+        <button id="loginBtn">Login</button>
+        <pre id="profileLoginOutput" class="output"></pre>
+
+        <h3>Register</h3>
+        <div class="input-wrapper">
+            <label for="profileRegisterUsername">Username</label>
+            <input type="text" id="profileRegisterUsername" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileRegisterEmail">Email</label>
+            <input type="email" id="profileRegisterEmail" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileRegisterPassword">Password</label>
+            <input type="password" id="profileRegisterPassword" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileRegisterPhoneNumber">Phone Number</label>
+            <input type="text" id="profileRegisterPhoneNumber" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileRegisterAddress">Address</label>
+            <input type="text" id="profileRegisterAddress" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileRegisterBirthdate">Birthdate (YYYY-MM-DD)</label>
+            <input type="date" id="profileRegisterBirthdate" />
+        </div>
+        <button id="registerBtn">Register</button>
+        <pre id="profileRegisterOutput" class="output"></pre>
+
+        <h3>Get Profile</h3>
+        <div class="input-wrapper">
+            <label for="profileUserId">Enter User ID</label>
+            <input type="text" id="profileUserId" />
+        </div>
+        <button id="getProfileBtn">Get Profile</button>
+        <pre id="profileOutput" class="output"></pre>
+
+        <h3>Update Email</h3>
+        <div class="input-wrapper">
+            <label for="profileNewEmail">Enter New Email</label>
+            <input type="text" id="profileNewEmail" />
+        </div>
+        <button id="updateEmailBtn">Update Email</button>
+        <pre id="profileUpdateEmailOutput" class="output"></pre>
+
+        <h3>Update Password</h3>
+        <div class="input-wrapper">
+            <label for="profileCurrentPassword">Enter Current Password</label>
+            <input type="password" id="profileCurrentPassword" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileNewPassword">Enter New Password</label>
+            <input type="password" id="profileNewPassword" />
+        </div>
+        <button id="updatePasswordBtn">Update Password</button>
+        <pre id="profileUpdatePasswordOutput" class="output"></pre>
+
+        <h3>Update Details</h3>
+        <div class="input-wrapper">
+            <label for="profileUsername">Enter Username</label>
+            <input type="text" id="profileUsername" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profilePhoneNumber">Enter Phone Number</label>
+            <input type="text" id="profilePhoneNumber" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileAddress">Enter Address</label>
+            <input type="text" id="profileAddress" />
+        </div>
+        <div class="input-wrapper">
+            <label for="profileBirthdate">Enter Birthdate (YYYY-MM-DD)</label>
+            <input type="date" id="profileBirthdate" />
+        </div>
+        <button id="updateDetailsBtn">Update Details</button>
+        <pre id="profileUpdateDetailsOutput" class="output"></pre>
+
+        <h3>Recharge Balance Using Credit Card</h3>
+        <div class="input-wrapper">
+            <label for="rechargeBalanceCreditCardName">Name on Card</label>
+            <input type="text" id="rechargeBalanceCreditCardName" />
+        </div>
+        <div class="input-wrapper">
+            <label for="rechargeBalanceCreditCardNumber">Card Number</label>
+            <input type="text" id="rechargeBalanceCreditCardNumber" />
+        </div>
+        <div class="input-wrapper">
+            <label for="rechargeBalanceCreditCardExpiryYear">Expiry Year</label>
+            <input type="text" id="rechargeBalanceCreditCardExpiryYear" />
+        </div>
+        <div class="input-wrapper">
+            <label for="rechargeBalanceCreditCardExpiryMonth">Expiry Month</label>
+            <input type="text" id="rechargeBalanceCreditCardExpiryMonth" />
+        </div>
+        <div class="input-wrapper">
+            <label for="rechargeBalanceCreditCardCvc">CVC</label>
+            <input type="text" id="rechargeBalanceCreditCardCvc" />
+        </div>
+        <div class="input-wrapper">
+            <label for="rechargeBalance">Enter Amount</label>
+            <input type="number" id="rechargeBalance" />
+        </div>
+        <button id="rechargeBalanceUsingCreditCardBtn">Recharge Balance</button>
+        <pre id="profileRechargeBalanceUsingCreditCardOutput" class="output"></pre>
+    </div>
+
+    <div class="manager-test">
+        <h2>Wishlist Manager</h2>
+        <div class="input-wrapper">
+            <label for="wishlistUserId">Enter User ID</label>
+            <input type="text" id="wishlistUserId" />
+        </div>
+        <button id="getAllWishlistItemsBtn">Get All Wishlist Items</button>
+        <pre id="wishlistAllItemsOutput" class="output"></pre>
+
+        <button id="getAllWishListBooksBtn">Get All Books in the WishList</button>
+        <pre id="wishlistAllBooksOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="wishlistAddBookId">Enter Book ID to Add</label>
+            <input type="text" id="wishlistAddBookId" />
+        </div>
+        <button id="addToWishlistBtn">Add Book to Wishlist</button>
+        <pre id="wishlistAddOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="wishlistRemoveBookId">Enter Book ID to Remove</label>
+            <input type="text" id="wishlistRemoveBookId" />
+        </div>
+        <button id="removeFromWishlistBtn">Remove Book from Wishlist</button>
+        <pre id="wishlistRemoveOutput" class="output"></pre>
+    </div>
+
+    <div class="manager-test">
+        <h2>Purchase History Manager</h2>
+        <div class="input-wrapper">
+            <label for="purchaseHistoryUserId">Enter User ID</label>
+            <input type="text" id="purchaseHistoryUserId" />
+        </div>
+        <button id="getAllPurchaseHistoryBtn">Get All Purchase History</button>
+        <pre id="purchaseHistoryAllOutput" class="output"></pre>
+
+        <div class="input-wrapper">
+            <label for="purchaseHistoryId">Enter Purchase History ID</label>
+            <input type="text" id="purchaseHistoryId" />
+        </div>
+        <button id="getPurchaseHistoryItemBtn">Get Specific Purchase History</button>
+        <pre id="purchaseHistoryItemOutput" class="output"></pre>
+    </div>
+</div>
+
+<script type="module" src="JavaScript/script.js"></script>
+</body>
+
+</html>

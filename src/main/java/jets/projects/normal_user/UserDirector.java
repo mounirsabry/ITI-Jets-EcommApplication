@@ -58,6 +58,8 @@ public class UserDirector extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
         String servletPath = request.getServletPath();
 
         // Also handles requests at root of the application.
@@ -74,6 +76,13 @@ public class UserDirector extends HttpServlet {
         } else if (servletPath.equals(UserURLMapper.SEARCH)) {
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.SEARCH_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_LOGIN)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_LOGIN_SERVLET);
             dispatcher.forward(request, response);
             return;
         }
@@ -119,6 +128,43 @@ public class UserDirector extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
+        if (servletPath.equals(UserURLMapper.USER_REGISTER)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_REGISTER_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        // Get User Profile
+        if (servletPath.equals(UserURLMapper.USER_GET_PROFILE)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_PROFILE_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } // Cart Endpoints
+        else if (servletPath.equals(UserURLMapper.USER_GET_CART)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_CART_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+
+        } else if (servletPath.equals(UserURLMapper.USER_VALIDATE_CART)) {
+
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_VALIDATE_CART_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } else if (servletPath.equals(UserURLMapper.USER_GET_CART_SHIPPING_FEE)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_CART_SHIPPING_FEE_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } else if (servletPath.equals(UserURLMapper.USER_TRUNCATE_CART)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_TRUNCATE_CART_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
 
         directToErrorPage(request, response,
                 "No Get Method Registered for this URL.");
@@ -127,16 +173,72 @@ public class UserDirector extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+
         String servletPath = request.getServletPath();
 
-        if (servletPath.equals(UserURLMapper.LOGIN)) {
+        if (servletPath.equals(UserURLMapper.USER_LOGIN)) {
             var dispatcher = getServletContext().getNamedDispatcher(
-                    UserURLMapper.LOGIN_SERVLET);
+                    UserURLMapper.USER_LOGIN_SERVLET);
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.REGISTER)) {
+            System.out.println("user register");
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.REGISTER_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } else if (servletPath.equals(UserURLMapper.USER_REGISTER)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_REGISTER_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+        // Update Email
+        if (servletPath.equals(UserURLMapper.USER_UPDATE_EMAIL)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_UPDATE_EMAIL_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        // Update Password
+        if (servletPath.equals(UserURLMapper.USER_UPDATE_PASSWORD)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_UPDATE_PASSWORD_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        // Update Personal Details
+        if (servletPath.equals(UserURLMapper.USER_UPDATE_PERSONAL_DETAILS)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_UPDATE_PERSONAL_DETAILS_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        // Recharge Account Balance
+        if (servletPath.equals(UserURLMapper.USER_RECHARGE_ACCOUNT)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_RECHARGE_ACCOUNT_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } // Cart Endpoints
+        else if (servletPath.equals(UserURLMapper.USER_ADD_ITEM_TO_CART)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_ADD_ITEM_TO_CART_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } else if (servletPath.equals(UserURLMapper.USER_UPDATE_CART_ITEM_QUANTITY)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_UPDATE_CART_ITEM_QUANTITY_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        } else if (servletPath.equals(UserURLMapper.USER_REMOVE_CART_ITEM)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_REMOVE_CART_ITEM_SERVLET);
             dispatcher.forward(request, response);
             return;
         }
