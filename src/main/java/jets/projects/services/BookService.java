@@ -1,24 +1,23 @@
 package jets.projects.services;
 
-import jets.projects.dao.BookDao;
-import jets.projects.client_dto.BookDto;
-import jets.projects.client_dto.BookImageDto;
-import jets.projects.entity.Book;
-import jets.projects.exceptions.NotFoundException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BookService
-{
+import jets.projects.client_dto.BookDto;
+import jets.projects.client_dto.BookImageDto;
+import jets.projects.dao.BookDao;
+import jets.projects.entity.Book;
+import jets.projects.exceptions.NotFoundException;
+
+public class BookService {
+
     private final BookDao bookDao;
 
     public BookService() {
         this.bookDao = new BookDao();
     }
 
-    private BookDto convertToDto(Book book)
-    {
+    private BookDto convertToDto(Book book) {
         BookDto dto = new BookDto();
         dto.setBookId(book.getBookId());
         dto.setTitle(book.getTitle());
@@ -48,46 +47,47 @@ public class BookService
         return dto;
     }
 
-    public List<BookDto> getTopSellingBooks()
-    {
+    public List<BookDto> getTopSellingBooks() {
         List<Book> books = bookDao.findTopSellingBooks(10);
         return books.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public List<BookDto> getTopSellingBooksByGenre()
-    {
+    public List<BookDto> getTopSellingBooksByGenre() {
         List<Book> books = bookDao.findTopSellingBooksByGenre();
+
+        // Force initialize lazy collections before session closes
+        books.forEach(book -> book.getImages().size());
         return books.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public List<BookDto> getAllBooks()
-    {
+    public List<BookDto> getAllBooks() {
         List<Book> books = bookDao.findAll();
+
         return books.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public List<BookDto> searchBooks(String keyword) throws NotFoundException
-    {
-        if (keyword == null || keyword.trim().isEmpty())
+    public List<BookDto> searchBooks(String keyword) throws NotFoundException {
+        if (keyword == null || keyword.trim().isEmpty()) {
             throw new NotFoundException("Search keyword cannot be empty");
+        }
 
         List<Book> books = bookDao.searchByKeyword(keyword);
-        if (books.isEmpty())
+        if (books.isEmpty()) {
             throw new NotFoundException("No books found for keyword: " + keyword);
+        }
 
         return books.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public BookDto getBookById(Long bookId) throws NotFoundException
-    {
+    public BookDto getBookById(Long bookId) throws NotFoundException {
         return bookDao.findById(bookId)
                 .map(this::convertToDto)
                 .orElseThrow(() -> new NotFoundException("Book not found with ID: " + bookId));

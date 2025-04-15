@@ -195,6 +195,36 @@
     <servlet-class>jets.projects.normal_user.UserSearchProducts</servlet-class>
   </servlet>
 
+
+  <!-- books servlets -->
+
+  <servlet>
+    <servlet-name>UserGetTopSellingBooksList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetTopSellingBooksList</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>UserGetTopSellingBookFromEachGenreList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetTopSellingBookFromEachGenreList</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>UserGetAllBooksList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllBooksList</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>UserSearchBooks</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserSearchBooks</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>UserGetBookDetails</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetBookDetails</servlet-class>
+  </servlet>
+
+ 
+
   <!-- User Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>UserDirector</servlet-name>
@@ -220,6 +250,35 @@
     <servlet-name>UserDirector</servlet-name>
     <url-pattern>/SearchProducts</url-pattern>
   </servlet-mapping>
+
+
+  <!-- books servlets mapping-->
+
+   <servlet-mapping>
+    <servlet-name>UserGetTopSellingBooksList</servlet-name>
+    <url-pattern>/userGetTopSellingBooksList</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>UserGetTopSellingBookFromEachGenreList</servlet-name>
+    <url-pattern>/userGetTopSellingBookFromEachGenreList</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>UserGetAllBooksList</servlet-name>
+    <url-pattern>/userGetAllBooksList</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>UserSearchBooks</servlet-name>
+    <url-pattern>/userSearchBooks</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>UserGetBookDetails</servlet-name>
+    <url-pattern>/userGetBookDetails</url-pattern>
+  </servlet-mapping>
+
 
   <!-- Error Handler -->
   <servlet>

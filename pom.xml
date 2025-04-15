@@ -19,6 +19,8 @@
         <pdfbox.version>2.0.27</pdfbox.version>
         <hibernate.orm.version>6.4.4.Final</hibernate.orm.version>
         <lombok.version>1.18.34</lombok.version>
+        <jackson.version>2.18.2</jackson.version>
+         <gson.version>2.10.1</gson.version>
     </properties>
 
     <dependencies>
@@ -79,6 +81,19 @@
             <scope>provided</scope>
         </dependency>
 
+          <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>${gson.version}</version>
+</dependency>
+
+
     </dependencies>
 
     <build>
@@ -91,7 +106,7 @@
                 <configuration>
                     <username>admin</username>
                     <password>admin</password>
-                    <url>http://localhost:8080/manager/text</url>
+                    <url>http://localhost:9090/manager/text</url>
                     <path>/ITI-Jets-EcommApplication</path>
                 </configuration>
             </plugin>

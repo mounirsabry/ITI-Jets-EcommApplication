@@ -28,8 +28,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Book 
-{
+public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,13 +81,13 @@ public class Book
     @Column(name = "discount_percentage", precision = 5, scale = 2, nullable = false)
     private BigDecimal discountPercentage = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL )
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL )
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Wishlist> wishlists = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL )
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<CartItem> cartItems = new ArrayList<>();
 
     @Column(name = "added_at", nullable = false)
