@@ -1,6 +1,4 @@
 package jets.projects.client_dto;
 
-public class PurchaseHistoryDTO
-{
-
+public class UserDto {
 }
