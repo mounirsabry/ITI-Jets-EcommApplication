@@ -3,12 +3,27 @@ package jets.projects.services;
 import jets.projects.dao.BookDao;
 import jets.projects.dao.CartItemDao;
 import jets.projects.dao.OrderDao;
+import jets.projects.dao.PurchaseHistoryDao;
 import jets.projects.dao.UserDao;
 import jets.projects.client_dto.CreditCardDetailsDto;
 import jets.projects.client_dto.OrderDto;
-import jets.projects.client_dto.OrderItemDto;
-import jets.projects.entity.*;
-import jets.projects.exceptions.*;
+import jets.projects.entity.Book;
+import jets.projects.entity.BookOrder;
+import jets.projects.entity.CartItem;
+import jets.projects.entity.OrderItem;
+import jets.projects.entity.PaymentMethod;
+import jets.projects.entity.PurchaseHistory;
+import jets.projects.entity.Status;
+import jets.projects.entity.User;
+import jets.projects.exceptions.InvalidInputException;
+import jets.projects.exceptions.NotFoundException;
+import jets.projects.exceptions.OperationFailedException;
+import jets.projects.exceptions.OutOfStockException;
+
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.io.File;
 
 public class OrderService {
     private final OrderDao orderDao;
@@ -23,8 +39,12 @@ public class OrderService {
     private final CartService cartService;
     private final BookDao bookDao;
     private final UserDao userDao;
+    private final PurchaseHistoryDao purchaseHistoryDao;
     private static final Pattern CARD_NUMBER_PATTERN = Pattern.compile("^\\d{4}-\\d{4}-\\d{4}-\\d{4}$");
     private static final Pattern CVC_PATTERN = Pattern.compile("^\\d{3}$");
+    private static final BigDecimal FIXED_SHIPPING_COST = new BigDecimal("28.00");
+    private static final String RECEIPT_DIR = "C:\\Users\\ibrah\\OneDrive\\Desktop\\Tools\\apache-tomcat-10.1.39\\webapps\\ITI-Jets-EcommApplication\\receipts\\";
+    private static final String RECEIPT_URL_PREFIX = "/ITI-Jets-EcommApplication/receipts/";
 
     public OrderService() {
         this.orderDao = new OrderDao();
@@ -32,27 +52,45 @@ public class OrderService {
         this.bookDao = new BookDao();
         this.userDao = new UserDao();
         this.cartItemDao = new CartItemDao();
+        this.purchaseHistoryDao = new PurchaseHistoryDao();
+        new File(RECEIPT_DIR).mkdirs();
     }
 
     private OrderDto convertToDto(BookOrder order) {
         OrderDto dto = new OrderDto();
-        dto.setOrderId(order.getOrderId());
-        dto.setUserId(order.getUser().getUserId());
-        dto.setDate(order.getOrderDate());
-        dto.setAddress(order.getAddress());
-        dto.setPaymentMethod(order.getMethod().getMethod());
-        dto.setShippingFee(order.getShippingCost());
-        List<OrderItemDto> itemDtos = order.getOrderItems().stream()
+        dto.setId(String.valueOf(order.getOrderId()));
+        dto.setDate(order.getOrderDate().toString());
+
+        OrderDto.CustomerDto customer = new OrderDto.CustomerDto();
+        customer.setName(order.getUser().getUsername());
+        customer.setEmail(order.getUser().getEmail());
+        customer.setPhone(order.getUser().getPhoneNumber());
+        customer.setAddress(order.getAddress());
+        dto.setCustomer(customer);
+
+        List<OrderDto.OrderItemDto> itemDtos = order.getOrderItems().stream()
                 .map(item -> {
-                    OrderItemDto itemDto = new OrderItemDto();
-                    itemDto.setBookId(item.getBook().getBookId());
-                    itemDto.setQuantity(item.getQuantity());
-                    itemDto.setPriceAtPurchase(item.getPrice());
+                    OrderDto.OrderItemDto itemDto = new OrderDto.OrderItemDto();
+                    itemDto.setBook(item.getBook().getTitle());
+                    itemDto.setPrice(item.getPrice());
+                    itemDto.setQuantity(item.getQuantity().intValue());
+                    itemDto.setTotal(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
                     return itemDto;
                 })
                 .collect(Collectors.toList());
-        dto.setOrderItems(itemDtos);
-        dto.setStatus(order.getOrderItems().get(0).getStatus().name());
+        dto.setItems(itemDtos);
+
+        BigDecimal subtotal = itemDtos.stream()
+                .map(OrderDto.OrderItemDto::getTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        dto.setSubtotal(subtotal);
+
+        dto.setShipping(FIXED_SHIPPING_COST);
+
+        BigDecimal total = subtotal.add(FIXED_SHIPPING_COST);
+        dto.setTotal(total);
+
+        dto.setStatus(order.getStatus().name());
         return dto;
     }
 
@@ -97,7 +135,7 @@ public class OrderService {
             throw new NotFoundException("Cart is empty");
         }
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem item : cartItems) {
             Book book = item.getBook();
             if (!book.getIsAvailable() || book.getStock() < item.getQuantity()) {
@@ -106,18 +144,16 @@ public class OrderService {
             BigDecimal itemTotal = book.getPrice()
                     .multiply(BigDecimal.valueOf(item.getQuantity()))
                     .multiply(BigDecimal.ONE.subtract(book.getDiscountPercentage().divide(BigDecimal.valueOf(100))));
-            total = total.add(itemTotal);
+            subtotal = subtotal.add(itemTotal);
         }
 
-        BigDecimal shippingFee = cartService.getShippingFee(userId);
-        total = total.add(shippingFee);
+        BigDecimal total = subtotal.add(FIXED_SHIPPING_COST);
 
         if (user.getBalance().compareTo(total) < 0) {
             throw new OperationFailedException("Insufficient account balance");
         }
 
-        BookOrder order = createOrder(user, cartItems, address, "ACCOUNT_BALANCE", shippingFee);
-        user.setBalance(user.getBalance().subtract(total));
+        BookOrder order = createOrder(user, cartItems, address, "ACCOUNT_BALANCE", FIXED_SHIPPING_COST);
         try {
             for (CartItem item : cartItems) {
                 Book book = item.getBook();
@@ -125,6 +161,7 @@ public class OrderService {
                 book.setSoldCount(book.getSoldCount() + item.getQuantity());
                 bookDao.update(book);
             }
+            user.setBalance(user.getBalance().subtract(total));
             userDao.update(user);
             orderDao.save(order);
             cartService.truncateCart(userId);
@@ -151,7 +188,7 @@ public class OrderService {
             throw new NotFoundException("Cart is empty");
         }
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem item : cartItems) {
             Book book = item.getBook();
             if (!book.getIsAvailable() || book.getStock() < item.getQuantity()) {
@@ -160,13 +197,12 @@ public class OrderService {
             BigDecimal itemTotal = book.getPrice()
                     .multiply(BigDecimal.valueOf(item.getQuantity()))
                     .multiply(BigDecimal.ONE.subtract(book.getDiscountPercentage().divide(BigDecimal.valueOf(100))));
-            total = total.add(itemTotal);
+            subtotal = subtotal.add(itemTotal);
         }
 
-        BigDecimal shippingFee = cartService.getShippingFee(userId);
-        total = total.add(shippingFee);
+        BigDecimal total = subtotal.add(FIXED_SHIPPING_COST);
 
-        BookOrder order = createOrder(user, cartItems, address, "CREDIT_CARD", shippingFee);
+        BookOrder order = createOrder(user, cartItems, address, "CREDIT_CARD", FIXED_SHIPPING_COST);
         try {
             for (CartItem item : cartItems) {
                 Book book = item.getBook();
@@ -191,6 +227,7 @@ public class OrderService {
         method.setMethod(paymentMethod);
         order.setMethod(method);
         order.setShippingCost(shippingFee);
+        order.setStatus(Status.PENDING);
 
         List<OrderItem> orderItems = cartItems.stream()
                 .map(item -> {
@@ -201,7 +238,6 @@ public class OrderService {
                     orderItem.setPrice(item.getBook().getPrice()
                             .multiply(BigDecimal.ONE.subtract(item.getBook().getDiscountPercentage().divide(BigDecimal.valueOf(100)))));
                     orderItem.setDiscountPercentage(item.getBook().getDiscountPercentage());
-                    orderItem.setStatus(Status.PENDING);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
@@ -229,6 +265,117 @@ public class OrderService {
         }
         if (details.getCvc() == null || !CVC_PATTERN.matcher(details.getCvc()).matches()) {
             throw new InvalidInputException("CVC must be a 3-digit number");
+        }
+    }
+
+    public List<OrderDto> getAllOrders() {
+        List<BookOrder> orders = orderDao.findAll();
+        return orders.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private String generateReceiptPdf(BookOrder order, BigDecimal totalPaid) throws OperationFailedException {
+        String fileName = "receipt_" + order.getOrderId() + "_" + System.currentTimeMillis() + ".pdf";
+        String filePath = RECEIPT_DIR + fileName;
+        String urlPath = RECEIPT_URL_PREFIX + fileName;
+
+        try {
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            document.add(new Paragraph("Receipt for Order #" + order.getOrderId()));
+            document.add(new Paragraph("Customer: " + order.getUser().getUsername()));
+            document.add(new Paragraph("Date: " + LocalDateTime.now()));
+            document.add(new Paragraph("Items:"));
+            for (OrderItem item : order.getOrderItems()) {
+                document.add(new Paragraph(
+                        item.getBook().getTitle() + " - Quantity: " + item.getQuantity() +
+                                " - Price: $" + item.getPrice() +
+                                " - Total: $" + item.getPrice().multiply(new BigDecimal(item.getQuantity()))
+                ));
+            }
+            document.add(new Paragraph("Subtotal: $" + totalPaid.subtract(FIXED_SHIPPING_COST)));
+            document.add(new Paragraph("Shipping: $" + FIXED_SHIPPING_COST));
+            document.add(new Paragraph("Total Paid: $" + totalPaid));
+
+            document.close();
+            return urlPath;
+        } catch (Exception e) {
+            throw new OperationFailedException("Failed to generate PDF for order ID: " + order.getOrderId(), e);
+        }
+    }
+
+    public boolean updateOrderStatus(Long orderId, String status) throws InvalidInputException, NotFoundException, OperationFailedException {
+        if (orderId == null || orderId <= 0) {
+            throw new InvalidInputException("Invalid order ID");
+        }
+        if (status == null || status.trim().isEmpty()) {
+            throw new InvalidInputException("Status cannot be empty");
+        }
+
+        BookOrder order = orderDao.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+
+        try {
+            Status newStatus;
+            try {
+                String normalizedStatus = status.trim().toUpperCase();
+                if ("CANCELED".equals(normalizedStatus)) {
+                    normalizedStatus = "CANCELLED";
+                }
+                newStatus = Status.valueOf(normalizedStatus);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidInputException("Invalid status: " + status);
+            }
+
+            order.setStatus(newStatus);
+            System.out.println("Order ID: " + orderId + ", Setting status: " + newStatus);
+
+            if ("DELIVERED".equalsIgnoreCase(status)) {
+                User user = order.getUser();
+                if (user == null) {
+                    throw new OperationFailedException("User not associated with order ID: " + orderId);
+                }
+                BigDecimal subtotal = order.getOrderItems().stream()
+                        .map(item -> item.getPrice().multiply(new BigDecimal(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (subtotal == null) {
+                    throw new OperationFailedException("Unable to calculate subtotal for order ID: " + orderId);
+                }
+                BigDecimal totalPaid = subtotal.add(FIXED_SHIPPING_COST);
+
+                PurchaseHistory purchase = new PurchaseHistory();
+                purchase.setUser(user);
+                purchase.setPurchaseDatetime(LocalDateTime.now());
+                purchase.setTotalPaid(totalPaid);
+                String receiptUrl = generateReceiptPdf(order, totalPaid);
+                purchase.setReceiptFileUrl(receiptUrl);
+                System.out.println("Saving purchase history for order ID: " + orderId + ", Receipt URL: " + receiptUrl);
+                try {
+                    purchaseHistoryDao.save(purchase);
+                } catch (Exception e) {
+                    throw new OperationFailedException("Failed to save purchase history for order ID: " + orderId, e);
+                }
+
+                System.out.println("Deleting order ID: " + orderId);
+                try {
+                    orderDao.deleteById(orderId);
+                } catch (Exception e) {
+                    throw new OperationFailedException("Failed to delete order ID: " + orderId, e);
+                }
+            } else {
+                System.out.println("Updating order status to " + newStatus + " for order ID: " + orderId);
+                try {
+                    orderDao.update(order);
+                } catch (Exception e) {
+                    throw new OperationFailedException("Failed to update order status to " + newStatus + " for order ID: " + orderId, e);
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            throw new OperationFailedException("Failed to process status update for order ID: " + orderId + ": " + e.getMessage(), e);
         }
     }
 }

@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     initializeDateFilters();
     loadPurchaseHistory();
+    setupStatsSSE();
 
     document.getElementById("applyDateFilter").addEventListener("click", () => {
         applyFilters();
@@ -36,12 +37,25 @@ let totalPages = 1;
 const itemsPerPage = 10;
 
 function initializeDateFilters() {
-    document.getElementById("dateFrom").value = null;
-    document.getElementById("dateTo").value = null;
+    document.getElementById("dateFrom").value = '';
+    document.getElementById("dateTo").value = '';
 }
 
-function formatDateForInput(date) {
-    return date.toISOString().split('T')[0];
+function setupStatsSSE() {
+    const eventSource = new EventSource(`${contextPath}/Admin/StatsServlet`);
+    eventSource.onmessage = (event) => {
+        try {
+            const stats = JSON.parse(event.data);
+            updatePurchaseStats(stats);
+        } catch (e) {
+            console.error("Error parsing SSE stats:", e);
+        }
+    };
+    eventSource.onerror = () => {
+        console.warn("SSE connection lost. Retrying...");
+        eventSource.close();
+        setTimeout(setupStatsSSE, 5000);
+    };
 }
 
 function loadPurchaseHistory() {
@@ -61,39 +75,34 @@ function fetchPurchaseHistory(page) {
         search: searchTerm
     });
 
-    fetch(`${contextPath}/Admin/PurchaseHistory/api?${params.toString()}`)
+    fetch(`${contextPath}/Admin/PurchaseHistoryServlet?${params.toString()}`, {
+        headers: { "Accept": "application/json" }
+    })
         .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch purchase history');
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            totalPages = data.totalPages;
-            processPurchaseHistory(data);
+            totalPages = data.totalPages || 1;
+            displayPurchaseHistory(data.purchases || []);
+            updatePagination();
         })
         .catch(error => {
             console.error('Error loading purchase history:', error);
-            processPurchaseHistory({ purchases: [], totalPages: 1, totalPurchases: 0, totalRevenue: 0, uniqueCustomers: 0 });
+            displayPurchaseHistory([]);
+            updatePagination();
         });
 }
 
-function processPurchaseHistory(data) {
-    updatePurchaseStats(data);
-    displayPurchaseHistory(data.purchases);
-}
-
-function updatePurchaseStats(data) {
-    document.getElementById("totalPurchases").textContent = data.totalPurchases;
-    document.getElementById("totalRevenue").textContent = formatCurrency(data.totalRevenue);
-    document.getElementById("uniqueCustomers").textContent = data.uniqueCustomers;
+function updatePurchaseStats(stats) {
+    document.getElementById("totalPurchases").textContent = stats.totalPurchases || 0;
+    document.getElementById("totalRevenue").textContent = formatCurrency(stats.totalRevenue || 0);
+    document.getElementById("uniqueCustomers").textContent = stats.uniqueCustomers || 0;
 }
 
 function displayPurchaseHistory(purchases) {
     const purchaseHistoryTable = document.getElementById("purchaseHistoryTable");
     purchaseHistoryTable.innerHTML = "";
-
-    document.getElementById("currentPage").textContent = `Page ${currentPage} of ${totalPages || 1}`;
-    document.getElementById("prevPage").disabled = currentPage === 1;
-    document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
 
     if (purchases.length === 0) {
         purchaseHistoryTable.innerHTML = `
@@ -108,7 +117,7 @@ function displayPurchaseHistory(purchases) {
         purchaseHistoryTable.innerHTML += `
             <tr>
                 <td>${purchase.id}</td>
-                <td>${purchase.userName}</td>
+                <td>${purchase.userName || 'Unknown'}</td>
                 <td>${formatDate(purchase.date)}</td>
                 <td>${formatCurrency(purchase.totalPaid)}</td>
                 <td>
@@ -117,6 +126,12 @@ function displayPurchaseHistory(purchases) {
             </tr>
         `;
     });
+}
+
+function updatePagination() {
+    document.getElementById("currentPage").textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage >= totalPages;
 }
 
 function applyFilters() {
@@ -140,69 +155,44 @@ function navigatePage(direction) {
 }
 
 function viewReceipt(id) {
-    console.log(`Fetching receipt for ID: ${id}`);
-    fetch(`${contextPath}/Admin/PurchaseHistory/api/${id}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
+    fetch(`${contextPath}/Admin/PurchaseHistoryServlet/receipt/${id}`, {
+        headers: { "Accept": "application/json" }
     })
         .then(response => {
-            console.log(`Response status: ${response.status}, headers: ${[...response.headers.entries()]}`);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`Failed to fetch receipt ${id}: ${response.statusText}, body: ${text}`);
-                });
-            }
-            return response.text();
-        })
-        .then(text => {
-            console.log(`Raw response: ${text}`);
-            try {
-                return text ? JSON.parse(text) : {};
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                return { id: id }; // Fallback with ID
-            }
+            if (!response.ok) throw new Error(`Failed to fetch receipt ${id}`);
+            return response.json();
         })
         .then(receipt => {
-            console.log('Received receipt:', receipt);
-            if (!receipt) {
-                console.warn('Empty receipt received, using fallback');
-                receipt = { id: id };
-            }
             displayReceiptDetails(receipt);
         })
         .catch(error => {
             console.error('Error fetching receipt:', error);
             alert('Failed to load receipt details. Please try again.');
-            displayReceiptDetails({ id: id });
+            displayReceiptDetails({ id });
         });
 }
 
 function displayReceiptDetails(receipt) {
-    console.log('Displaying receipt details:', receipt);
-    document.getElementById("modalReceiptId").textContent = String(receipt.id || 'N/A');
+    document.getElementById("modalReceiptId").textContent = receipt.id || 'N/A';
     document.getElementById("modalReceiptDate").textContent = receipt.date ? formatDate(receipt.date) : 'N/A';
     document.getElementById("modalUserName").textContent = receipt.userName || 'Unknown';
     document.getElementById("modalUserEmail").textContent = receipt.userEmail || 'N/A';
     document.getElementById("modalTotalPaid").textContent = receipt.totalPaid != null ? formatCurrency(receipt.totalPaid) : '$0.00';
 
     const downloadBtn = document.getElementById("downloadReceiptBtn");
-    const downloadUrl = receipt.id ? `${contextPath}/Admin/PurchaseHistory/api/${receipt.id}/download` : '#';
-    downloadBtn.href = downloadUrl;
-    console.log('Set download URL:', downloadUrl);
+    downloadBtn.href = receipt.id ? `${contextPath}/Admin/PurchaseHistoryServlet/receipt/${receipt.id}/download` : '#';
 
     openModal("receiptModal");
 }
 
 function formatDate(dateString) {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString(undefined, options) || 'N/A';
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
 }
 
 function openModal(modalId) {

@@ -1,37 +1,68 @@
 package jets.projects.client_dto;
 
-
-import jets.projects.client_dto.OrderItemDto;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderDto {
-    private Long orderId;
-    private Long userId;
-    private LocalDateTime date;
-    private String address;
-    private String paymentMethod;
-    private BigDecimal shippingFee;
-    private List<OrderItemDto> orderItems;
+    private String id;
+    private CustomerDto customer;
+    private String date;
+    private List<OrderItemDto> items;
+    private BigDecimal subtotal;
+    private BigDecimal shipping;
+    private BigDecimal total;
     private String status;
 
     // Getters and Setters
-    public Long getOrderId() { return orderId; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-    public LocalDateTime getDate() { return date; }
-    public void setDate(LocalDateTime date) { this.date = date; }
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-    public BigDecimal getShippingFee() { return shippingFee; }
-    public void setShippingFee(BigDecimal shippingFee) { this.shippingFee = shippingFee; }
-    public List<OrderItemDto> getOrderItems() { return orderItems; }
-    public void setOrderItems(List<OrderItemDto> orderItems) { this.orderItems = orderItems; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public CustomerDto getCustomer() { return customer; }
+    public void setCustomer(CustomerDto customer) { this.customer = customer; }
+    public String getDate() { return date; }
+    public void setDate(String date) { this.date = date; }
+    public List<OrderItemDto> getItems() { return items; }
+    public void setItems(List<OrderItemDto> items) { this.items = items; }
+    public BigDecimal getSubtotal() { return subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+    public BigDecimal getShipping() { return shipping; }
+    public void setShipping(BigDecimal shipping) { this.shipping = shipping; }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public static class CustomerDto {
+        private String name;
+        private String email;
+        private String phone;
+        private String address;
+
+        // Getters and Setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
+        public String getAddress() { return address; }
+        public void setAddress(String address) { this.address = address; }
+    }
+
+    public static class OrderItemDto {
+        private String book;
+        private BigDecimal price;
+        private Integer quantity;
+        private BigDecimal total;
+
+        // Getters and Setters
+        public String getBook() { return book; }
+        public void setBook(String book) { this.book = book; }
+        public BigDecimal getPrice() { return price; }
+        public void setPrice(BigDecimal price) { this.price = price; }
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        public BigDecimal getTotal() { return total; }
+        public void setTotal(BigDecimal total) { this.total = total; }
+    }
 }

@@ -82,6 +82,23 @@ public class BookDao {
         }
     }
 
+
+    public void save(Book book) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(book);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
     public void update(Book book) {
         EntityManager em = emf.createEntityManager();
         try {
@@ -93,6 +110,28 @@ public class BookDao {
                 em.getTransaction().rollback();
             }
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean deleteById(Long bookId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Book book = em.find(Book.class, bookId);
+            if (book != null) {
+                em.remove(book);
+                em.getTransaction().commit();
+                return true;
+            }
+            em.getTransaction().commit();
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            return false;
         } finally {
             em.close();
         }

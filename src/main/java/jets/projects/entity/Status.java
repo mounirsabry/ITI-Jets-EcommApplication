@@ -1,8 +1,8 @@
 package jets.projects.entity;
 
-public enum Status 
-{
+public enum Status {
     PENDING,
     SHIPPED,
     CANCELLED,
+    DELIVERED
 }

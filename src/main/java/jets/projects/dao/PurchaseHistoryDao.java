@@ -47,4 +47,20 @@ public class PurchaseHistoryDao {
             em.close();
         }
     }
+
+    public void save(PurchaseHistory purchase) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(purchase);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

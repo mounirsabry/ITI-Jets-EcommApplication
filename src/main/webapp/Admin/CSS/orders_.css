@@ -122,7 +122,7 @@
   font-weight: 500;
   text-transform: uppercase;
   border-radius: 12px;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .status-pending {
@@ -138,7 +138,9 @@
 }
 
 .status-canceled {
-  background-color: #dc3545;
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
 
 /* Modal Styles */

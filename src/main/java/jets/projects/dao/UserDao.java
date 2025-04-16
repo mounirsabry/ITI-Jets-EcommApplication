@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import jets.projects.entity.User;
 import jets.projects.utils.JpaUtil;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UserDao {
@@ -81,6 +82,51 @@ public class UserDao {
                 em.getTransaction().rollback();
             }
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+
+    public List<User> findAll() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u LEFT JOIN FETCH u.interests ui LEFT JOIN FETCH ui.genre",
+                    User.class
+            );
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void deleteById(Long id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            User user = em.find(User.class, id);
+            if (user != null) {
+                em.remove(user);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public int getOrderCountForUser(Long userId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(o) FROM BookOrder o WHERE o.user.userId = :userId", Long.class);
+            query.setParameter("userId", userId);
+            return query.getSingleResult().intValue();
         } finally {
             em.close();
         }

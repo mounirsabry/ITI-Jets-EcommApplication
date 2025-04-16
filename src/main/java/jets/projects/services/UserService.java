@@ -4,13 +4,16 @@ package jets.projects.services;
 import jets.projects.client_dto.CreditCardDetailsDto;
 import jets.projects.dao.UserDao;
 import jets.projects.client_dto.UserDto;
+import jets.projects.dto.UserAdminDto;
 import jets.projects.entity.User;
 import jets.projects.exceptions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class UserService {
     private final UserDao userDao;
@@ -229,6 +232,30 @@ public class UserService {
         if (details.getCvc() == null || !Pattern.compile("^\\d{3}$").matcher(details.getCvc()).matches()) {
             throw new InvalidInputException("CVC must be a 3-digit number");
         }
+    }
+
+    public List<UserAdminDto> getAllUsers() throws NotFoundException {
+        List<User> users = userDao.findAll();
+        if (users.isEmpty()) {
+            throw new NotFoundException("No users found");
+        }
+        return users.stream().map(this::convertToUserAdminDto).collect(Collectors.toList());
+    }
+
+    private UserAdminDto convertToUserAdminDto(User user) {
+        UserAdminDto dto = new UserAdminDto();
+        dto.setId(user.getUserId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setBirthDate(user.getBirthDate().toString());
+        dto.setAddress(user.getAddress());
+        dto.setBalance(user.getBalance());
+        dto.setInterests(user.getInterests().stream()
+                .map(ui -> ui.getGenre().getName())
+                .collect(Collectors.toList()));
+        dto.setOrders(userDao.getOrderCountForUser(user.getUserId()));
+        return dto;
     }
 }
 

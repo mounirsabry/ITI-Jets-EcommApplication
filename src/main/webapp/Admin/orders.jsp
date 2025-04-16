@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Management</title>
     <link rel="stylesheet" href="CSS/styles.css">
-    <link rel="stylesheet" href="CSS/orders.css">
+    <link rel="stylesheet" href="CSS/orders_.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 </head>
 <body>
@@ -152,10 +152,6 @@
                         <div class="summary-item">
                             <span>Shipping:</span>
                             <span id="modalShipping"></span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Tax:</span>
-                            <span id="modalTax"></span>
                         </div>
                         <div class="summary-item total">
                             <span>Total:</span>

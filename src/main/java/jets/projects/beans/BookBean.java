@@ -1,5 +1,6 @@
 package jets.projects.beans;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class BookBean {
@@ -10,8 +11,8 @@ public class BookBean {
     private String publisher;
     private String isbn;
     private String genre;
-    private double price;
-    private int discount;
+    private BigDecimal price;
+    private BigDecimal discount;
     private int quantity;
     private String status;
     private String mainImage;
@@ -20,12 +21,13 @@ public class BookBean {
     private String language;
     private int pages;
     private String overview;
+    private String description;
 
     // Constructor
     public BookBean(int id, String title, String author, String publisher,
-            String isbn, String genre, double price, int discount, int quantity,
+            String isbn, String genre, BigDecimal price, BigDecimal discount, int quantity,
             String status, String mainImage, List<String> images,
-            String publicationDate, String language, int pages, String overview) {
+            String publicationDate, String language, int pages, String overview, String description) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -42,6 +44,11 @@ public class BookBean {
         this.language = language;
         this.pages = pages;
         this.overview = overview;
+        this.description = description;
+    }
+
+    public BookBean() {
+
     }
 
     public int getId() {
@@ -92,19 +99,19 @@ public class BookBean {
         this.genre = genre;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public int getDiscount() {
+    public BigDecimal getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
 
@@ -164,8 +171,20 @@ public class BookBean {
         this.overview = overview;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
 }

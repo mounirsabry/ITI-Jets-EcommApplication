@@ -24,12 +24,12 @@ public class PurchaseHistory
     @JoinColumn(name = "user_ID", nullable = false)
     private User user;
 
-    @Column(name = "purchase_datetime", nullable = false)
+    @Column(name = "purchase_datetime")
     private LocalDateTime purchaseDatetime = LocalDateTime.now();
 
     @Column(name = "total_paid", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPaid;
 
-    @Column(name = "receipt_file_URL", nullable = false, length = 255)
+    @Column(name = "receipt_file_URL", length = 255)
     private String receiptFileUrl;
 }

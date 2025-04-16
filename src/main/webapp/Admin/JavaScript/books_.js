@@ -194,7 +194,6 @@ function populateBookForm(book) {
   document.getElementById("pages").value = book.pages || ""
   document.getElementById("overview").value = book.overview || ""
 
-  // Set main image preview
 
 
   if (book.mainImage) {
@@ -504,5 +503,3 @@ function editOnMessage(event) {
   loadBooks();
 
 }
-
-

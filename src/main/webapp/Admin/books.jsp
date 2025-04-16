@@ -145,14 +145,14 @@
                                         <option value="">Select Genre</option>
                                         <option value="Fiction">Fiction</option>
                                         <option value="Non-Fiction">Non-Fiction</option>
-                                        <option value="Science Fiction">Science Fiction</option>
-                                        <option value="Fantasy">Fantasy</option>
-                                        <option value="Mystery">Mystery</option>
-                                        <option value="Romance">Romance</option>
-                                        <option value="Thriller">Thriller</option>
+                                        <option value="Personal Development">Personal Development</option>
+                                        <option value="Business & Finance">Business & Finance</option>
+                                        <option value="Science & Technology">Science & Technology</option>
+                                        <option value="Health & Wellness">Health & Wellness</option>
+                                        <option value="Education & Academic">Education & Academic</option>
                                         <option value="Biography">Biography</option>
-                                        <option value="History">History</option>
-                                        <option value="Self-Help">Self-Help</option>
+                                        <option value="Childrens Books">Childrens Books</option>
+                                        <option value="Religion">Religion</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
