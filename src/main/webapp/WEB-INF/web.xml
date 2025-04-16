@@ -196,6 +196,99 @@
   </servlet>
 
 
+<!-- Get User Profile -->
+<servlet>
+    <servlet-name>UserGetProfile</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetProfile</servlet-class>
+</servlet>
+
+<!-- Update Email -->
+<servlet>
+    <servlet-name>UserUpdateEmail</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserUpdateEmail</servlet-class>
+</servlet>
+
+<!-- Update Password -->
+<servlet>
+    <servlet-name>UserUpdatePassword</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserUpdatePassword</servlet-class>
+</servlet>
+
+<!-- Update Personal Details -->
+<servlet>
+    <servlet-name>UserUpdatePersonalDetails</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserUpdatePersonalDetails</servlet-class>
+</servlet>
+
+<!-- Recharge Account Balance -->
+<servlet>
+    <servlet-name>UserRechargeAccountBalanceUsingCreditCard</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserRechargeAccountBalanceUsingCreditCard</servlet-class>
+</servlet>
+<!-- Get Cart -->
+<servlet>
+    <servlet-name>UserGetCart</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetCart</servlet-class>
+</servlet>
+
+<!-- Validate Cart -->
+<servlet>
+    <servlet-name>UserValidateCart</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserValidateCart</servlet-class>
+</servlet>
+
+<!-- Get Shipping Fee -->
+<servlet>
+    <servlet-name>UserGetCartShippingFee</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetCartShippingFee</servlet-class>
+</servlet>
+
+<!-- Add Item to Cart -->
+<servlet>
+    <servlet-name>UserAddItemToCart</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserAddItemToCart</servlet-class>
+</servlet>
+
+<!-- Update Cart Item Quantity -->
+<servlet>
+    <servlet-name>UserUpdateCartItemQuantity</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserUpdateCartItemQuantity</servlet-class>
+</servlet>
+
+<!-- Remove Cart Item -->
+<servlet>
+    <servlet-name>UserRemoveCartItem</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserRemoveCartItem</servlet-class>
+</servlet>
+
+<!-- Truncate Cart -->
+<servlet>
+    <servlet-name>UserTruncateCart</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
+</servlet>
+
+<!-- wishlist -->
+<servlet>
+    <servlet-name>UserGetAllWishList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllWishList</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserGetAllWishListBooks</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllWishListBooks</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserAddWishListItem</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserAddWishListItem</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserRemoveFromWishList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserRemoveFromWishList</servlet-class>
+</servlet>
+
+
   <!-- books servlets -->
 
   <servlet>
@@ -223,7 +316,9 @@
     <servlet-class>jets.projects.normal_user.UserGetBookDetails</servlet-class>
   </servlet>
 
- 
+
+
+
 
   <!-- User Servlet Mappings -->
   <servlet-mapping>
@@ -238,7 +333,12 @@
 
   <servlet-mapping>
     <servlet-name>UserDirector</servlet-name>
-    <url-pattern>/Register</url-pattern>
+    <url-pattern>/userRegister</url-pattern>
+  </servlet-mapping>
+
+   <servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userLogin</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -250,6 +350,96 @@
     <servlet-name>UserDirector</servlet-name>
     <url-pattern>/SearchProducts</url-pattern>
   </servlet-mapping>
+
+
+<!-- Get User Profile -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetProfile</url-pattern>
+</servlet-mapping>
+
+<!-- Update Email -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userUpdateEmail</url-pattern>
+</servlet-mapping>
+
+<!-- Update Password -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userUpdatePassword</url-pattern>
+</servlet-mapping>
+
+<!-- Update Personal Details -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userUpdatePersonalDetails</url-pattern>
+</servlet-mapping>
+
+<!-- Recharge Account Balance -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userRechargeAccountBalanceUsingCreditCard</url-pattern>
+</servlet-mapping>
+
+<!-- Cart Operations -->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetCart</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userValidateCart</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetCartShippingFee</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userAddItemToCart</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userUpdateCartItemQuantity</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userRemoveCartItem</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userTruncateCart</url-pattern>
+</servlet-mapping>
+
+<!--wishlist-->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllWishList</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllWishListBooks</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userAddWishListItem</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userRemoveFromWishList</url-pattern>
+</servlet-mapping>
+
+
 
 
   <!-- books servlets mapping-->
@@ -311,6 +501,16 @@
   <filter-mapping>
     <filter-name>userLoginCheckFilter</filter-name>
     <url-pattern>/Admin/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>corsFilter</filter-name>
+    <filter-class>jets.projects.filters.CORSFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>corsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <!-- Welcome Files -->

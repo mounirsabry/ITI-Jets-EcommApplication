@@ -10,22 +10,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jets.projects.client_dto.UserDto;
-import jets.projects.dal.UsersDAL;
 import jets.projects.exceptions.InvalidCredentialsException;
+import jets.projects.exceptions.InvalidInputException;
+import jets.projects.exceptions.OperationFailedException;
 import jets.projects.services.UserService;
 import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
-public class UserLogin extends HttpServlet {
+public class UserUpdatePassword extends HttpServlet {
 
-    private final UsersDAL usersDAL = new UsersDAL();
-    
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
-
+        System.out.println("do post in update email");
         //System.out.println("Query String = " + request.getQueryString());
         //System.out.println("Request URI = " + request.getRequestURI());
         BufferedReader reader = request.getReader();
@@ -41,8 +38,10 @@ public class UserLogin extends HttpServlet {
 
         JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
 
-        String email = jsonObject.get("email").getAsString();
-        String password = jsonObject.get("password").getAsString();
+        String currentPassword = jsonObject.get("currentPassword").getAsString();
+        String newPassword = jsonObject.get("newPassword").getAsString();
+
+        Long registeredID = GetUserID.getUserId(request);
 
         UserService userService = new UserService();
 
@@ -51,49 +50,33 @@ public class UserLogin extends HttpServlet {
 
         try {
 
-            result = userService.login(email, password);
-        } catch (InvalidCredentialsException e) {
+            if (userService.updatePassword(registeredID, currentPassword, newPassword) == true) {
+                result = "password updated successfully.";
+            }
+
+        } catch (InvalidInputException e) {
 
             result = e.getMessage();
+            returnState = false;
 
+        } catch (OperationFailedException e) {
+            result = e.getMessage();
+            returnState = false;
+        } catch (InvalidCredentialsException e) {
+            result = e.getMessage();
             returnState = false;
 
         }
 
         String returnJson = JsonResponseConverter.toJsonResponse(result, returnState);
 
-        if (returnState == true) {
-            UserDto user = (UserDto) result;
-            Long registeredID = user.getUserId();
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
-            }
-            session = request.getSession(true);
-
-            session.setAttribute("userID", registeredID);
-            System.out.println("user id" + registeredID);
-
-            GetUserID.id = registeredID;
-
-            System.out.println("val: " + GetUserID.id);
-
-        }
-
-        HttpSession session = request.getSession(false);
-
-        Long registeredID = null;
-
-        if (session != null) {
-            // Retrieve the userID
-            registeredID = (Long) session.getAttribute("userID");
-            System.out.println("user id " + registeredID);
-
-        }
-
-        System.out.println("user id " + registeredID);
-
         response.getWriter().write(returnJson);
+
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
 
     }
 }
