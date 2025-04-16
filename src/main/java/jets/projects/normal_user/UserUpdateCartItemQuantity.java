@@ -56,7 +56,12 @@ public class UserUpdateCartItemQuantity extends HttpServlet {
         //InvalidInputException, NotFoundException, OutOfStockException
         try {
 
-            result = cartService.updateCart(registeredID, bookID, newQuantity);
+            if (cartService.updateCart(registeredID, bookID, newQuantity)) {
+                result = "Book in cart updated successfully";
+            } else {
+                result = "Book not found in the cart!";
+                returnState = false;
+            }
         } catch (InvalidInputException e) {
 
             result = e.getMessage();

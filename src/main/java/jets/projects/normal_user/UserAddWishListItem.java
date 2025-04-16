@@ -10,17 +10,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jets.projects.dal.UsersDAL;
 import jets.projects.exceptions.InvalidInputException;
 import jets.projects.exceptions.NotFoundException;
-import jets.projects.exceptions.OutOfStockException;
-import jets.projects.services.CartService;
+import jets.projects.exceptions.OperationFailedException;
+import jets.projects.services.WishlistService;
 import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
-public class UserAddItemToCart extends HttpServlet {
-
-    private final UsersDAL usersDAL = new UsersDAL();
+public class UserAddWishListItem extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request,
@@ -28,11 +25,10 @@ public class UserAddItemToCart extends HttpServlet {
 
         Long registeredID = GetUserID.getUserId(request);
 
-        CartService cartService = new CartService();
+        WishlistService wishlistService = new WishlistService();
 
-        System.out.println("do post in user register");
-        //System.out.println("Query String = " + request.getQueryString());
-        //System.out.println("Request URI = " + request.getRequestURI());
+        System.out.println("do post in wish list remove item");
+
         BufferedReader reader = request.getReader();
         StringBuilder json = new StringBuilder();
         String line;
@@ -48,7 +44,6 @@ public class UserAddItemToCart extends HttpServlet {
 
         //userID, bookID, quantity
         Long bookID = jsonObject.get("bookID").getAsLong();
-        Integer quantity = jsonObject.get("quantity").getAsInt();
 
         Object result = null;
         Boolean returnState = true;
@@ -56,8 +51,8 @@ public class UserAddItemToCart extends HttpServlet {
         //InvalidInputException, NotFoundException, OutOfStockException
         try {
 
-            if (cartService.addToCart(registeredID, bookID, quantity)) {
-                result = "Book added to cart successfully.";
+            if (wishlistService.addToWishlist(registeredID, bookID)) {
+                result = "Book added to wishlist successfully.";
 
             }
         } catch (InvalidInputException e) {
@@ -68,7 +63,7 @@ public class UserAddItemToCart extends HttpServlet {
         } catch (NotFoundException e) {
             result = e.getMessage();
             returnState = false;
-        } catch (OutOfStockException e) {
+        } catch (OperationFailedException e) {
             result = e.getMessage();
             returnState = false;
         }

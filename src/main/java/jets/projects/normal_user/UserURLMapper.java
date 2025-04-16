@@ -80,4 +80,16 @@ public class UserURLMapper {
     public static final String USER_TRUNCATE_CART = "/userTruncateCart";
     public static final String USER_TRUNCATE_CART_SERVLET = "UserTruncateCart";
 
+    public static final String USER_GET_ALL_WISH_LIST = "/userGetAllWishList";
+    public static final String USER_GET_ALL_WISH_LIST_SERVLET = "UserGetAllWishList";
+
+    public static final String USER_GET_ALL_WISH_LIST_BOOKS = "/userGetAllWishListBooks";
+    public static final String USER_GET_ALL_WISH_LIST_BOOKS_SERVLET = "UserGetAllWishListBooks";
+
+    public static final String USER_ADD_WISH_LIST_ITEM = "/userAddWishListItem";
+    public static final String USER_ADD_WISH_LIST_ITEM_SERVLET = "UserAddWishListItem";
+
+    public static final String USER_REMOVE_FROM_WISH_LIST = "/userRemoveFromWishList";
+    public static final String USER_REMOVE_FROM_WISH_LIST_SERVLET = "UserRemoveFromWishList";
+
 }

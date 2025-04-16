@@ -165,6 +165,19 @@ public class UserDirector extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
+        if (servletPath.equals(UserURLMapper.USER_GET_ALL_WISH_LIST)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_ALL_WISH_LIST_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_GET_ALL_WISH_LIST_BOOKS)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_ALL_WISH_LIST_BOOKS_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
 
         directToErrorPage(request, response,
                 "No Get Method Registered for this URL.");
@@ -181,6 +194,7 @@ public class UserDirector extends HttpServlet {
         if (servletPath.equals(UserURLMapper.USER_LOGIN)) {
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_LOGIN_SERVLET);
+
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.REGISTER)) {
@@ -239,6 +253,20 @@ public class UserDirector extends HttpServlet {
         } else if (servletPath.equals(UserURLMapper.USER_REMOVE_CART_ITEM)) {
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_REMOVE_CART_ITEM_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_ADD_WISH_LIST_ITEM)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_ADD_WISH_LIST_ITEM_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_REMOVE_FROM_WISH_LIST)) {
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_REMOVE_FROM_WISH_LIST_SERVLET);
             dispatcher.forward(request, response);
             return;
         }

@@ -54,7 +54,10 @@ public class UserRemoveCartItem extends HttpServlet {
         //InvalidInputException, NotFoundException, OutOfStockException
         try {
             if (cartService.removeFromCart(registeredID, bookID)) {
-                result = "Item remover";
+                result = "Item removed from cart successfully.";
+            } else {
+                result = "Book not found in the cart!";
+                returnState = false;
             }
         } catch (InvalidInputException e) {
 

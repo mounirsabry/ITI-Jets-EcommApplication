@@ -43,7 +43,9 @@ public class UserTruncateCart extends HttpServlet {
 
         try {
 
-            result = cartService.truncateCart(registeredID);
+            if (cartService.truncateCart(registeredID)) {
+                result = "Cart cleared";
+            }
         } catch (NotFoundException e) {
 
             result = e.getMessage();

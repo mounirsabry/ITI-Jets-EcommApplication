@@ -267,6 +267,28 @@
     <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
 </servlet>
 
+<!-- wishlist -->
+<servlet>
+    <servlet-name>UserGetAllWishList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllWishList</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserGetAllWishListBooks</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllWishListBooks</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserAddWishListItem</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserAddWishListItem</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserRemoveFromWishList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserRemoveFromWishList</servlet-class>
+</servlet>
+
+
   <!-- books servlets -->
 
   <servlet>
@@ -395,6 +417,28 @@
     <servlet-name>UserDirector</servlet-name>
     <url-pattern>/userTruncateCart</url-pattern>
 </servlet-mapping>
+
+<!--wishlist-->
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllWishList</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllWishListBooks</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userAddWishListItem</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userRemoveFromWishList</url-pattern>
+</servlet-mapping>
+
 
 
 

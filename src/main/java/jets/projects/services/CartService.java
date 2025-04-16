@@ -1,9 +1,14 @@
 package jets.projects.services;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jets.projects.client_dto.CartItemDto;
 import jets.projects.dao.BookDao;
 import jets.projects.dao.CartItemDao;
 import jets.projects.dao.UserDao;
-import jets.projects.client_dto.CartItemDto;
 import jets.projects.entity.Book;
 import jets.projects.entity.CartItem;
 import jets.projects.entity.User;
@@ -11,12 +16,8 @@ import jets.projects.exceptions.InvalidInputException;
 import jets.projects.exceptions.NotFoundException;
 import jets.projects.exceptions.OutOfStockException;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class CartService {
+
     private final CartItemDao cartItemDao;
     private final BookDao bookDao;
     private final UserDao userDao;
@@ -57,6 +58,9 @@ public class CartService {
                 return false;
             }
         }
+        if (cartItems.isEmpty()) {
+            throw new NotFoundException("Cart is empty");
+        }
         return true;
     }
 
@@ -73,7 +77,6 @@ public class CartService {
 
         return new BigDecimal("28.00");
     }
-
 
     public boolean addToCart(Long userId, Long bookId, Integer quantity) throws InvalidInputException, NotFoundException, OutOfStockException {
         if (userId == null || userId <= 0) {
