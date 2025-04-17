@@ -1,79 +1,57 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import handleManagerError from "./handleManagerError.js";
+import { Server } from "../../ServerSimulator";
+import createResponseHandler from "./responseHandler.js";
 
-const ajaxClient = new VanillaAJAX();
-
-export default {
+export const ProfileManager = {
     login(email, password, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userLogin, { email, password })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.LoginHandler.userLogin(
+            JSON.stringify({ email, password }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
+    // userData are email, password, userName, phone, address, and birthDate.
     register(userData, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userRegister, userData)
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.RegisterHandler.userRegister(
+            JSON.stringify(userData),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     getProfile(userID, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetProfile, { userID })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.ProfileHandler.userGetProfile(
+            JSON.stringify({ userID }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     updateEmail(userID, newEmail, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userUpdateEmail, { userID, newEmail })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.ProfileHandler.userUpdateEmail(
+            JSON.stringify({ userID, newEmail }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     updatePassword(userID, currentPassword, newPassword, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userUpdatePassword, { userID, currentPassword, newPassword })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.ProfileHandler.userUpdatePassword(
+            JSON.stringify({ userID, currentPassword, newPassword }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
-    updateDetails(userID, updatedDetails, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userUpdatePersonalDetails, { userID, updatedDetails })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    // updatedDetails are userName, phoneNumber, address, and birthDate.
+	updateDetails(userID, updatedDetails, callbackOnSuccess, callbackOnFailure) {
+        Server.ProfileHandler.userUpdatePersonalDetails(
+            JSON.stringify({ userID, updatedDetails }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     rechargeAccountBalanceUsingCreditCard(userID, creditCardDetails, amount, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userRechargeAccountBalanceUsingCreditCard, { userID, creditCardDetails, amount })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.ProfileHandler.userRechargeAccountBalanceUsingCreditCard(
+            JSON.stringify({ userID, creditCardDetails, amount }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     }
 };

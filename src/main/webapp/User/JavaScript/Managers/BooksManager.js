@@ -1,76 +1,36 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import handleManagerError from "./handleManagerError.js";
+import { Server } from "../../ServerSimulator";
+import createResponseHandler from "./responseHandler.js";
 
-const ajaxClient = new VanillaAJAX();
-
-export default {
+export const BooksManager = {
     getTopSelling(callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetTopSellingBooksList, {})
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+
+        Server.BooksHandler.userGetTopSellingBooksList('{}',
+            createResponseHandler(callbackOnSuccess, callbackOnFailure));
     },
 
     getTopSellingInGenres(callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetTopSellingBookFromEachGenreList, {})
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+
+        Server.BooksHandler.userGetTopSellingBookFromEachGenreList('{}',
+            createResponseHandler(callbackOnSuccess, callbackOnFailure));
     },
 
     getAllBooks(callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetAllBooksList, {})
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+
+        Server.BooksHandler.userGetAllBooksList('{}',
+            createResponseHandler(callbackOnSuccess, callbackOnFailure));
     },
 
     search(keywords, callbackOnSuccess, callbackOnFailure) {
 
-
-        ajaxClient.get(ServerURLMapper.userSearchBooks, { keywords })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
-
+        Server.BooksHandler.userSearchBooks(JSON.stringify({ keywords }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure));
     },
 
     getBookDetails(bookID, callbackOnSuccess, callbackOnFailure) {
-        /*
 
-        const url = `${ServerURLMapper.userGetBookDetails}?bookID=${encodeURIComponent(bookID)}`;
-
-        ajaxClient.get(url)
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
-            */
-
-        ajaxClient.get(ServerURLMapper.userGetBookDetails, { bookID })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
-
+        Server.BooksHandler.userGetBookDetails(JSON.stringify({ bookID }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure));
     }
 };

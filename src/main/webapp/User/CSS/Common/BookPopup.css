@@ -1,0 +1,142 @@
+/* Popup overlay covers the entire viewport */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal styling */
+.popup-modal {
+  background-color: #fff;
+  padding: 20px;
+  
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
+  box-shadow: var(--main-box-shadow);
+}
+
+/* Modifying the scrollbar style. */
+/* For WebKit browsers */
+.popup-modal::-webkit-scrollbar {
+  width: 12px;
+}
+
+.popup-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.popup-modal::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* For Firefox */
+.popup-modal {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+/* Close button */
+.close-popup {
+  align-self: flex-end;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+/* Image Container */
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.popup-image {
+  width: 90%;
+  height: auto;
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
+  padding: 5px;
+}
+
+/* Image Navigation Buttons */
+.image-nav {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.image-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Image Indicator */
+.image-indicator {
+  font-size: 0.9em;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.popup-modal p strong {
+  font-weight: bold;
+}
+
+.popup-modal p.overview {
+  margin: 5px 0 10px 0;
+  font-family: cursive;
+}
+
+.popup-modal p.description {
+  margin: 10px 0 15px 0;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+/* 📱 Fully Responsive */
+@media (max-width: 1200px) {
+  .popup-image {
+    width: 85%;
+  }
+}
+
+@media (max-width: 768px) {
+  .popup-image {
+    width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .popup-modal {
+    width: 100%;
+  }
+
+  .popup-image {
+    width: 70%;
+  }
+}

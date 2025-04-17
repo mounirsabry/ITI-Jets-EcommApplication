@@ -1,53 +1,35 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import handleManagerError from "./handleManagerError.js";
+import { Server } from "../../ServerSimulator";
+import createResponseHandler from "./responseHandler.js";
 
-const ajaxClient = new VanillaAJAX();
-
-export default {
+export const OrdersManager = {
     getOrdersList(userID, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetAllOrdersList, { userID })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.OrderHandler.userGetAllOrdersList(
+            JSON.stringify({ userID }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     getOrderDetails(userID, orderID, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.get(ServerURLMapper.userGetOrderDetails, { userID, orderID })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.OrderHandler.userGetOrderDetails(
+            JSON.stringify({ userID, orderID }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
     checkoutUsingAccountBalance(userID, address, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userCheckoutUsingAccountBalance, { userID, address })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.OrderHandler.userCheckoutUsingAccountBalance(
+            JSON.stringify({ userID, address }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 
+    // creditCardDetails are (nameOnCard, cardNumber, expiryDate, CVC)
     checkoutUsingCreditCard(userID, address, creditCardDetails, callbackOnSuccess, callbackOnFailure) {
-        ajaxClient.post(ServerURLMapper.userCheckoutUsingCreditCard, {
-            userID,
-            address,
-            creditCardDetails
-        })
-            .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+        Server.OrderHandler.userCheckoutUsingCreditCard(
+            JSON.stringify({ userID, address, creditCardDetails }),
+            createResponseHandler(callbackOnSuccess, callbackOnFailure)
+        );
     },
 };
