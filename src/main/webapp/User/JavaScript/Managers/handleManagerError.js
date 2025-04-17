@@ -8,7 +8,7 @@ const handleManagerError = function(error, callbackOnFailure) {
     // Only show popup for non-parsing errors
     if (!(error instanceof AjaxRequestError &&
         error.errorType === AjaxRequestErrorType.PARSING_ERROR)) {
-        PopupMessage.show(error.errorMessage || 'An unexpected error occurred', true);
+        MessagePopup.show(error.errorMessage || 'An unexpected error occurred', true);
     }
 
     if (typeof callbackOnFailure === 'function') {
