@@ -2,8 +2,6 @@ package jets.projects.normal_user;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -13,19 +11,25 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jets.projects.exceptions.InvalidInputException;
+import jets.projects.exceptions.NotFoundException;
 import jets.projects.exceptions.OperationFailedException;
-import jets.projects.services.UserService;
+import jets.projects.exceptions.OutOfStockException;
+import jets.projects.services.OrderService;
 import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
-public class UserUpdatePersonalDetails extends HttpServlet {
+public class UserCheckoutUsingAccountBalance extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
-        //System.out.println("Query String = " + request.getQueryString());
-        //System.out.println("Request URI = " + request.getRequestURI());
+        Long registeredID = GetUserID.getUserId(request);
+
+        OrderService orderServce = new OrderService();
+
+        System.out.println("do post in checkcard");
+
         BufferedReader reader = request.getReader();
         StringBuilder json = new StringBuilder();
         String line;
@@ -38,33 +42,29 @@ public class UserUpdatePersonalDetails extends HttpServlet {
         String jsonString = json.toString();
 
         JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
-        JsonObject updatedDetails = jsonObject.getAsJsonObject("updatedDetails");
 
-        String username = updatedDetails.get("userName").getAsString();
-
-        String phoneNumber = updatedDetails.get("phoneNumber").getAsString();
-
-        String address = updatedDetails.get("address").getAsString();
-        String birthDate = updatedDetails.get("birthDate").getAsString();
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(birthDate);
-        LocalDate localDate = zonedDateTime.toLocalDate();
-
-        Long registeredID = GetUserID.getUserId(request);
-
-        UserService userService = new UserService();
+        //userID, bookID, newQuantity
+        String address = jsonObject.get("address").getAsString();
 
         Object result = null;
         Boolean returnState = true;
 
+        //InvalidInputException, NotFoundException, OutOfStockException
         try {
-
-            result = userService.updateDetails(registeredID, username, phoneNumber, address, localDate);
+            Long orderID = orderServce.checkoutWithBalance(registeredID, address);
+            result = "Order placed successfully, with ID#" + orderID.toString();
 
         } catch (InvalidInputException e) {
 
             result = e.getMessage();
             returnState = false;
 
+        } catch (NotFoundException e) {
+            result = e.getMessage();
+            returnState = false;
+        } catch (OutOfStockException e) {
+            result = e.getMessage();
+            returnState = false;
         } catch (OperationFailedException e) {
             result = e.getMessage();
             returnState = false;
@@ -76,9 +76,4 @@ public class UserUpdatePersonalDetails extends HttpServlet {
 
     }
 
-    @Override
-    public void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-
-    }
 }

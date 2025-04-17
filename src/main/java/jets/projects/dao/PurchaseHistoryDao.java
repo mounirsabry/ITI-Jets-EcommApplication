@@ -1,15 +1,16 @@
 package jets.projects.dao;
 
+import java.util.List;
+import java.util.Optional;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import jets.projects.entity.PurchaseHistory;
 import jets.projects.utils.JpaUtil;
 
-import java.util.List;
-import java.util.Optional;
-
 public class PurchaseHistoryDao {
+
     private final EntityManagerFactory emf;
 
     public PurchaseHistoryDao() {
@@ -36,7 +37,7 @@ public class PurchaseHistoryDao {
         EntityManager em = emf.createEntityManager();
         try {
             TypedQuery<PurchaseHistory> query = em.createQuery(
-                    "SELECT p FROM PurchaseHistory p WHERE p.user.userId = :userId AND p.itemId = :itemId",
+                    "SELECT p FROM PurchaseHistory p WHERE p.user.userId = :userId AND p.receiptId = :itemId",
                     PurchaseHistory.class
             );
             query.setParameter("userId", userId);

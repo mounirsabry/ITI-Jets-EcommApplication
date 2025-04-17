@@ -1,15 +1,16 @@
 package jets.projects.dao;
 
+import java.util.List;
+import java.util.Optional;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import jets.projects.entity.BookOrder;
 import jets.projects.utils.JpaUtil;
 
-import java.util.List;
-import java.util.Optional;
-
 public class OrderDao {
+
     private final EntityManagerFactory emf;
 
     public OrderDao() {

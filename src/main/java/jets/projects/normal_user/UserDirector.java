@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jets.projects.utils.JsonResponseConverter;
 
 public class UserDirector extends HttpServlet {
 
@@ -58,7 +59,8 @@ public class UserDirector extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+
+        System.out.println("do get user director--------------------");
 
         String servletPath = request.getServletPath();
 
@@ -81,6 +83,7 @@ public class UserDirector extends HttpServlet {
         }
 
         if (servletPath.equals(UserURLMapper.USER_LOGIN)) {
+
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_LOGIN_SERVLET);
             dispatcher.forward(request, response);
@@ -128,6 +131,7 @@ public class UserDirector extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
+
         if (servletPath.equals(UserURLMapper.USER_REGISTER)) {
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_REGISTER_SERVLET);
@@ -137,35 +141,59 @@ public class UserDirector extends HttpServlet {
 
         // Get User Profile
         if (servletPath.equals(UserURLMapper.USER_GET_PROFILE)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_GET_PROFILE_SERVLET);
             dispatcher.forward(request, response);
             return;
         } // Cart Endpoints
         else if (servletPath.equals(UserURLMapper.USER_GET_CART)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_GET_CART_SERVLET);
             dispatcher.forward(request, response);
             return;
 
         } else if (servletPath.equals(UserURLMapper.USER_VALIDATE_CART)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
 
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_VALIDATE_CART_SERVLET);
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.USER_GET_CART_SHIPPING_FEE)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_GET_CART_SHIPPING_FEE_SERVLET);
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.USER_TRUNCATE_CART)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_TRUNCATE_CART_SERVLET);
             dispatcher.forward(request, response);
             return;
         }
+
         if (servletPath.equals(UserURLMapper.USER_GET_ALL_WISH_LIST)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_GET_ALL_WISH_LIST_SERVLET);
             dispatcher.forward(request, response);
@@ -173,8 +201,55 @@ public class UserDirector extends HttpServlet {
         }
 
         if (servletPath.equals(UserURLMapper.USER_GET_ALL_WISH_LIST_BOOKS)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_GET_ALL_WISH_LIST_BOOKS_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_GET_ALL_ORDERS_LIST)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_ALL_ORDERS_LIST_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_GET_ORDER_DETAILS)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_ORDER_DETAILS_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_GET_ALL_PURCHASE_HISTORY_LIST)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_ALL_PURCHASE_HISTORY_LIST_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_GET_PURCHASE_HISTORY_ITEM_DETAILS)) {
+
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_PURCHASE_HISTORY_ITEM_DETAILS_SERVLET);
             dispatcher.forward(request, response);
             return;
         }
@@ -186,8 +261,6 @@ public class UserDirector extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
 
         String servletPath = request.getServletPath();
 
@@ -211,6 +284,9 @@ public class UserDirector extends HttpServlet {
         }
         // Update Email
         if (servletPath.equals(UserURLMapper.USER_UPDATE_EMAIL)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_UPDATE_EMAIL_SERVLET);
             dispatcher.forward(request, response);
@@ -219,6 +295,9 @@ public class UserDirector extends HttpServlet {
 
         // Update Password
         if (servletPath.equals(UserURLMapper.USER_UPDATE_PASSWORD)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_UPDATE_PASSWORD_SERVLET);
             dispatcher.forward(request, response);
@@ -227,6 +306,9 @@ public class UserDirector extends HttpServlet {
 
         // Update Personal Details
         if (servletPath.equals(UserURLMapper.USER_UPDATE_PERSONAL_DETAILS)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_UPDATE_PERSONAL_DETAILS_SERVLET);
             dispatcher.forward(request, response);
@@ -235,22 +317,34 @@ public class UserDirector extends HttpServlet {
 
         // Recharge Account Balance
         if (servletPath.equals(UserURLMapper.USER_RECHARGE_ACCOUNT)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_RECHARGE_ACCOUNT_SERVLET);
             dispatcher.forward(request, response);
             return;
         } // Cart Endpoints
         else if (servletPath.equals(UserURLMapper.USER_ADD_ITEM_TO_CART)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_ADD_ITEM_TO_CART_SERVLET);
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.USER_UPDATE_CART_ITEM_QUANTITY)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_UPDATE_CART_ITEM_QUANTITY_SERVLET);
             dispatcher.forward(request, response);
             return;
         } else if (servletPath.equals(UserURLMapper.USER_REMOVE_CART_ITEM)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_REMOVE_CART_ITEM_SERVLET);
             dispatcher.forward(request, response);
@@ -258,6 +352,9 @@ public class UserDirector extends HttpServlet {
         }
 
         if (servletPath.equals(UserURLMapper.USER_ADD_WISH_LIST_ITEM)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_ADD_WISH_LIST_ITEM_SERVLET);
             dispatcher.forward(request, response);
@@ -265,8 +362,30 @@ public class UserDirector extends HttpServlet {
         }
 
         if (servletPath.equals(UserURLMapper.USER_REMOVE_FROM_WISH_LIST)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
             var dispatcher = getServletContext().getNamedDispatcher(
                     UserURLMapper.USER_REMOVE_FROM_WISH_LIST_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+        if (servletPath.equals(UserURLMapper.USER_CHECKOUT_USING_ACCOUNT_BALANCE)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_CHECKOUT_USING_ACCOUNT_BALANCE_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
+
+        if (servletPath.equals(UserURLMapper.USER_CHECKOUT_USING_CREDIT_CARD)) {
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_CHECKOUT_USING_CREDIT_CARD_SERVLET);
             dispatcher.forward(request, response);
             return;
         }
@@ -308,5 +427,33 @@ public class UserDirector extends HttpServlet {
             HttpServletResponse response) throws ServletException, IOException {
         directToErrorPage(request, response,
                 "No Trace Method Registered for this URL.");
+    }
+
+    public Boolean isLoggedIn(HttpServletRequest request,
+            HttpServletResponse response) {
+        Boolean logedIn = false;
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            System.out.println("there is session");
+            if (session.getAttribute("isLoggedIn") != null) {
+                System.out.println("there isLoggidIn");
+                String isLoggidIn = (String) session.getAttribute("isLoggedIn");
+                System.out.println(isLoggidIn);
+                if (isLoggidIn.equals("true")) {
+                    logedIn = true;
+                }
+            }
+        }
+        if (!logedIn) {
+            String returnJson = JsonResponseConverter.toJsonResponse("you should log in first", false);
+
+            try {
+                response.getWriter().write(returnJson);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return logedIn;
     }
 }

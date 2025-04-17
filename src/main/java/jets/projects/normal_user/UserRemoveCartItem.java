@@ -10,7 +10,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jets.projects.dal.UsersDAL;
 import jets.projects.exceptions.InvalidInputException;
 import jets.projects.exceptions.NotFoundException;
 import jets.projects.services.CartService;
@@ -18,8 +17,6 @@ import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
 public class UserRemoveCartItem extends HttpServlet {
-
-    private final UsersDAL usersDAL = new UsersDAL();
 
     @Override
     public void doPost(HttpServletRequest request,

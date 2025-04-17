@@ -110,6 +110,26 @@
     <servlet-class>jets.projects.admin_user.purchaseHistory.ReceiptDetailsApiServlet</servlet-class>
   </servlet>
 
+<servlet>
+    <servlet-name>UserGetAllOrdersList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllOrdersList</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserGetOrderDetails</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetOrderDetails</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserCheckoutUsingAccountBalance</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserCheckoutUsingAccountBalance</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserCheckoutUsingCreditCard</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserCheckoutUsingCreditCard</servlet-class>
+</servlet>
+
   <!-- Purchase History Servlet Mappings -->
   <servlet-mapping>
     <servlet-name>PurchaseHistoryServlet</servlet-name>
@@ -316,6 +336,17 @@
     <servlet-class>jets.projects.normal_user.UserGetBookDetails</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>UserGetAllPurchaseHistoryList</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetAllPurchaseHistoryList</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>UserGetPurchaseHistoryItemDetails</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetPurchaseHistoryItemDetails</servlet-class>
+</servlet>
+
+
 
 
 
@@ -438,6 +469,38 @@
     <servlet-name>UserDirector</servlet-name>
     <url-pattern>/userRemoveFromWishList</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllOrdersList</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetOrderDetails</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userCheckoutUsingAccountBalance</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userCheckoutUsingCreditCard</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetAllPurchaseHistoryList</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userGetPurchaseHistoryItemDetails</url-pattern>
+</servlet-mapping>
+
+
 
 
 
