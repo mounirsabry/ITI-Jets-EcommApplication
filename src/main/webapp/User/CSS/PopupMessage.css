@@ -1,0 +1,72 @@
+/* Main Message Container */
+.popup-message-container {
+  position: fixed;
+  top: -100px; /* Initially hidden above the viewport */
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 300px;
+  max-width: 80%;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: top 0.5s ease-in-out;
+  z-index: 1000;
+}
+
+/* Different styles for message types */
+.popup-message-info {
+  background: rgba(59, 130, 246, 0.9); /* Blue */
+}
+
+.popup-message-error {
+  background: rgba(239, 68, 68, 0.9); /* Red */
+}
+
+/* Show class to slide down the message */
+.popup-message-container.show {
+  top: 20px;
+}
+
+/* Close Button */
+.popup-close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .popup-message-container {
+    max-width: 75%;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 820px) {
+  .popup-message-container {
+    max-width: 90%;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .popup-message-container {
+    max-width: 95%;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+  .popup-close-button {
+    font-size: 1.2rem;
+  }
+}

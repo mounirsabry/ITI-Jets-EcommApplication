@@ -2,7 +2,6 @@ package jets.projects.normal_user;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.google.gson.JsonObject;
@@ -14,21 +13,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jets.projects.client_dto.CreditCardDetailsDto;
 import jets.projects.exceptions.InvalidInputException;
+import jets.projects.exceptions.NotFoundException;
 import jets.projects.exceptions.OperationFailedException;
-import jets.projects.services.UserService;
+import jets.projects.exceptions.OutOfStockException;
+import jets.projects.services.OrderService;
 import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
-public class UserRechargeAccountBalanceUsingCreditCard extends HttpServlet {
+public class UserCheckoutUsingCreditCard extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("do post in update Charge ---------------------------");
-        //System.out.println("Query String = " + request.getQueryString());
-        //System.out.println("Request URI = " + request.getRequestURI());
 
         Long registeredID = GetUserID.getUserId(request);
+
+        OrderService orderServce = new OrderService();
+
+        System.out.println("do post in checkcard");
+
         BufferedReader reader = request.getReader();
         StringBuilder json = new StringBuilder();
         String line;
@@ -37,7 +40,6 @@ public class UserRechargeAccountBalanceUsingCreditCard extends HttpServlet {
             json.append(line);
         }
 
-        System.out.println("Raw JSON Received: " + json.toString());
         String jsonString = json.toString();
 
         JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
@@ -45,7 +47,7 @@ public class UserRechargeAccountBalanceUsingCreditCard extends HttpServlet {
 
         CreditCardDetailsDto creditCardDetailsDto = new CreditCardDetailsDto();
 
-        BigDecimal amount = jsonObject.get("amount").getAsBigDecimal();
+        String address = jsonObject.get("address").getAsString();
 
         creditCardDetailsDto.setNameOnCard(creditCardDetails.get("nameOnCard").getAsString());
 
@@ -66,42 +68,42 @@ public class UserRechargeAccountBalanceUsingCreditCard extends HttpServlet {
         LocalDate expiryDate = LocalDate.of(year, month, 1);
 
         creditCardDetailsDto.setExpiryDate(expiryDate);
+
         Object result = null;
         Boolean returnState = true;
 
-        UserService userService = new UserService();
+        System.out.println("data: " + creditCardDetailsDto.getExpiryDate());
+        System.out.println("nameoncard: " + creditCardDetailsDto.getNameOnCard());
+        System.out.println("cardNumber: " + creditCardDetailsDto.getCardNumber());
+        System.out.println("cvc: " + creditCardDetailsDto.getCvc());
+        System.out.println("address: " + address);
 
+        //InvalidInputException, NotFoundException, OutOfStockException
         try {
+            Long orderID = orderServce.checkoutWithCreditCard(registeredID, creditCardDetailsDto, address);
 
-            result = userService.rechargeBalance(registeredID, creditCardDetailsDto, amount);
+            result = "Order placed successfully, with ID#" + orderID.toString();
 
         } catch (InvalidInputException e) {
 
             result = e.getMessage();
             returnState = false;
 
-        } catch (OperationFailedException e) {
-
+        } catch (NotFoundException e) {
             result = e.getMessage();
             returnState = false;
-
-        }
-        if (returnState == true) {
-            Object temp = new Object();
-            temp = result;
-            result = "your balance was charged with " + temp + "EGP";
+        } catch (OutOfStockException e) {
+            result = e.getMessage();
+            returnState = false;
+        } catch (OperationFailedException e) {
+            result = e.getMessage();
+            returnState = false;
         }
 
         String returnJson = JsonResponseConverter.toJsonResponse(result, returnState);
 
         response.getWriter().write(returnJson);
 
-    }
-
-    @Override
-    public void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("get in recharge");
     }
 
 }

@@ -1,5 +1,6 @@
 package jets.projects.services;
 
+import jets.projects.client_dto.ClientOrderDto;
 import jets.projects.dao.BookDao;
 import jets.projects.dao.CartItemDao;
 import jets.projects.dao.OrderDao;
@@ -377,5 +378,55 @@ public class OrderService {
         } catch (Exception e) {
             throw new OperationFailedException("Failed to process status update for order ID: " + orderId + ": " + e.getMessage(), e);
         }
+    }
+
+    private ClientOrderDto convertToClientDto(BookOrder order) {
+        ClientOrderDto dto = new ClientOrderDto();
+        dto.setOrderID(order.getOrderId());
+        dto.setUserID(order.getUser().getUserId());
+        dto.setDate(order.getOrderDate());
+        dto.setAddress(order.getAddress());
+        dto.setPaymentMethod(order.getMethod().getMethod());
+        dto.setShippingFee(order.getShippingCost());
+        dto.setStatus(order.getStatus().name());
+
+        List<ClientOrderDto.OrderItemDto> itemDtos = order.getOrderItems().stream()
+                .map(item -> {
+                    ClientOrderDto.OrderItemDto itemDto = new ClientOrderDto.OrderItemDto();
+                    itemDto.setBookID(item.getBook().getBookId());
+                    itemDto.setQuantity(item.getQuantity().intValue());
+                    itemDto.setPriceAtPurchase(item.getPrice());
+                    return itemDto;
+                })
+                .collect(Collectors.toList());
+        dto.setOrderItems(itemDtos);
+
+        return dto;
+    }
+
+    public ClientOrderDto getOrderDetailsForClient(Long userId, Long orderId) throws InvalidInputException, NotFoundException {
+        if (userId == null || userId <= 0) {
+            throw new InvalidInputException("Invalid user ID");
+        }
+        if (orderId == null || orderId <= 0) {
+            throw new InvalidInputException("Invalid order ID");
+        }
+        userDao.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+        BookOrder order = orderDao.findByUserIdAndOrderId(userId, orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId + " for user ID: " + userId));
+        return convertToClientDto(order);
+    }
+
+    public List<ClientOrderDto> getAllOrdersForClient(Long userId) throws InvalidInputException, NotFoundException {
+        if (userId == null || userId <= 0) {
+            throw new InvalidInputException("Invalid user ID");
+        }
+        userDao.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+        List<BookOrder> orders = orderDao.findByUserId(userId);
+        return orders.stream()
+                .map(this::convertToClientDto)
+                .collect(Collectors.toList());
     }
 }

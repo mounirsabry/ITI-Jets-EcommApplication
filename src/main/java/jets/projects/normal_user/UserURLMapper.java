@@ -92,4 +92,22 @@ public class UserURLMapper {
     public static final String USER_REMOVE_FROM_WISH_LIST = "/userRemoveFromWishList";
     public static final String USER_REMOVE_FROM_WISH_LIST_SERVLET = "UserRemoveFromWishList";
 
+    public static final String USER_GET_ALL_ORDERS_LIST = "/userGetAllOrdersList";
+    public static final String USER_GET_ALL_ORDERS_LIST_SERVLET = "UserGetAllOrdersList";
+
+    public static final String USER_GET_ORDER_DETAILS = "/userGetOrderDetails";
+    public static final String USER_GET_ORDER_DETAILS_SERVLET = "UserGetOrderDetails";
+
+    public static final String USER_CHECKOUT_USING_ACCOUNT_BALANCE = "/userCheckoutUsingAccountBalance";
+    public static final String USER_CHECKOUT_USING_ACCOUNT_BALANCE_SERVLET = "UserCheckoutUsingAccountBalance";
+
+    public static final String USER_CHECKOUT_USING_CREDIT_CARD = "/userCheckoutUsingCreditCard";
+    public static final String USER_CHECKOUT_USING_CREDIT_CARD_SERVLET = "UserCheckoutUsingCreditCard";
+
+    public static final String USER_GET_ALL_PURCHASE_HISTORY_LIST = "/userGetAllPurchaseHistoryList";
+    public static final String USER_GET_ALL_PURCHASE_HISTORY_LIST_SERVLET = "UserGetAllPurchaseHistoryList";
+
+    public static final String USER_GET_PURCHASE_HISTORY_ITEM_DETAILS = "/userGetPurchaseHistoryItemDetails";
+    public static final String USER_GET_PURCHASE_HISTORY_ITEM_DETAILS_SERVLET = "UserGetPurchaseHistoryItemDetails";
+
 }

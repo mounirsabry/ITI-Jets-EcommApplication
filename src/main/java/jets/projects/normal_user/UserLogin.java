@@ -15,19 +15,16 @@ import jets.projects.client_dto.UserDto;
 import jets.projects.dal.UsersDAL;
 import jets.projects.exceptions.InvalidCredentialsException;
 import jets.projects.services.UserService;
-import jets.projects.utils.GetUserID;
 import jets.projects.utils.JsonResponseConverter;
 
 public class UserLogin extends HttpServlet {
 
     private final UsersDAL usersDAL = new UsersDAL();
-    
+
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
-        //System.out.println("Query String = " + request.getQueryString());
-        //System.out.println("Request URI = " + request.getRequestURI());
         BufferedReader reader = request.getReader();
         StringBuilder json = new StringBuilder();
         String line;
@@ -36,7 +33,8 @@ public class UserLogin extends HttpServlet {
             json.append(line);
         }
 
-        System.out.println("Raw JSON Received: " + json.toString());
+        System.out.println(
+                "Raw JSON Received: " + json.toString());
         String jsonString = json.toString();
 
         JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
@@ -72,11 +70,8 @@ public class UserLogin extends HttpServlet {
             session = request.getSession(true);
 
             session.setAttribute("userID", registeredID);
+            session.setAttribute("isLoggedIn", "true");
             System.out.println("user id" + registeredID);
-
-            GetUserID.id = registeredID;
-
-            System.out.println("val: " + GetUserID.id);
 
         }
 
@@ -84,16 +79,19 @@ public class UserLogin extends HttpServlet {
 
         Long registeredID = null;
 
-        if (session != null) {
+        if (session
+                != null) {
             // Retrieve the userID
             registeredID = (Long) session.getAttribute("userID");
             System.out.println("user id " + registeredID);
 
         }
 
-        System.out.println("user id " + registeredID);
+        System.out.println(
+                "user id " + registeredID);
 
-        response.getWriter().write(returnJson);
+        response.getWriter()
+                .write(returnJson);
 
     }
 }
