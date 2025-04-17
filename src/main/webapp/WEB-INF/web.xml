@@ -72,6 +72,12 @@
     <url-pattern>/Admin/AdminUsers</url-pattern>
   </servlet-mapping>
 
+    <!-- Dashboard servlets-->
+    <servlet>
+        <servlet-name>StatsServlet</servlet-name>
+        <servlet-class>jets.projects.admin_user.StatsServlet</servlet-class>
+    </servlet>
+
   <!-- Orders Servlets -->
   <servlet>
     <servlet-name>OrdrersServlet</servlet-name>
@@ -96,35 +102,36 @@
 
   <!-- Purchase History Servlets -->
   <servlet>
-    <servlet-name>PurchaseHistoryServlet</servlet-name>
-    <servlet-class>jets.projects.admin_user.purchaseHistory.PurchaseHistoryServlet</servlet-class>
+    <servlet-name>PurchaseStatsServlet</servlet-name>
+    <servlet-class>jets.projects.admin_user.purchaseHistory.StatsServlet</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>PurchaseHistoryApiServlet</servlet-name>
-    <servlet-class>jets.projects.admin_user.purchaseHistory.PurchaseHistoryApiServlet</servlet-class>
-  </servlet>
+    <servlet>
+        <servlet-name>PurchaseHistoryServlet</servlet-name>
+        <servlet-class>jets.projects.admin_user.purchaseHistory.PurchaseHistoryServlet</servlet-class>
+    </servlet>
 
-  <servlet>
-    <servlet-name>ReceiptDetailsApiServlet</servlet-name>
-    <servlet-class>jets.projects.admin_user.purchaseHistory.ReceiptDetailsApiServlet</servlet-class>
-  </servlet>
+    <servlet>
+        <servlet-name>ReceiptDownloadServlet</servlet-name>
+        <servlet-class>jets.projects.admin_user.purchaseHistory.ReceiptDownloadServlet</servlet-class>
+    </servlet>
 
   <!-- Purchase History Servlet Mappings -->
-  <servlet-mapping>
-    <servlet-name>PurchaseHistoryServlet</servlet-name>
-    <url-pattern>/Admin/PurchaseHistory</url-pattern>
-  </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>PurchaseHistoryApiServlet</servlet-name>
-    <url-pattern>/Admin/PurchaseHistory/api</url-pattern>
+    <servlet-name>PurchaseStatsServlet</servlet-name>
+    <url-pattern>/Admin/StatsServlet</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>ReceiptDetailsApiServlet</servlet-name>
-    <url-pattern>/Admin/PurchaseHistory/api/*</url-pattern>
-  </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PurchaseHistoryServlet</servlet-name>
+        <url-pattern>/Admin/PurchaseHistoryServlet/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ReceiptDownloadServlet</servlet-name>
+        <url-pattern>/Admin/ReceiptDownloadServlet/*</url-pattern>
+    </servlet-mapping>
 
   <!-- Discounts Admin Servlets -->
   <servlet>
@@ -167,6 +174,12 @@
     <servlet-name>DiscountsServlet</servlet-name>
     <url-pattern>/Admin/DiscountsServlet</url-pattern>
   </servlet-mapping>
+
+    <!--Dashboard servlets mapping-->
+    <servlet-mapping>
+        <servlet-name>StatsServlet</servlet-name>
+        <url-pattern>/Admin/DashboardStatsServlet</url-pattern>
+    </servlet-mapping>
 
   <!-- User Servlets -->
   <servlet>

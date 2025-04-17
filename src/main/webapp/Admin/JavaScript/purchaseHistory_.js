@@ -28,8 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nextPage").addEventListener("click", () => {
         navigatePage(1);
     });
-
-    window.viewReceipt = viewReceipt;
 });
 
 let currentPage = 1;
@@ -114,6 +112,7 @@ function displayPurchaseHistory(purchases) {
     }
 
     purchases.forEach(purchase => {
+        console.log("Generating download link for purchase ID:", purchase.id);
         purchaseHistoryTable.innerHTML += `
             <tr>
                 <td>${purchase.id}</td>
@@ -121,7 +120,7 @@ function displayPurchaseHistory(purchases) {
                 <td>${formatDate(purchase.date)}</td>
                 <td>${formatCurrency(purchase.totalPaid)}</td>
                 <td>
-                    <a href="#" class="view-receipt-btn" onclick="viewReceipt(${purchase.id}); return false;">View Receipt</a>
+                    <a href="${contextPath}/Admin/ReceiptDownloadServlet/${purchase.id}" class="btn download-btn">Download</a>
                 </td>
             </tr>
         `;
@@ -154,37 +153,6 @@ function navigatePage(direction) {
     }
 }
 
-function viewReceipt(id) {
-    fetch(`${contextPath}/Admin/PurchaseHistoryServlet/receipt/${id}`, {
-        headers: { "Accept": "application/json" }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`Failed to fetch receipt ${id}`);
-            return response.json();
-        })
-        .then(receipt => {
-            displayReceiptDetails(receipt);
-        })
-        .catch(error => {
-            console.error('Error fetching receipt:', error);
-            alert('Failed to load receipt details. Please try again.');
-            displayReceiptDetails({ id });
-        });
-}
-
-function displayReceiptDetails(receipt) {
-    document.getElementById("modalReceiptId").textContent = receipt.id || 'N/A';
-    document.getElementById("modalReceiptDate").textContent = receipt.date ? formatDate(receipt.date) : 'N/A';
-    document.getElementById("modalUserName").textContent = receipt.userName || 'Unknown';
-    document.getElementById("modalUserEmail").textContent = receipt.userEmail || 'N/A';
-    document.getElementById("modalTotalPaid").textContent = receipt.totalPaid != null ? formatCurrency(receipt.totalPaid) : '$0.00';
-
-    const downloadBtn = document.getElementById("downloadReceiptBtn");
-    downloadBtn.href = receipt.id ? `${contextPath}/Admin/PurchaseHistoryServlet/receipt/${receipt.id}/download` : '#';
-
-    openModal("receiptModal");
-}
-
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -194,33 +162,3 @@ function formatDate(dateString) {
 function formatCurrency(amount) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
 }
-
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = "block";
-    document.body.style.overflow = "hidden";
-}
-
-function closeModal(modal) {
-    modal.style.display = "none";
-    document.body.style.overflow = "auto";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const closeButtons = document.querySelectorAll(".close");
-    closeButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const modal = button.closest(".modal");
-            closeModal(modal);
-        });
-    });
-
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach(modal => {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                closeModal(modal);
-            }
-        });
-    });
-});

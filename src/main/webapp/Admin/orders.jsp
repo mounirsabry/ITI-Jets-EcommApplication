@@ -166,6 +166,6 @@
         const contextPath = "${pageContext.request.contextPath}";
     </script>
     <script src="JavaScript/common.js"></script>
-    <script src="JavaScript/order.js"></script>
+    <script src="JavaScript/orders.js"></script>
 </body>
 </html>

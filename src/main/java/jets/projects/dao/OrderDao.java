@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import jets.projects.entity.BookOrder;
+import jets.projects.entity.Status;
 import jets.projects.utils.JpaUtil;
 
 import java.util.List;
@@ -123,6 +124,20 @@ public class OrderDao {
             query.setParameter("orderId", orderId);
             List<BookOrder> results = query.getResultList();
             return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } finally {
+            em.close();
+        }
+    }
+
+    public long countPendingOrders() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(o) FROM BookOrder o WHERE o.status = :status",
+                    Long.class
+            );
+            query.setParameter("status", Status.PENDING);
+            return query.getSingleResult();
         } finally {
             em.close();
         }

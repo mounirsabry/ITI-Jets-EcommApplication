@@ -169,7 +169,7 @@ function displayOrders(orders) {
         ordersTable.innerHTML += `
             <tr>
                 <td>${order.id}</td>
-                <td>${order.customer.username}</td>
+                <td>${order.customer.name}</td>
                 <td>${formatDate(order.date)}</td>
                 <td>${formatCurrency(order.total)}</td>
                 <td><span class="status-badge ${statusClass}">${order.status}</span></td>
@@ -261,7 +261,7 @@ function viewOrder(id) {
         document.getElementById("modalOrderId").textContent = order.id;
         document.getElementById("modalOrderDate").textContent = formatDate(order.date);
         document.getElementById("modalOrderStatus").value = order.status;
-        document.getElementById("modalCustomerName").textContent = order.customer.username;
+        document.getElementById("modalCustomerName").textContent = order.customer.name;
         document.getElementById("modalCustomerEmail").textContent = order.customer.email;
         document.getElementById("modalCustomerPhone").textContent = order.customer.phoneNumber || "N/A";
         document.getElementById("modalShippingAddress").textContent = order.customer.address || "N/A";

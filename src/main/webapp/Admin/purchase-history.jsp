@@ -93,7 +93,7 @@
                         <th>User</th>
                         <th>Date</th>
                         <th>Total Paid</th>
-                        <th>Receipt</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody id="purchaseHistoryTable">
@@ -110,40 +110,10 @@
     </main>
 </div>
 
-<div id="receiptModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Receipt Details</h2>
-            <span class="close">×</span>
-        </div>
-        <div class="modal-body">
-            <div class="receipt-container">
-                <div class="receipt-header">
-                    <h3>Purchase Receipt</h3>
-                    <p>Date: <span id="modalReceiptDate"></span></p>
-                    <p>Receipt ID: <span id="modalReceiptId"></span></p>
-                </div>
-                <div class="receipt-user">
-                    <h4>Customer Information</h4>
-                    <p><strong>Name:</strong> <span id="modalUserName"></span></p>
-                    <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
-                </div>
-                <div class="receipt-details">
-                    <h4>Purchase Details</h4>
-                    <p><strong>Total Paid:</strong> <span id="modalTotalPaid"></span></p>
-                </div>
-                <div class="receipt-actions">
-                    <a id="downloadReceiptBtn" href="#" class="btn" target="_blank">Download Receipt</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     const contextPath = "${pageContext.request.contextPath}";
 </script>
 <script src="JavaScript/common.js"></script>
-<script src="JavaScript/purchaseHistory.js"></script>
+<script src="JavaScript/purchaseHistory_.js"></script>
 </body>
 </html>

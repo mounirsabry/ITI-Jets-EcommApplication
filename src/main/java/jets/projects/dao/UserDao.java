@@ -131,4 +131,14 @@ public class UserDao {
             em.close();
         }
     }
+
+    public long countTotalUsers() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery("SELECT COUNT(u) FROM User u", Long.class);
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 }

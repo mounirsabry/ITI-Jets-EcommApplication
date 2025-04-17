@@ -136,4 +136,28 @@ public class BookDao {
             em.close();
         }
     }
+
+    public long countTotalBooks() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery("SELECT COUNT(b) FROM Book b", Long.class);
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Object[]> findTopSellingBooksDashboard(int limit) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT b.title, b.soldCount FROM Book b WHERE b.soldCount > 0 ORDER BY b.soldCount DESC",
+                    Object[].class
+            );
+            query.setMaxResults(limit);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

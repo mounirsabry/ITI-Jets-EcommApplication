@@ -82,47 +82,47 @@ public class AdminDirector extends HttpServlet {
             return;
         }
 
-        // Purchase History Page
-        if (servletPath.equals(AdminURLMapper.PURCHASE_HISTORY)) {
-            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_SERVLET);
-            if (dispatcher == null) {
-                directToErrorPage(request, response, "Purchase History Servlet not found.");
-                return;
-            }
-            dispatcher.forward(request, response);
-            return;
-        }
+        // Purchase History stats api
+//        if (servletPath.equals(AdminURLMapper.PURCHASE_HISTORY_STATS_SERVLET)) {
+//            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_STATS_API);
+//            if (dispatcher == null) {
+//                directToErrorPage(request, response, "Purchase History Servlet not found.");
+//                return;
+//            }
+//            dispatcher.forward(request, response);
+//            return;
+//        }
 
         // Purchase History API
-        if (servletPath.equals(AdminURLMapper.PURCHASE_HISTORY_API)) {
-            if (redirectOnHavingInvalidSession(request, response, session)) {
-                return;
-            }
-            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_API_SERVLET);
-            if (dispatcher == null) {
-                System.out.println("Dispatcher null for " + AdminURLMapper.PURCHASE_HISTORY_API_SERVLET);
-                directToErrorPage(request, response, "Purchase History API Servlet not found.");
-                return;
-            }
-            System.out.println("Forwarding to PurchaseHistoryApiServlet");
-            dispatcher.forward(request, response);
-            return;
-        }
+//        if (servletPath.equals(AdminURLMapper.PURCHASE_HISTORY_API)) {
+//            if (redirectOnHavingInvalidSession(request, response, session)) {
+//                return;
+//            }
+//            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_API_SERVLET);
+//            if (dispatcher == null) {
+//                System.out.println("Dispatcher null for " + AdminURLMapper.PURCHASE_HISTORY_API_SERVLET);
+//                directToErrorPage(request, response, "Purchase History API Servlet not found.");
+//                return;
+//            }
+//            System.out.println("Forwarding to PurchaseHistoryApiServlet");
+//            dispatcher.forward(request, response);
+//            return;
+//        }
 
         // Purchase History Receipt API (including download)
-        if (servletPath.startsWith(AdminURLMapper.PURCHASE_HISTORY_RECEIPT_API.substring(0,
-                AdminURLMapper.PURCHASE_HISTORY_RECEIPT_API.length() - 1))) {
-            if (redirectOnHavingInvalidSession(request, response, session)) {
-                return;
-            }
-            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_RECEIPT_SERVLET);
-            if (dispatcher == null) {
-                directToErrorPage(request, response, "Receipt Details API Servlet not found.");
-                return;
-            }
-            dispatcher.forward(request, response);
-            return;
-        }
+//        if (servletPath.startsWith(AdminURLMapper.PURCHASE_HISTORY_RECEIPT_API.substring(0,
+//                AdminURLMapper.PURCHASE_HISTORY_RECEIPT_API.length() - 1))) {
+//            if (redirectOnHavingInvalidSession(request, response, session)) {
+//                return;
+//            }
+//            var dispatcher = getServletContext().getNamedDispatcher(AdminURLMapper.PURCHASE_HISTORY_RECEIPT_SERVLET);
+//            if (dispatcher == null) {
+//                directToErrorPage(request, response, "Receipt Details API Servlet not found.");
+//                return;
+//            }
+//            dispatcher.forward(request, response);
+//            return;
+//        }
 
         if (servletPath.equals(AdminURLMapper.SEARCH)) {
             if (redirectOnHavingInvalidSession(request, response, session)) {
