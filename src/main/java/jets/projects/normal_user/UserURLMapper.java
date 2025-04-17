@@ -110,4 +110,10 @@ public class UserURLMapper {
     public static final String USER_GET_PURCHASE_HISTORY_ITEM_DETAILS = "/userGetPurchaseHistoryItemDetails";
     public static final String USER_GET_PURCHASE_HISTORY_ITEM_DETAILS_SERVLET = "UserGetPurchaseHistoryItemDetails";
 
+    public static final String WELCOME_PAGE = "/User/welcome.html";
+
+//    public static final String WELCOME_PAGE = "/User/welcome.html";
+////    public static final String REGISTER_PAGE = "/User/user_register.jspx";
+//    public static final String HOME_PAGE = "/User/user_home.jspx";
+
 }

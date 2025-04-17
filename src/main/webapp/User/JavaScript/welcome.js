@@ -5,7 +5,7 @@ import URL_Mapper from "./Utils/URL_Mapper.js";
 
 import { createBookCard } from "./Utils/bookUIFunctions.js";
 import displayProduct from "./Common/BookPopup.js";
-import { BooksManager } from "./Managers/BooksManager.js";
+import BooksManager from "./Managers/BooksManager.js";
 import Book from "./Models/Book.js";
 
 document.addEventListener("DOMContentLoaded", function() {

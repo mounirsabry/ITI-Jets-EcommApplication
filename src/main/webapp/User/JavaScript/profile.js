@@ -4,7 +4,7 @@ import checkForErrorMessageParameter from "./Common/checkForError.js";
 import URL_Mapper from './Utils/URL_Mapper.js';
 import DataValidator from './Utils/DataValidator.js';
 
-import { ProfileManager } from "./Managers/ProfileManager.js";
+import ProfileManager from "./Managers/ProfileManager.js";
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 import User from "./Models/User.js";
 import MessagePopup from "./Common/MessagePopup.js";
@@ -149,6 +149,11 @@ document.addEventListener('DOMContentLoaded', function () {
         else if (newPassword !== confirmPassword) {
             errorMessage = 'New password and confirm password do not match.';
         }
+
+        // Old cannot be the same as new.
+        else if (currentPassword === newPassword) {
+            errorMessage = 'Current password cannot be the same as new password.';
+        }
     
         // Show error if any
         if (errorMessage) {
@@ -199,7 +204,10 @@ document.addEventListener('DOMContentLoaded', function () {
         ProfileManager.updateEmail(userObject.userID, newEmail,
             (data) => {
             MessagePopup.show(data);
+
             displayEmail.textContent = newEmail;
+            userObject.email = newEmail;
+
             closeEmailPopup();
         });
     });

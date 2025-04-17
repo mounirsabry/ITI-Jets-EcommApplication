@@ -20,4 +20,6 @@ public class UserLogout extends HttpServlet {
         response.sendRedirect(request.getContextPath()
                         + UserURLMapper.HOME_PAGE);
     }
+
+    //todo: remove the session and return true
 }

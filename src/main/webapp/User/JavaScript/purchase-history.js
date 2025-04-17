@@ -4,7 +4,7 @@ import checkForErrorMessageParameter from "./Common/checkForError.js";
 import URL_Mapper from './Utils/URL_Mapper.js';
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 
-import {PurchaseHistoryManager} from "./Managers/PurchaseHistoryManager.js";
+import PurchaseHistoryManager from "./Managers/PurchaseHistoryManager.js";
 import HistoryItem from "./Models/HistoryItem.js";
 
 document.addEventListener('DOMContentLoaded', function () {

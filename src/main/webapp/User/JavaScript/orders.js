@@ -2,11 +2,11 @@
 
 import checkForErrorMessageParameter from "./Common/checkForError.js";
 import URL_Mapper from './Utils/URL_Mapper.js';
-import { OrdersManager } from "./Managers/OrdersManager.js";
+import OrdersManager from "./Managers/OrdersManager.js";
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 import Order from "./Models/Order.js";
 
-import { formatDate, formatTime } from "./Utils/UICommonFunctions.js";
+import { addOrderDateTimeAddress } from "./Utils/UICommonFunctions.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     checkForErrorMessageParameter();
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderOrders(orders) {
         let parsedOrders = orders.map((order) => {
             try {
-                return Order.fromJSON(order); // Use the Order class to parse the order
+                return Order.fromJSON(order);
             } catch (_) {
                 console.error('Could not parse an order from the orders list!');
                 return null;
@@ -58,17 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             orderIdHeading.textContent = `Order #${order.orderID}`;
             orderDetails.appendChild(orderIdHeading);
 
-            const dateParagraph = document.createElement('p');
-            dateParagraph.innerHTML = `<strong>Date:</strong> ${formatDate(order.date)}`;
-            orderDetails.appendChild(dateParagraph);
-
-            const timeParagraph = document.createElement('p');
-            timeParagraph.innerHTML = `<strong>Time:</strong> ${formatTime(order.date)}`;
-            orderDetails.appendChild(timeParagraph);
-
-            const addressParagraph = document.createElement('p');
-            addressParagraph.innerHTML = `<strong>Address:</strong> ${order.address}`;
-            orderDetails.appendChild(addressParagraph);
+            addOrderDateTimeAddress(orderDetails, order);
 
             const orderItems = order.orderItems;
             let numberOfDifferentBooks = 'Unknown';

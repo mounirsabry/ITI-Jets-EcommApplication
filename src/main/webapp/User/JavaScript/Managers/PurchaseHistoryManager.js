@@ -1,16 +1,29 @@
 'use strict';
 
-import { Server } from "../../ServerSimulator";
-import createResponseHandler from "./responseHandler.js";
+import VanillaAJAX from "../Ajax/VanillaAJAX.js";
+import ServerURLMapper from "./ServerURLMapper.js";
+import handleManagerError from "./handleManagerError.js";
 
-export const PurchaseHistoryManager = {
+const ajaxClient = new VanillaAJAX();
+
+export default {
     getAllPurchaseHistory(userID, callbackOnSuccess, callbackOnFailure) {
-        Server.PurchaseHistoryHandler.userGetAllPurchaseHistoryList(JSON.stringify({ userID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.get(ServerURLMapper.userGetAllPurchaseHistoryList, { userID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     getPurchaseHistoryItem(userID, itemID, callbackOnSuccess, callbackOnFailure) {
-        Server.PurchaseHistoryHandler.userGetPurchaseHistoryItemDetails(JSON.stringify({ userID, itemID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.get(ServerURLMapper.userGetPurchaseHistoryItemDetails, { userID, itemID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     }
 };

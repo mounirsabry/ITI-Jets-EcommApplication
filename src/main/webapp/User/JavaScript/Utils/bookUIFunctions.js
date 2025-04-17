@@ -2,7 +2,7 @@
 
 import URL_Mapper from './URL_Mapper.js';
 import displayProduct from "../Common/BookPopup.js";
-import { CartManager } from "../Managers/CartManager.js";
+import CartManager from "../Managers/CartManager.js";
 import UserAuthTracker from "../Common/UserAuthTracker.js";
 import MessagePopup from "../Common/MessagePopup.js";
 

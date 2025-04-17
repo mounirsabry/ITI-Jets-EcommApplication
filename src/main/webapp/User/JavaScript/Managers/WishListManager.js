@@ -1,26 +1,49 @@
 'use strict';
 
-import { Server } from "../../ServerSimulator";
-import createResponseHandler from "./responseHandler.js";
+import VanillaAJAX from "../Ajax/VanillaAJAX.js";
+import ServerURLMapper from "./ServerURLMapper.js";
+import handleManagerError from "./handleManagerError.js";
 
-export const WishListManager = {
+const ajaxClient = new VanillaAJAX();
+
+export default {
     getAllWishList(userID, callbackOnSuccess, callbackOnFailure) {
-        Server.WishListHandler.userGetAllWishList(JSON.stringify({ userID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.get(ServerURLMapper.userGetAllWishList, { userID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     getAllWishListBooks(userID, callbackOnSuccess, callbackOnFailure) {
-        Server.WishListHandler.userGetAllWishList(JSON.stringify({ userID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.get(ServerURLMapper.userGetAllWishListBooks, { userID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     addWishListItem(userID, bookID, callbackOnSuccess, callbackOnFailure) {
-        Server.WishListHandler.userAddWishListItem(JSON.stringify({ userID, bookID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.post(ServerURLMapper.userAddWishListItem, { userID, bookID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     removeFromWishList(userID, bookID, callbackOnSuccess, callbackOnFailure) {
-        Server.WishListHandler.userRemoveFromWishList(JSON.stringify({ userID, bookID }),
-            createResponseHandler(callbackOnSuccess, callbackOnFailure));
+        ajaxClient.post(ServerURLMapper.userRemoveFromWishList, { userID, bookID })
+            .then(response => {
+                if (typeof callbackOnSuccess === 'function') {
+                    callbackOnSuccess(response);
+                }
+            })
+            .catch(error => handleManagerError(error, callbackOnFailure));
     }
 };

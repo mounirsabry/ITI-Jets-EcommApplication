@@ -15,4 +15,18 @@ const formatTime = function(isoDateString) {
     return `${hours}:${minutes}:${seconds}`;
 }
 
-export { formatDate, formatTime };
+const addOrderDateTimeAddress = function(orderDetailsElement, order) {
+    const dateParagraph = document.createElement('p');
+    dateParagraph.innerHTML = `<strong>Date:</strong> ${formatDate(order.date)}`;
+    orderDetailsElement.appendChild(dateParagraph);
+
+    const timeParagraph = document.createElement('p');
+    timeParagraph.innerHTML = `<strong>Time:</strong> ${formatTime(order.date)}`;
+    orderDetailsElement.appendChild(timeParagraph);
+
+    const addressParagraph = document.createElement('p');
+    addressParagraph.innerHTML = `<strong>Address:</strong> ${order.address}`;
+    orderDetailsElement.appendChild(addressParagraph);
+}
+
+export { formatDate, formatTime, addOrderDateTimeAddress };

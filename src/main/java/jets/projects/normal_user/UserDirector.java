@@ -68,7 +68,7 @@ public class UserDirector extends HttpServlet {
         if (servletPath.equals("/Home")) {
             if (HOME_SERVICE_AVAILABLE) {
                 response.sendRedirect(request.getContextPath()
-                        + UserURLMapper.HOME_PAGE);
+                        + UserURLMapper.WELCOME_PAGE);
                 return;
             } else {
                 directToErrorPage(request, response,

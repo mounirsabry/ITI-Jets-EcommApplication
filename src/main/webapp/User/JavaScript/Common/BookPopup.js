@@ -4,7 +4,7 @@ import URL_Mapper from '../Utils/URL_Mapper.js';
 import MessagePopup from "./MessagePopup.js";
 
 import { appendAddToCartControls, appendStockValue } from "../Utils/bookUIFunctions.js";
-import { BooksManager } from "../Managers/BooksManager.js";
+import BooksManager from "../Managers/BooksManager.js";
 import Book from "../Models/Book.js";
 
 export default function displayProduct(book, updateOriginalBookCallback, isInfoOnly = false) {

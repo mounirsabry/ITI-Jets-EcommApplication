@@ -2,7 +2,7 @@
 
 import checkForErrorMessageParameter from "./Common/checkForError.js";
 import { createBookCard } from './Utils/bookUIFunctions.js';
-import { BooksManager } from './Managers/BooksManager.js';
+import BooksManager from './Managers/BooksManager.js';
 import Book from './Models/Book.js';
 import Genres from './Models/Genres.js';
 

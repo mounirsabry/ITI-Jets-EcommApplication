@@ -2,8 +2,8 @@
 
 import checkForErrorMessageParameter from "./Common/checkForError.js";
 import URL_Mapper from './Utils/URL_Mapper.js';
-import { CartManager } from "./Managers/CartManager.js";
-import { OrdersManager } from "./Managers/OrdersManager.js";
+import CartManager from "./Managers/CartManager.js";
+import OrdersManager from "./Managers/OrdersManager.js";
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 import MessagePopup from "./Common/MessagePopup.js";
 import DataValidator from "./Utils/DataValidator.js";

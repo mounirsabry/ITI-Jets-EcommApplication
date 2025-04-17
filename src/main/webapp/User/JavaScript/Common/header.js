@@ -3,7 +3,7 @@
 import URL_Mapper from '../Utils/URL_Mapper.js';
 import UserAuthTracker from './UserAuthTracker.js';
 import MessagePopup from '../Common/MessagePopup.js';
-import { ProfileManager } from '../Managers/ProfileManager.js';
+import ProfileManager from '../Managers/ProfileManager.js';
 import DataValidator from '../Utils/DataValidator.js';
 import User from "../Models/User.js";
 

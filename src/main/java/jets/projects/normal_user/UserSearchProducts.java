@@ -26,7 +26,7 @@ public class UserSearchProducts extends HttpServlet {
                     StandardCharsets.UTF_8);
             
             response.sendRedirect(request.getContextPath()
-                    + UserURLMapper.HOME_PAGE
+                    + UserURLMapper.WELCOME_PAGE
                     + "?errorMessage=" + errorMessage);
             return;
         }
