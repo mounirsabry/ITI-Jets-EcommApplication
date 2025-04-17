@@ -6,7 +6,7 @@ export default class User {
     #userID = -1; // Private field
     #email = '';
     #hashPassword = ''; // Stored in plaintext for this demo
-    #userName = '';
+    #username = '';
     #phoneNumber = '';
     #address = '';
     #birthDate = '';
@@ -48,15 +48,15 @@ export default class User {
         this.#hashPassword = value;
     }
 
-    get userName() {
-        return this.#userName;
+    get username() {
+        return this.#username;
     }
 
-    set userName(value) {
+    set username(value) {
         if (typeof value !== 'string' || value.trim().length === 0) {
             throw new Error('Invalid user name!');
         }
-        this.#userName = value;
+        this.#username = value;
     }
 
     get phoneNumber() {
@@ -108,7 +108,7 @@ export default class User {
             userID: this.#userID,
             email: this.#email,
             hashPassword: this.#hashPassword,
-            userName: this.#userName,
+            username: this.#username,
             phoneNumber: this.#phoneNumber,
             address: this.#address,
             birthDate: this.#birthDate,
@@ -125,7 +125,7 @@ export default class User {
             userID,
             email,
             hashPassword,
-            userName,
+            username,
             phoneNumber,
             address,
             birthDate,
@@ -149,10 +149,11 @@ export default class User {
         }
         user.hashPassword = hashPassword;
 
-        if (typeof userName !== 'string' || userName.trim().length === 0) {
-            throw new Error('Invalid user name in JSON!');
-        }
-        user.userName = userName;
+        // if (typeof userName !== 'string' || userName.trim().length === 0) {
+        //     throw new Error('Invalid user name in JSON!');
+        // }
+        // user.username = userName;
+        user.username = 'dummy';
 
         if (!DataValidator.isPhoneValid(phoneNumber)) {
             throw new Error('Invalid phone number in JSON!');

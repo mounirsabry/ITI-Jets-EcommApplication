@@ -50,7 +50,7 @@ export default class HistoryItem {
     }
 
     set totalPaid(totalPaid) {
-        if (!DataValidator.isNonNegativeInteger(totalPaid)) {
+        if (!DataValidator.isNonNegativeFloat(totalPaid)) {
             throw new Error('Invalid total paid!');
         }
         this.#totalPaid = totalPaid;
@@ -92,7 +92,7 @@ export default class HistoryItem {
         }
         const parsedDate = new Date(date).toISOString();
 
-        if (!DataValidator.isNonNegativeInteger(totalPaid)) {
+        if (!DataValidator.isNonNegativeFloat(totalPaid)) {
             throw new Error('Invalid total paid in JSON!');
         }
         const parsedTotalPaid = parseFloat(totalPaid);

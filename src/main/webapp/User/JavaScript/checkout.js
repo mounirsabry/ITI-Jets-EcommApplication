@@ -98,6 +98,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function loadOrderSummary() {
         // Load subtotal.
         CartManager.getSubtotal(userObject.userID, (data) => {
+            console.log(data);
             const subtotal = data || 0;
             if (subtotalComponent) {
                 subtotalComponent.textContent = subtotal.toFixed(2);

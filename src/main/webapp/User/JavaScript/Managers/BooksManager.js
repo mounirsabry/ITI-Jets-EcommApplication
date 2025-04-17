@@ -15,7 +15,7 @@ export default {
             .then(response => {
                 responseHandler(response);
             })
-            .catch(responseHandler(response));
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     getTopSellingInGenres(callbackOnSuccess, callbackOnFailure) {
@@ -25,35 +25,35 @@ export default {
             .then(response => {
                 responseHandler(response);
             })
-            .catch(responseHandler(response));
+            .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     getAllBooks(callbackOnSuccess, callbackOnFailure) {
+        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
+
         ajaxClient.get(ServerURLMapper.userGetAllBooksList, {})
             .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
+                responseHandler(response);
             })
             .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     search(keywords, callbackOnSuccess, callbackOnFailure) {
+        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
+
         ajaxClient.get(ServerURLMapper.userSearchBooks, { keywords })
             .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
+                responseHandler(response);
             })
             .catch(error => handleManagerError(error, callbackOnFailure));
     },
 
     getBookDetails(bookID, callbackOnSuccess, callbackOnFailure) {
+        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
+
         ajaxClient.get(ServerURLMapper.userGetBookDetails, { bookID })
             .then(response => {
-                if (typeof callbackOnSuccess === 'function') {
-                    callbackOnSuccess(response);
-                }
+                responseHandler(response);
             })
             .catch(error => handleManagerError(error, callbackOnFailure));
     }

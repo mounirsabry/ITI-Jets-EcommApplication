@@ -34,7 +34,7 @@ export default class DataValidator {
     }
 
     static isPasswordValid(password) {
-        return DataValidator.passwordPattern.test(password);
+        return DataValidator.passwordPattern.test(password) || password === 'Hidden';
     }
 
     static isUserNameValid(username) {

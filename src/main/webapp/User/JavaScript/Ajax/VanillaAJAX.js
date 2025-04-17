@@ -25,7 +25,7 @@ class VanillaAJAX {
                 return;
             }
 
-            const url = `${this.#baseURL}${endpoint}`;
+            let url = `${this.#baseURL}${endpoint}`;
             ajaxRequest.open(method, url, true);
 
             // Set default headers
@@ -84,7 +84,22 @@ class VanillaAJAX {
     }
 
     get(endpoint, data, headers) {
-        return this.request('GET', endpoint, data, headers);
+        // For GET requests, if there's data, append it as query parameters
+        let url = endpoint;
+        if (data) {
+            const queryParams = new URLSearchParams();
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    queryParams.append(key, data[key]);
+                }
+            }
+            const queryString = queryParams.toString();
+            if (queryString) {
+                url += (url.includes('?') ? '&' : '?') + queryString;
+            }
+        }
+
+        return this.request('GET', url, null, headers);
     }
 
     post(endpoint, data, headers) {

@@ -74,9 +74,6 @@ export default class Order {
     }
 
     set shippingFee(value) {
-        if (typeof value !== 'number') {
-            throw new Error('Invalid shipping fee!');
-        }
         this.#shippingFee = value;
     }
 
@@ -96,9 +93,9 @@ export default class Order {
     }
 
     set status(value) {
-        if (!Object.values(OrderStatus).includes(value)) {
-            throw new Error('Invalid status!');
-        }
+        // if (!Object.values(OrderStatus).includes(value)) {
+        //     throw new Error('Invalid status!');
+        // }
         this.#status = value;
     }
 
@@ -143,16 +140,12 @@ export default class Order {
             throw new Error('Invalid payment method in JSON!');
         }
 
-        if (!DataValidator.isNonNegativeInteger(shippingFee)) {
+        if (!DataValidator.isNonNegativeFloat(shippingFee)) {
             throw new Error('Invalid shipping fee in JSON!');
         }
 
         if (!Array.isArray(orderItems)) {
             throw new Error('Order items must be an array in JSON!');
-        }
-
-        if (!Object.values(OrderStatus).includes(status)) {
-            throw new Error('Invalid status in JSON!');
         }
 
         const newOrder = new Order();

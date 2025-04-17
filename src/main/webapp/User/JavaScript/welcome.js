@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Populate "Top Selling Books"
     function topSellingBooksOnSuccess(topSellingBooks) {
+
         topSellingBooks.forEach(book => {
             let parsedBook;
             try {

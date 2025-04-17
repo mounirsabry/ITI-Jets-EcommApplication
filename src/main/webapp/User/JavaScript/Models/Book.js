@@ -18,7 +18,7 @@ export default class Book {
     #language = '';
     #isAvailable = true;
     #stock = 0;
-    #price = 0;
+    #price = 0.0;
     #discountedPercentage = 0;
     #images = []; // Array of BookImage objects
     #copiesSold = 0;
@@ -160,7 +160,7 @@ export default class Book {
     }
 
     set price(value) {
-        if (!DataValidator.isNonNegativeInteger(value)) {
+        if (!DataValidator.isNonNegativeFloat(value)) {
             throw new Error('Price must be a non-negative number!');
         }
         this.#price = value;
@@ -172,7 +172,7 @@ export default class Book {
     }
 
     set discountedPercentage(value) {
-        if (!DataValidator.isNonNegativeInteger(value)) {
+        if (!DataValidator.isNonNegativeFloat(value)) {
             throw new Error('Discount percentage must be a non-negative integer!');
         }
         this.#discountedPercentage = value;
@@ -288,10 +288,10 @@ export default class Book {
         if (!DataValidator.isNonNegativeInteger(stock)) {
             throw new Error('Invalid stock!');
         }
-        if (!DataValidator.isNonNegativeInteger(price)) {
+        if (!DataValidator.isNonNegativeFloat(price)) {
             throw new Error('Invalid price!');
         }
-        if (!DataValidator.isNonNegativeInteger(discountedPercentage)) {
+        if (!DataValidator.isNonNegativeFloat(discountedPercentage)) {
             throw new Error('Invalid discounted percentage!');
         }
         if (!Array.isArray(images)) {

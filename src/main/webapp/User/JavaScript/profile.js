@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateProfile(userObject) {
         displayEmail.textContent = userObject.email;
-        editUserName.value = userObject.userName;
+        editUserName.value = 'Some user name';
         editPhone.value = userObject.phoneNumber;
         editAddress.value = userObject.address;
 
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     editProfileForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const userNameValue = editUserName.value.trim();
+        const usernameValue = editUserName.value.trim();
         const phoneValue = editPhone.value.trim();
         const addressValue = editAddress.value.trim();
         const birthDateValue = editBirthDate.value;
@@ -228,10 +228,10 @@ document.addEventListener('DOMContentLoaded', function () {
         profileChangesError.textContent = '';
         let errorMessage = '';
 
-        if (userNameValue === '') {
+        if (usernameValue === '') {
             errorMessage = 'User name cannot be empty.';
         }
-        else if (!DataValidator.isUserNameValid(userNameValue)) {
+        else if (!DataValidator.isUserNameValid(usernameValue)) {
             errorMessage = 'Invalid user name.';
         }
 
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const updatedDetails = {
-            userName: userNameValue,
+            username: usernameValue,
             phoneNumber: phoneValue,
             address: addressValue,
             birthDate: birthDateValue,
