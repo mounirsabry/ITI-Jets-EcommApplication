@@ -4,64 +4,103 @@ import jets.projects.beans.BookBean;
 import jets.projects.client_dto.BookDto;
 import jets.projects.client_dto.BookImageDto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MapperUtil {
 
+    private static final String BASE_URL = "http://localhost:8080/ITI-Jets-EcommApplication/Admin/Images/";
 
-    public static BookBean convertToBookBean(BookDto dto)
-    {
-        BookBean bean = new BookBean();
-        bean.setId(dto.getBookId().intValue());
-        bean.setTitle(dto.getTitle());
-        bean.setAuthor(dto.getAuthor());
-        bean.setPublisher(dto.getPublisher());
-        bean.setIsbn(dto.getIsbn());
-        bean.setGenre(dto.getGenre());
-        bean.setPrice(BigDecimal.valueOf(dto.getPrice().doubleValue()));
-        bean.setDiscount(dto.getDiscountedPercentage() != null ? dto.getDiscountedPercentage(): BigDecimal.valueOf(0));
-        bean.setQuantity(dto.getStock());
-        bean.setStatus(dto.getIsAvailable() ? "Available" : "Unavailable");
-        bean.setMainImage(dto.getImages() != null && !dto.getImages().isEmpty() ? dto.getImages().get(0).getUrl() : "default.jpg");
-        bean.setImages(new ArrayList<>(dto.getImages().stream().map(BookImageDto::getUrl).collect(Collectors.toList())));
-        bean.setPublicationDate(dto.getPublicationDate().toString());
-        bean.setLanguage(dto.getLanguage());
-        bean.setPages(dto.getNumberOfPages());
-        bean.setOverview(dto.getOverview());
-        bean.setDescription(dto.getDescription());
-        return bean;
-    }
-    public static BookDto convertToBookDto(BookBean bean) {
+    public static BookDto convertToBookDto(BookBean bookBean) {
         BookDto dto = new BookDto();
-        dto.setBookId((long) bean.getId());
-        dto.setTitle(bean.getTitle());
-        dto.setAuthor(bean.getAuthor());
-        dto.setGenre(bean.getGenre());
-        dto.setPublisher(bean.getPublisher());
-        dto.setPublicationDate(LocalDate.parse(bean.getPublicationDate()));
-        dto.setIsbn(bean.getIsbn());
-        dto.setDescription(bean.getDescription());
-        dto.setOverview(bean.getOverview());
-        dto.setNumberOfPages(bean.getPages());
-        dto.setLanguage(bean.getLanguage());
-        dto.setIsAvailable("Available".equalsIgnoreCase(bean.getStatus()));
-        dto.setStock(bean.getQuantity());
-        dto.setPrice(bean.getPrice());
-        dto.setDiscountedPercentage(bean.getDiscount());
-        dto.setCopiesSold(0);
-        List<BookImageDto> images = bean.getImages().stream()
-                .map(url -> {
+        dto.setBookId((long) bookBean.getId());
+        dto.setTitle(bookBean.getTitle());
+        dto.setAuthor(bookBean.getAuthor());
+        dto.setGenre(bookBean.getGenre());
+        dto.setPublisher(bookBean.getPublisher());
+        // Parse publicationDate from String to LocalDate
+        String publicationDateStr = String.valueOf(bookBean.getPublicationDate());
+        if (publicationDateStr != null && !publicationDateStr.trim().isEmpty()) {
+            dto.setPublicationDate(LocalDate.parse(publicationDateStr));
+        } else {
+            dto.setPublicationDate(null);
+        }
+        dto.setIsbn(bookBean.getIsbn());
+        dto.setDescription(bookBean.getDescription());
+        dto.setOverview(bookBean.getOverview());
+        dto.setNumberOfPages(bookBean.getPages());
+        dto.setLanguage(bookBean.getLanguage());
+        // Map status to isAvailable (assuming "available" means true)
+        dto.setIsAvailable(bookBean.getStatus() != null && bookBean.getStatus().equalsIgnoreCase("available"));
+        dto.setStock(bookBean.getQuantity());
+        dto.setPrice(bookBean.getPrice());
+        dto.setDiscountedPercentage(bookBean.getDiscount());
+        dto.setCopiesSold(0); // Default for new books, not present in BookBean
+
+        // Map images
+        List<BookImageDto> images = new ArrayList<>();
+        // Map mainImage
+        if (bookBean.getMainImage() != null && !bookBean.getMainImage().trim().isEmpty()) {
+            BookImageDto mainImg = new BookImageDto();
+            String mainImageUrl = bookBean.getMainImage();
+            // Prepend BASE_URL if not already present
+            if (!mainImageUrl.startsWith(BASE_URL)) {
+                mainImageUrl = BASE_URL + mainImageUrl;
+            }
+            mainImg.setUrl(mainImageUrl);
+            mainImg.setIsMain(true);
+            images.add(mainImg);
+        }
+        // Map additional images
+        List<String> additionalImages = bookBean.getImages();
+        if (additionalImages != null) {
+            for (String url : additionalImages) {
+                if (url != null && !url.trim().isEmpty()) {
                     BookImageDto img = new BookImageDto();
+                    // Prepend BASE_URL if not already present
+                    if (!url.startsWith(BASE_URL)) {
+                        url = BASE_URL + url;
+                    }
                     img.setUrl(url);
-                    img.setIsMain(url.equals(bean.getMainImage()));
-                    return img;
-                })
-                .collect(Collectors.toList());
+                    img.setIsMain(false);
+                    images.add(img);
+                }
+            }
+        }
         dto.setImages(images);
         return dto;
+    }
+
+    public static BookBean convertToBookBean(BookDto bookDto) {
+        BookBean bean = new BookBean();
+        bean.setId(bookDto.getBookId() != null ? bookDto.getBookId().intValue() : 0);
+        bean.setTitle(bookDto.getTitle());
+        bean.setAuthor(bookDto.getAuthor());
+        bean.setGenre(bookDto.getGenre());
+        bean.setPublisher(bookDto.getPublisher());
+        bean.setPublicationDate(bookDto.getPublicationDate() != null ? bookDto.getPublicationDate().toString() : null);
+        bean.setIsbn(bookDto.getIsbn());
+        bean.setDescription(bookDto.getDescription());
+        bean.setOverview(bookDto.getOverview());
+        bean.setPages(bookDto.getNumberOfPages() != null ? bookDto.getNumberOfPages() : 0);
+        bean.setLanguage(bookDto.getLanguage());
+        bean.setStatus(bookDto.getIsAvailable() != null && bookDto.getIsAvailable() ? "available" : "unavailable");
+        bean.setQuantity(bookDto.getStock() != null ? bookDto.getStock() : 0);
+        bean.setPrice(bookDto.getPrice());
+        bean.setDiscount(bookDto.getDiscountedPercentage());
+        // Map images
+        List<String> additionalImages = new ArrayList<>();
+        if (bookDto.getImages() != null) {
+            for (BookImageDto img : bookDto.getImages()) {
+                if (img.getIsMain() != null && img.getIsMain()) {
+                    bean.setMainImage(img.getUrl());
+                } else {
+                    additionalImages.add(img.getUrl());
+                }
+            }
+        }
+        bean.setImages(additionalImages);
+        return bean;
     }
 }

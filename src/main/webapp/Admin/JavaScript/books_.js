@@ -118,7 +118,7 @@ function displayBooks(books) {
 
     booksTable.innerHTML += `
       <tr>
-        <td><img src="Images/${book.mainImage}" alt="${book.title}" class="book-cover"></td>
+        <td><img src="${book.mainImage}" alt="${book.title}" class="book-cover"></td>
         <td>${book.title}</td>
         <td>${book.author}</td>
         <td>${book.genre}</td>
