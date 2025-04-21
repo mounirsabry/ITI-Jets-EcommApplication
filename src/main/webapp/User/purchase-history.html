@@ -1,42 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Purchase History | Book Alley</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purchase History | Book Alley</title>
 
-    <link rel="stylesheet" href="CSS/Common/reset.css" />
-    <link rel="stylesheet" href="CSS/Common/root.css" />
-    <link rel="stylesheet" href="CSS/Common/header.css" />
-    <link rel="stylesheet" href="CSS/Common/footer.css" />
-    <link rel="stylesheet" href="CSS/Common/main.css" />
-    <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+  <link rel="stylesheet" href="CSS/Common/reset.css" />
+  <link rel="stylesheet" href="CSS/Common/root.css" />
+  <link rel="stylesheet" href="CSS/Common/header.css" />
+  <link rel="stylesheet" href="CSS/Common/footer.css" />
+  <link rel="stylesheet" href="CSS/Common/main.css" />
+  <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="CSS/purchase-history.css" />
 
-    <link rel="stylesheet" href="CSS/purchase-history.css" />
+  <script src="JavaScript/Common/context_path.js"></script>
 
-    <script src="JavaScript/Common/context_path.js"></script>
+  <script defer type="module" src="JavaScript/Common/header.js"></script>
+  <script defer type="module" src="JavaScript/Common/footer.js"></script>
 
-    <script defer type="module" src="JavaScript/Common/header.js"></script>
-    <script defer type="module" src="JavaScript/Common/footer.js"></script>
+  <script defer type="module" src="JavaScript/purchase-history.js"></script>
+</head>
+<body>
+<header id="siteHeader">
+  <!-- Header will be injected here by JS -->
+</header>
 
-    <script defer type="module" src="JavaScript/purchase-history.js"></script>
-  </head>
-  <body>
-    <header id="siteHeader">
-      <!-- Header will be injected here by JS -->
-    </header>
+<main class="container">
+  <button id="backToProfile" class="back-button" aria-label="Back to profile">
+    Back to Profile
+  </button>
 
-    <main>
-      <button id="backToProfile" class="back-button">Back to Profile</button>
+  <h1 class="center-title">Purchase History</h1>
 
-      <h1 class="center-title">Purchase History</h1>
-      <section id="historyList" class="history-list">
-        <!-- History items will be injected here by JS -->
-      </section>
-    </main>
+  <section id="historyList" class="history-list">
+    <!-- History items will be injected here by JS -->
+    <div class="loading-container">
+      <div class="loading-spinner" aria-label="Loading purchase history"></div>
+    </div>
+  </section>
+</main>
 
-    <footer id="siteFooter">
-      <!-- Footer will be injected here by JS -->
-    </footer>
-  </body>
+<footer id="siteFooter">
+  <!-- Footer will be injected here by JS -->
+</footer>
+</body>
 </html>

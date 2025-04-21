@@ -1,14 +1,14 @@
-'use strict';
+import MessagePopup from "./MessagePopup.js"
 
-import MessagePopup from "./MessagePopup.js";
+export default function checkForErrorMessageParameter() {
+  const urlParams = new URLSearchParams(window.location.search)
+  const errorMessage = urlParams.get("errorMessage")
 
-const checkForErrorMessageParameter = function() {
-    // Check if the errorMessage parameter exists in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('errorMessage')) {
-        const errorMessage = urlParams.get('errorMessage');
-        MessagePopup.show(errorMessage, true);
-    }
+  if (errorMessage) {
+    MessagePopup.show(decodeURIComponent(errorMessage), true)
+
+    // Remove the error message from the URL
+    const newUrl = window.location.pathname
+    window.history.replaceState({}, document.title, newUrl)
+  }
 }
-
-export default checkForErrorMessageParameter;

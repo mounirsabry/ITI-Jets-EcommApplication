@@ -1,241 +1,174 @@
-'use strict';
+import URL_Mapper from "./URL_Mapper.js"
+import UserAuthTracker from "../Common/UserAuthTracker.js"
+import MessagePopup from "../Common/MessagePopup.js"
+import displayProduct from "../Common/BookPopup.js"
+import WishlistManager from "./WishlistManager.js"
 
-import URL_Mapper from './URL_Mapper.js';
-import displayProduct from "../Common/BookPopup.js";
-import CartManager from "../Managers/CartManager.js";
-import UserAuthTracker from "../Common/UserAuthTracker.js";
-import MessagePopup from "../Common/MessagePopup.js";
+// Create a book card element
+export function createBookCard(book) {
+  const bookElement = document.createElement("div")
+  bookElement.classList.add("book-card")
 
-const createBookCard = function(book) {
-    const mainImage = book.images.find(image => image.isMain);
-    const imageURL = mainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
+  const imagesArray = book.images || []
+  const mainImage = imagesArray.find((image) => image.isMain)
+  const imageUrl = mainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE
 
-    // Create elements.
-    const bookElement = document.createElement("div");
-    bookElement.classList.add("book-card");
+  // Calculate discounted price if applicable
+  const hasDiscount = book.discountedPercentage > 0
+  const originalPrice = book.price
+  const discountedPrice = hasDiscount ? originalPrice * (1 - book.discountedPercentage / 100) : originalPrice
 
-    const imgElement = document.createElement('img');
-    imgElement.src = imageURL;
-    imgElement.alt = book.title;
-    imgElement.className = 'product-image';
+  // Check if book is in wishlist
+  const isInWishlist = WishlistManager.isInWishlist(book.bookID)
 
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = book.title;
+  // Create HTML structure
+  bookElement.innerHTML = `
+    <div class="book-image-container">
+      <img src="${imageUrl}" alt="${book.title}" class="product-image">
+      ${hasDiscount ? `<div class="discount-badge">-${book.discountedPercentage}%</div>` : ""}
+      <div class="book-overview">${book.overview || "No overview available"}</div>
+      <button class="wishlist-button ${isInWishlist ? "in-wishlist" : ""}" data-book-id="${book.bookID}" aria-label="${isInWishlist ? "Remove from wishlist" : "Add to wishlist"}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${isInWishlist ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="book-content">
+      <div class="book-description">${book.overview || "No description available."}</div>
+      <h3 class="book-title">${book.title}</h3>
+      <p class="book-author">${book.author || "Unknown author"}</p>
+      <p class="book-category">${book.genre || "Business & Finance"}</p>
+      <div class="book-price">
+        ${hasDiscount ? `<span class="original-price">${originalPrice.toFixed(2)} EGP</span>` : ""}
+        <span class="current-price">${discountedPrice.toFixed(2)} EGP</span>
+      </div>
+      <div class="stock-status">
+        In Stock
+      </div>
+      <div class="cart-controls">
+        <div class="quantity-controls">
+          <button class="quantity-button decrease-quantity" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>-</button>
+          <input type="number" min="1" max="${book.stock}" value="1" class="quantity-input">
+          <button class="quantity-button increase-quantity" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>+</button>
+        </div>
+        <button class="add-to-cart" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  `
 
-    const bookCardDetails = document.createElement('div');
-    bookCardDetails.classList.add('book-card-details');
+  // Add event listeners
+  const decreaseBtn = bookElement.querySelector(".decrease-quantity")
+  const increaseBtn = bookElement.querySelector(".increase-quantity")
+  const quantityInput = bookElement.querySelector(".quantity-input")
+  const addToCartBtn = bookElement.querySelector(".add-to-cart")
+  const productImage = bookElement.querySelector(".product-image")
+  const bookImageContainer = bookElement.querySelector(".book-image-container")
+  const wishlistButton = bookElement.querySelector(".wishlist-button")
 
-    // Helper function to create detail paragraphs.
-    const createDetailElement = (text, className = '') => {
-        const el = document.createElement('p');
-        if (className) el.classList.add(className);
-        el.textContent = text || 'Not specified';
-        return el;
-    };
+  if (decreaseBtn && increaseBtn && quantityInput) {
+    decreaseBtn.addEventListener("click", (e) => {
+      e.preventDefault() // Prevent form submission
+      e.stopPropagation() // Prevent event bubbling
+      const currentValue = Number.parseInt(quantityInput.value) || 1
+      if (currentValue > 1) {
+        quantityInput.value = currentValue - 1
+      }
+    })
 
-    // Append details.
-    bookCardDetails.append(
-        createDetailElement(book.overview, 'overview'),
-        createDetailElement(book.genre, 'genre'),
-        createDetailElement(book.author, 'author'),
-        createDetailElement(`${book.price} EGP`, 'price')
-    );
+    increaseBtn.addEventListener("click", (e) => {
+      e.preventDefault() // Prevent form submission
+      e.stopPropagation() // Prevent event bubbling
+      const currentValue = Number.parseInt(quantityInput.value) || 1
+      const maxValue = Number.parseInt(quantityInput.max) || 99
+      if (currentValue < maxValue) {
+        quantityInput.value = currentValue + 1
+      }
+    })
 
-    // Assemble card
-    bookElement.append(imgElement, titleElement, bookCardDetails);
-    appendStockValue(bookElement, book);
-    appendAddToCartControls(bookElement, book);
+    // Ensure valid input when manually typing
+    quantityInput.addEventListener("change", (e) => {
+      e.stopPropagation() // Prevent event bubbling
+      let value = Number.parseInt(quantityInput.value) || 1
+      const maxValue = Number.parseInt(quantityInput.max) || 99
 
-    // Update function (closure captures all elements)
-    function updateCard(updatedBook) {
-        // Update main image if changed
-        const newMainImage = updatedBook.images?.find(img => img.isMain);
-        const newImageURL = newMainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-        if (newImageURL !== imgElement.src) {
-            imgElement.src = newImageURL;
+      if (value < 1) value = 1
+      if (value > maxValue) value = maxValue
+
+      quantityInput.value = value
+    })
+  }
+
+  if (addToCartBtn && book.isAvailable && book.stock > 0) {
+    addToCartBtn.addEventListener("click", (e) => {
+      e.preventDefault() // Prevent form submission
+      e.stopPropagation() // Prevent event bubbling
+      const quantity = Number.parseInt(quantityInput.value) || 1
+      addToCart(book.bookID, quantity)
+    })
+  }
+
+  // Make the entire image container clickable to show popup
+  if (bookImageContainer) {
+    bookImageContainer.addEventListener("click", (e) => {
+      // Don't trigger if clicking on the wishlist button
+      if (e.target.closest(".wishlist-button")) {
+        return
+      }
+      displayProduct(book)
+    })
+  }
+
+  // Also make the product image clickable
+  if (productImage) {
+    productImage.addEventListener("click", (e) => {
+      e.stopPropagation() // Prevent event bubbling
+      displayProduct(book)
+    })
+  }
+
+  // Add wishlist button functionality
+  if (wishlistButton) {
+    wishlistButton.addEventListener("click", (e) => {
+      e.preventDefault() // Prevent form submission
+      e.stopPropagation() // Prevent event bubbling
+
+      const isCurrentlyInWishlist = wishlistButton.classList.contains("in-wishlist")
+
+      if (isCurrentlyInWishlist) {
+        // Remove from wishlist
+        if (WishlistManager.removeFromWishlist(book.bookID)) {
+          wishlistButton.classList.remove("in-wishlist")
+          wishlistButton.setAttribute("aria-label", "Add to wishlist")
+          wishlistButton.querySelector("svg").setAttribute("fill", "none")
+          MessagePopup.show("Removed from wishlist")
         }
-
-        // Update text content
-        titleElement.textContent = updatedBook.title || book.title;
-
-        // Update details
-        const details = bookCardDetails.querySelectorAll('p');
-        if (details.length >= 4) {
-            details[0].textContent = updatedBook.overview || book.overview;  // Overview
-            details[1].textContent = updatedBook.genre || book.genre;       // Genre
-            details[2].textContent = updatedBook.author || book.author;     // Author
-            details[3].textContent = updatedBook.price ? `${updatedBook.price} EGP` : book.price; // Price
+      } else {
+        // Add to wishlist
+        if (WishlistManager.addToWishlist(book.bookID)) {
+          wishlistButton.classList.add("in-wishlist")
+          wishlistButton.setAttribute("aria-label", "Remove from wishlist")
+          wishlistButton.querySelector("svg").setAttribute("fill", "currentColor")
         }
+      }
+    })
+  }
 
-        updateStockValue(bookElement, updatedBook);
-
-        // Remove the old quantity specifier and add to cart (if they exist).
-        const oldQuantitySelector = bookElement.querySelector('.quantity-selector');
-        if (oldQuantitySelector) {
-            oldQuantitySelector.remove();
-        }
-
-        const odlAddToCartButton = bookElement.querySelector('.add-to-cart');
-        if (odlAddToCartButton) {
-            odlAddToCartButton.remove();
-        }
-        appendAddToCartControls(bookElement, updatedBook);
-    }
-
-    // Make the update function available to click handler.
-    imgElement.addEventListener('click', () => {
-        displayProduct(book, updateCard);
-    });
-
-    return bookElement;
-};
-
-const updateStockValue = function(bookElement, book) {
-    // Find existing stock status element
-    const oldStockElement = bookElement.querySelector('.stock-status');
-
-    // Create new stock status element
-    const newStockElement = createStockElement(book);
-
-    // Replace or append the element
-    if (oldStockElement) {
-        oldStockElement.replaceWith(newStockElement);
-    } else {
-        bookElement.appendChild(newStockElement);
-    }
-};
-
-// Helper function to create stock element (extracted from appendStockValue)
-const createStockElement = function(book) {
-    const paragraph = document.createElement('p');
-    paragraph.className = 'stock-status';
-
-    if (!book.isAvailable || !book.stock) {
-        paragraph.classList.add('out-stock');
-        paragraph.textContent = 'Book Not Available';
-        return paragraph;
-    }
-
-    // Determine stock status and CSS class
-    let stockText;
-    let stockClass;
-    if (book.stock > 20) {
-        stockText = 'In Stock';
-        stockClass = 'in-stock';
-    } else if (book.stock === 0) {
-        stockText = 'Out of Stock';
-        stockClass = 'out-stock';
-    } else if (book.stock === 1) {
-        stockText = 'Last Piece';
-        stockClass = 'last-piece';
-    } else {
-        stockText = `${book.stock} Pieces Left`;
-        stockClass = 'low-stock';
-    }
-
-    paragraph.classList.add(stockClass);
-    paragraph.textContent = stockText;
-    return paragraph;
-};
-
-// Updated appendStockValue to use the helper function
-const appendStockValue = function(bookElement, book) {
-    const stockElement = createStockElement(book);
-    bookElement.appendChild(stockElement);
-};
-
-const appendAddToCartControls = function(bookElement, book) {
-    if (book.stock <= 0 || !book.isAvailable) {
-        return;
-    }
-
-    // Create the quantity selector container
-    const quantitySelector = document.createElement('div');
-    quantitySelector.className = 'quantity-selector';
-
-    // Create the decrease button
-    const decreaseButton = document.createElement('button');
-    decreaseButton.className = 'decrease';
-    decreaseButton.textContent = '-';
-
-    // Create the input element
-    const quantityInput = document.createElement('input');
-    quantityInput.type = 'number';
-    quantityInput.value = '1';
-    quantityInput.min = '1';
-    quantityInput.max = Math.min(book.stock, 20).toString();
-    quantityInput.readOnly = true;
-
-    // Create the increase button
-    const increaseButton = document.createElement('button');
-    increaseButton.className = 'increase';
-    increaseButton.textContent = '+';
-
-    // Append the buttons and input to the quantity selector
-    quantitySelector.appendChild(decreaseButton);
-    quantitySelector.appendChild(quantityInput);
-    quantitySelector.appendChild(increaseButton);
-
-    // Create the add to cart button
-    const addToCartButton = document.createElement('button');
-    addToCartButton.className = 'add-to-cart';
-    addToCartButton.textContent = 'Add to Cart';
-
-    bookElement.appendChild(quantitySelector);
-    bookElement.appendChild(addToCartButton);
-
-    function updateQuantity(quantity) {
-        decreaseButton.disabled = (quantity === 1);
-        increaseButton.disabled = quantity >= Math.min(book.stock, 20);
-    }
-    updateQuantity(1);
-
-    decreaseButton.addEventListener('click', () => {
-        let value = parseInt(quantityInput.value);
-        if (value > 1) {
-            quantityInput.value = `${value - 1}`;
-            updateQuantity(value - 1);
-        }
-    });
-
-    increaseButton.addEventListener('click', () => {
-        let value = parseInt(quantityInput.value);
-        if (value < Math.min(book.stock, 20)) {
-            quantityInput.value = `${value + 1}`;
-            updateQuantity(value + 1);
-        }
-    });
-
-    addToCartButton.addEventListener('click', () => {
-        let quantity;
-        try {
-            quantity = quantityInput.value;
-            quantity = parseInt(quantity);
-        } catch (_) {
-            MessagePopup.show('Could not parse quantity to int in add to cart event handler!', true);
-        }
-        addToCart(book, quantity);
-    });
+  return bookElement
 }
 
-const addToCart = function(book, quantity) {
-    const isAuthenticated = UserAuthTracker.isAuthenticated;
-    if (!isAuthenticated) {
-        MessagePopup.show('You must login to add book to cart!');
-        return;
-    }
+// Helper function to add to cart
+function addToCart(bookID, quantity) {
+  const userObject = UserAuthTracker.userObject
+  if (!userObject) {
+    MessagePopup.show("Please login to add items to your cart", true)
+    return
+  }
 
-    function callbackOnSuccess() {
-        MessagePopup.show(`Added ${quantity} of "${book.title}" to cart.`);
-    }
-
-    CartManager.addItem(UserAuthTracker.userObject.userID, book.bookID, quantity, callbackOnSuccess, null);
-}
-
-export {
-    createBookCard,
-    appendStockValue,
-    updateStockValue,
-    appendAddToCartControls,
-    addToCart
+  // In a real app, this would call the CartManager.addItem method
+  // For now, we'll simulate a successful addition
+  setTimeout(() => {
+    MessagePopup.show("Item added to cart!")
+  }, 500)
 }

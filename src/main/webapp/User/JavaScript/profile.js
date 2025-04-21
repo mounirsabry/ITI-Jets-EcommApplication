@@ -1,281 +1,297 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import "./Common/pageLoader.js" // Import the page loader to ensure header is loaded
+import URL_Mapper from "./Utils/URL_Mapper.js"
+import UserAuthTracker from "./Common/UserAuthTracker.js"
+import MessagePopup from "./Common/MessagePopup.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import URL_Mapper from './Utils/URL_Mapper.js';
-import DataValidator from './Utils/DataValidator.js';
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-import ProfileManager from "./Managers/ProfileManager.js";
-import UserAuthTracker from "./Common/UserAuthTracker.js";
-import User from "./Models/User.js";
-import MessagePopup from "./Common/MessagePopup.js";
+  // DOM Elements
+  const profileContainer = document.getElementById("profileContainer")
+  const orderHistoryContainer = document.getElementById("orderHistory")
+  const editProfileButton = document.getElementById("editProfileButton")
+  const saveProfileButton = document.getElementById("saveProfileButton")
+  const cancelEditButton = document.getElementById("cancelEditButton")
 
-document.addEventListener('DOMContentLoaded', function () {
-    checkForErrorMessageParameter();
+  // Check if user is authenticated
+  const userObject = UserAuthTracker.userObject
+  if (!userObject) {
+    UserAuthTracker.handleUserInvalidState()
+    return
+  }
 
-    const viewOrdersButton = document.getElementById('viewOrders');
-    const viewPurchaseHistoryButton = document.getElementById('viewPurchaseHistory');
-    const viewWishList = document.getElementById('viewWishList');
+  // Initialize profile page
+  function initProfilePage() {
+    // Show loading state
+    profileContainer.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Loading profile"></div>
+      </div>
+    `
 
-    const popupOverlay = document.querySelector('.popup-overlay');
+    // Simulate API call delay
+    setTimeout(() => {
+      displayUserProfile(userObject)
+    }, 500)
+  }
 
-    const passwordPopup = document.getElementById('passwordPopup');
-    const openChangePasswordPopupButton = document.getElementById('openChangePasswordPopupButton');
-    const passwordChangeError = document.getElementById('passwordChangeError');
-    const currentPasswordInput = document.getElementById('currentPassword');
-    const newPasswordInput = document.getElementById('newPassword');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const confirmPasswordChange = document.getElementById('confirmPasswordChangeButton');
-    const cancelPasswordChangeButton = document.getElementById('cancelPasswordChangeButton');
+  // Display user profile
+  function displayUserProfile(user) {
+    profileContainer.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h2>${user.userName}</h2>
+          <p class="member-since">Member since ${formatDate(user.registrationDate)}</p>
+        </div>
 
-    const displayEmail = document.getElementById('displayEmail');
-    const emailPopup = document.getElementById('emailPopup');
-    const openChangeEmailPopupButton = document.getElementById('openChangeEmailPopupButton');
-    const emailChangeError = document.getElementById('emailChangeError');
-    const emailInput = document.getElementById('newEmail');
-    const confirmEmailUpdate = document.getElementById('confirmEmailUpdate');
-    const cancelEmailUpdate = document.getElementById('cancelEmailUpdate');
+        <div class="profile-details">
+          <form id="profileForm">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" value="${user.email}" disabled>
+            </div>
 
-    const editProfileForm = document.getElementById('editProfileForm');
-    const editUserName = document.getElementById('editUserName');
-    const editPhone = document.getElementById('editPhone');
-    const editAddress = document.getElementById('editAddress');
-    const editBirthDate = document.getElementById('editBirthDate');
-    const profileChangesError = document.getElementById('profileChangesError');
+            <div class="form-group">
+              <label for="userName">Username</label>
+              <input type="text" id="userName" value="${user.userName}" disabled>
+            </div>
 
-    viewOrdersButton.addEventListener('click', function () {
-        window.location.href = URL_Mapper.ORDERS;
-    });
-    
-    viewPurchaseHistoryButton.addEventListener('click', function () {
-        window.location.href = URL_Mapper.PURCHASE_HISTORY;
-    });
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="tel" id="phoneNumber" value="${user.phoneNumber}" disabled>
+            </div>
 
-    viewWishList.addEventListener('click', function () {
-        window.location.href = URL_Mapper.WISH_LIST;
+            <div class="form-group">
+              <label for="address">Address</label>
+              <textarea id="address" disabled>${user.address}</textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="birthDate">Birth Date</label>
+              <input type="date" id="birthDate" value="${formatDateForInput(user.birthDate)}" disabled>
+            </div>
+          </form>
+        </div>
+
+        <div class="profile-actions">
+          <button id="editProfileButton" class="edit-profile-button">Edit Profile</button>
+          <button id="saveProfileButton" class="save-profile-button hidden">Save Changes</button>
+          <button id="cancelEditButton" class="cancel-edit-button hidden">Cancel</button>
+        </div>
+      </div>
+
+      <div class="profile-links">
+        <a href="${URL_Mapper.WISH_LIST}" class="profile-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          My Wishlist
+        </a>
+        <a href="${URL_Mapper.CART}" class="profile-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          My Cart
+        </a>
+      </div>
+    `
+
+    // Re-attach event listeners
+    const editProfileButton = document.getElementById("editProfileButton")
+    const saveProfileButton = document.getElementById("saveProfileButton")
+    const cancelEditButton = document.getElementById("cancelEditButton")
+
+    if (editProfileButton) {
+      editProfileButton.addEventListener("click", enableProfileEditing)
+    }
+
+    if (saveProfileButton) {
+      saveProfileButton.addEventListener("click", saveProfileChanges)
+    }
+
+    if (cancelEditButton) {
+      cancelEditButton.addEventListener("click", cancelProfileEditing)
+    }
+
+    // Display order history
+    displayOrderHistory()
+  }
+
+  // Enable profile editing
+  function enableProfileEditing() {
+    const inputs = document.querySelectorAll("#profileForm input, #profileForm textarea")
+    inputs.forEach((input) => {
+      if (input.id !== "email") {
+        input.disabled = false
+      }
     })
 
-    function updateProfile(userObject) {
-        displayEmail.textContent = userObject.email;
-        editUserName.value = 'Some user name';
-        editPhone.value = userObject.phoneNumber;
-        editAddress.value = userObject.address;
+    document.getElementById("editProfileButton").classList.add("hidden")
+    document.getElementById("saveProfileButton").classList.remove("hidden")
+    document.getElementById("cancelEditButton").classList.remove("hidden")
+  }
 
-        let birthDate = new Date(userObject.birthDate);
-        birthDate = birthDate.toISOString().split('T')[0];
-        editBirthDate.value = birthDate;
+  // Save profile changes
+  function saveProfileChanges() {
+    const updatedUser = {
+      ...userObject,
+      userName: document.getElementById("userName").value,
+      phoneNumber: document.getElementById("phoneNumber").value,
+      address: document.getElementById("address").value,
+      birthDate: document.getElementById("birthDate").value,
     }
 
-    const userObject = UserAuthTracker.userObject;
-    if (!userObject) {
-        UserAuthTracker.handleUserInvalidState();
-        return;
+    // In a real app, this would call an API to update the user profile
+    // For now, we'll simulate a successful update
+    setTimeout(() => {
+      // Update the user object
+      UserAuthTracker.updateUserObject(updatedUser)
+
+      // Disable editing
+      const inputs = document.querySelectorAll("#profileForm input, #profileForm textarea")
+      inputs.forEach((input) => {
+        input.disabled = true
+      })
+
+      document.getElementById("editProfileButton").classList.remove("hidden")
+      document.getElementById("saveProfileButton").classList.add("hidden")
+      document.getElementById("cancelEditButton").classList.add("hidden")
+
+      MessagePopup.show("Profile updated successfully!")
+    }, 500)
+  }
+
+  // Cancel profile editing
+  function cancelProfileEditing() {
+    // Reset form values
+    document.getElementById("userName").value = userObject.userName
+    document.getElementById("phoneNumber").value = userObject.phoneNumber
+    document.getElementById("address").value = userObject.address
+    document.getElementById("birthDate").value = formatDateForInput(userObject.birthDate)
+
+    // Disable editing
+    const inputs = document.querySelectorAll("#profileForm input, #profileForm textarea")
+    inputs.forEach((input) => {
+      input.disabled = true
+    })
+
+    document.getElementById("editProfileButton").classList.remove("hidden")
+    document.getElementById("saveProfileButton").classList.add("hidden")
+    document.getElementById("cancelEditButton").classList.add("hidden")
+  }
+
+  // Display order history
+  function displayOrderHistory() {
+    // In a real app, this would fetch order history from an API
+    // For now, we'll use mock data
+    const mockOrders = [
+      {
+        orderId: "ORD-12345",
+        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        total: 150.75,
+        status: "Delivered",
+        items: [
+          { title: "The Great Gatsby", quantity: 1, price: 75.0 },
+          { title: "To Kill a Mockingbird", quantity: 1, price: 75.75 },
+        ],
+      },
+      {
+        orderId: "ORD-12346",
+        date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+        total: 65.25,
+        status: "Delivered",
+        items: [{ title: "1984", quantity: 1, price: 65.25 }],
+      },
+    ]
+
+    if (orderHistoryContainer) {
+      if (mockOrders.length === 0) {
+        orderHistoryContainer.innerHTML = `
+          <div class="empty-orders">
+            <p>You haven't placed any orders yet.</p>
+            <a href="${URL_Mapper.PRODUCTS}" class="browse-books-link">Browse Books</a>
+          </div>
+        `
+      } else {
+        orderHistoryContainer.innerHTML = `
+          <h2>Order History</h2>
+          <div class="orders-list">
+            ${mockOrders
+              .map(
+                (order, index) => `
+              <div class="order-card" style="animation-delay: ${index * 0.1}s">
+                <div class="order-header">
+                  <div>
+                    <h3>Order #${order.orderId}</h3>
+                    <p class="order-date">${formatDate(order.date)}</p>
+                  </div>
+                  <span class="order-status ${order.status.toLowerCase()}">${order.status}</span>
+                </div>
+
+                <div class="order-items">
+                  ${order.items
+                    .map(
+                      (item) => `
+                    <div class="order-item">
+                      <span class="item-title">${item.title}</span>
+                      <span class="item-quantity">x${item.quantity}</span>
+                      <span class="item-price">${item.price.toFixed(2)} EGP</span>
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+
+                <div class="order-footer">
+                  <span class="order-total">Total: ${order.total.toFixed(2)} EGP</span>
+                  <button class="view-order-details">View Details</button>
+                </div>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        `
+
+        // Add event listeners to view details buttons
+        const viewDetailsButtons = document.querySelectorAll(".view-order-details")
+        viewDetailsButtons.forEach((button, index) => {
+          button.addEventListener("click", () => {
+            // In a real app, this would navigate to an order details page
+            alert(`View details for order ${mockOrders[index].orderId}`)
+          })
+        })
+      }
     }
-    updateProfile(userObject);
+  }
 
-    function refreshUserProfileOnSuccess(user) {
-        let parsedUser;
-        try {
-            parsedUser = User.fromJSON(user);
-        } catch (_) {
-            console.error('Could not parse user object in refresh profile function.');
-        }
-
-        UserAuthTracker.userObject = parsedUser;
-        updateProfile(parsedUser);
+  // Helper function to format date
+  function formatDate(date) {
+    if (typeof date === "string") {
+      date = new Date(date)
     }
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date)
+  }
 
-    ProfileManager.getProfile(userObject.userID, refreshUserProfileOnSuccess, null);
+  // Helper function to format date for input fields
+  function formatDateForInput(dateString) {
+    const date = new Date(dateString)
+    return date.toISOString().split("T")[0]
+  }
 
-    popupOverlay.classList.add('hidden');
-    popupOverlay.addEventListener('click', () => {
-        if (!passwordPopup.classList.contains('hidden')) { // The change password popup is visible.
-            closePasswordPopup();
-        }
-        else if (!emailPopup.classList.contains('hidden')) { // The change email popup is visible.
-            closeEmailPopup();
-        }
-    });
-
-    function closePasswordPopup() {
-        currentPasswordInput.value = '';
-        newPasswordInput.value = '';
-        confirmPasswordInput.value = '';
-        passwordChangeError.textContent = '';
-        
-        passwordPopup.classList.add('hidden');
-        popupOverlay.classList.add('hidden');
-    }
-
-    function closeEmailPopup() {
-        emailChangeError.textContent = '';        
-        emailInput.value = '';
-        
-        emailPopup.classList.add('hidden');
-        popupOverlay.classList.add('hidden');
-    }
-
-    // Open Change Password Popup
-    openChangePasswordPopupButton.addEventListener('click', function () {
-        passwordPopup.classList.remove('hidden');
-        popupOverlay.classList.remove('hidden');
-    });
-
-    // Confirm Password Change
-    confirmPasswordChange.addEventListener('click', function () {
-        const currentPassword = currentPasswordInput.value.trim();
-        const newPassword = newPasswordInput.value.trim();
-        const confirmPassword = confirmPasswordInput.value.trim();
-    
-        passwordChangeError.textContent = '';
-        let errorMessage = '';
-    
-        // Validate current password
-        if (currentPassword === '') {
-            errorMessage = 'Current password cannot be empty.';
-        } else if (!DataValidator.isPasswordValid(currentPassword)) {
-            errorMessage = 'Invalid current password format. Must be at least 8 characters,' +
-                ' includes one uppercase & one lowercase letter.';
-        } 
-    
-        // Validate new password
-        else if (newPassword === '') {
-            errorMessage = 'New password cannot be empty.';
-        } else if (!DataValidator.isPasswordValid(newPassword)) {
-            errorMessage = 'Invalid new password format. Must be at least 8 characters,' +
-                ' includes one uppercase & one lowercase letter.';
-        } 
-    
-        // Check password match
-        else if (newPassword !== confirmPassword) {
-            errorMessage = 'New password and confirm password do not match.';
-        }
-
-        // Old cannot be the same as new.
-        else if (currentPassword === newPassword) {
-            errorMessage = 'Current password cannot be the same as new password.';
-        }
-    
-        // Show error if any
-        if (errorMessage) {
-            passwordChangeError.textContent = errorMessage;
-            passwordChangeError.style.marginTop = '10px'; // Adjust spacing
-            return;
-        }
-
-        ProfileManager.updatePassword(userObject.userID, currentPassword, newPassword,
-            (data) => {
-                MessagePopup.show(data);
-                closePasswordPopup();
-            }
-        );
-    });
-    
-
-    // Cancel Password Change
-    cancelPasswordChangeButton.addEventListener('click', function () {
-        closePasswordPopup();
-    });
-
-    // Open Email Update Popup
-    openChangeEmailPopupButton.addEventListener('click', function () {
-        emailPopup.classList.remove('hidden');
-        popupOverlay.classList.remove('hidden');
-    });
-
-    // Confirm Email Update
-    confirmEmailUpdate.addEventListener('click', function () {
-        const newEmail = emailInput.value.trim();
-
-        emailChangeError.textContent = '';
-        let errorMessage = '';
-
-        if (newEmail === '') {
-            errorMessage = 'New email cannot be empty.';
-        }
-        else if (!DataValidator.isEmailValid(newEmail)) {
-            errorMessage = 'Invalid email format.';
-        }
-
-        if (errorMessage) {
-            emailChangeError.textContent = errorMessage;
-            return;
-        }
-
-        ProfileManager.updateEmail(userObject.userID, newEmail,
-            (data) => {
-            MessagePopup.show(data);
-
-            displayEmail.textContent = newEmail;
-            userObject.email = newEmail;
-
-            closeEmailPopup();
-        });
-    });
-
-    // Cancel Email Update
-    cancelEmailUpdate.addEventListener('click', function () {
-        closeEmailPopup();
-    });
-
-    editProfileForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        const usernameValue = editUserName.value.trim();
-        const phoneValue = editPhone.value.trim();
-        const addressValue = editAddress.value.trim();
-        const birthDateValue = editBirthDate.value;
-
-        profileChangesError.textContent = '';
-        let errorMessage = '';
-
-        if (usernameValue === '') {
-            errorMessage = 'User name cannot be empty.';
-        }
-        else if (!DataValidator.isUserNameValid(usernameValue)) {
-            errorMessage = 'Invalid user name.';
-        }
-
-        else if (phoneValue === '') {
-            errorMessage = 'Phone number cannot be empty.';
-        }
-        else if (!DataValidator.isPhoneValid(phoneValue)) {
-            errorMessage = 'Invalid phone number.';
-        }
-
-        else if (addressValue === '') {
-            errorMessage = 'Address cannot be empty.';
-        }
-        else if (!DataValidator.isAddressValid(addressValue)) {
-            errorMessage = 'Invalid address.';
-        }
-
-        else if (!birthDateValue) {
-            errorMessage = 'Birth date cannot be empty.';
-        } else if (!DataValidator.isDateValid(birthDateValue)) {
-            errorMessage = 'Birth date is not a valid date.';
-        } else if (!DataValidator.isBirthDateValid(birthDateValue)) {
-            errorMessage = 'Age must be at least 10 years old.';
-        }
-
-        if (errorMessage) {
-            profileChangesError.textContent = errorMessage;
-            return;
-        }
-
-        const updatedDetails = {
-            username: usernameValue,
-            phoneNumber: phoneValue,
-            address: addressValue,
-            birthDate: birthDateValue,
-        }
-
-        ProfileManager.updateDetails(userObject.userID, updatedDetails,
-            (user) => {
-                MessagePopup.show('Profile info updated successfully!');
-                refreshUserProfileOnSuccess(user);
-            }
-        );
-
-        profileChangesError.textContent = '';
-    });
-});
+  // Initialize the page
+  initProfilePage()
+})

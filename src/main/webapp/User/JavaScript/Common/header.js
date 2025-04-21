@@ -1,270 +1,254 @@
-'use strict';
+import URL_Mapper from "../Utils/URL_Mapper.js"
+import UserAuthTracker from "./UserAuthTracker.js"
 
-import URL_Mapper from '../Utils/URL_Mapper.js';
-import UserAuthTracker from './UserAuthTracker.js';
-import MessagePopup from '../Common/MessagePopup.js';
-import ProfileManager from '../Managers/ProfileManager.js';
-import DataValidator from '../Utils/DataValidator.js';
-import User from "../Models/User.js";
+document.addEventListener("DOMContentLoaded", () => {
+  const headerContainer = document.getElementById("siteHeader")
+  if (!headerContainer) {
+    console.log("Could not load the header component.")
+    return
+  }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const headerContainer = document.getElementById('siteHeader');
-    if (!headerContainer) {
-        console.log('Could not load the header component.');
-        return;
+  // Get user authentication status
+  const userObject = UserAuthTracker.userObject
+
+  // Create header HTML
+  headerContainer.innerHTML = `
+    <div>
+      <div class="logo-container">
+        <img src="${URL_Mapper.ASSETS.LOGO}" alt="Book Alley Logo" />
+        <h1 class="site-title">Book Alley</h1>
+      </div>
+
+      <div class="navbar">
+        <a href="${URL_Mapper.WELCOME}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Home
+        </a>
+        <a href="${URL_Mapper.PRODUCTS}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Books
+        </a>
+        <a href="${URL_Mapper.ABOUT}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          About
+        </a>
+        ${
+          userObject
+            ? `
+            <a href="${URL_Mapper.PROFILE}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="user-icon">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
+            </a>
+            <a href="${URL_Mapper.WISH_LIST}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              Wishlist
+            </a>
+            <a href="${URL_Mapper.CART}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              Cart
+            </a>
+            <button id="logoutButton" class="auth-button logout-button">Logout</button>
+            `
+            : `
+            <button id="loginButton" class="auth-button login-button">Login</button>
+            <button id="registerButton" class="auth-button register-button">Register</button>
+            `
+        }
+      </div>
+    </div>
+  `
+
+  // Create login popup
+  const loginPopupOverlay = document.createElement("div")
+  loginPopupOverlay.id = "loginPopupOverlay"
+  loginPopupOverlay.className = "header-popup-overlay hidden"
+  loginPopupOverlay.innerHTML = `
+    <div id="loginPopup" class="header-popup">
+      <button class="header-close-popup" id="closeLoginPopup">&times;</button>
+      <div class="header-popup-content">
+        <h3>Login</h3>
+        <form id="loginForm">
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <div class="header-popup-buttons">
+            <button type="submit">Login</button>
+            <button type="button" id="switchToRegister">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `
+  document.body.appendChild(loginPopupOverlay)
+
+  // Create register popup
+  const registerPopupOverlay = document.createElement("div")
+  registerPopupOverlay.id = "registerPopupOverlay"
+  registerPopupOverlay.className = "header-popup-overlay hidden"
+  registerPopupOverlay.innerHTML = `
+    <div id="registerPopup" class="header-popup">
+      <button class="header-close-popup" id="closeRegisterPopup">&times;</button>
+      <div class="header-popup-content">
+        <h3>Register</h3>
+        <form id="registerForm">
+          <input type="email" id="registerEmail" placeholder="Email" required />
+          <input type="password" id="registerPassword" placeholder="Password" required />
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+          <input type="text" id="userName" placeholder="User Name" required />
+          <input type="tel" id="phoneNumber" placeholder="Phone Number" required />
+          <input type="text" id="address" placeholder="Address" required />
+          <input type="date" id="birthDate" required />
+          <div class="header-popup-buttons">
+            <button type="submit">Register</button>
+            <button type="button" id="switchToLogin">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `
+  document.body.appendChild(registerPopupOverlay)
+
+  // Handle login button click
+  const loginButton = document.getElementById("loginButton")
+  if (loginButton) {
+    loginButton.addEventListener("click", () => {
+      const loginPopupOverlay = document.getElementById("loginPopupOverlay")
+      if (loginPopupOverlay) {
+        loginPopupOverlay.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Handle register button click
+  const registerButton = document.getElementById("registerButton")
+  if (registerButton) {
+    registerButton.addEventListener("click", () => {
+      const registerPopupOverlay = document.getElementById("registerPopupOverlay")
+      if (registerPopupOverlay) {
+        registerPopupOverlay.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Handle close buttons
+  const closeButtons = document.querySelectorAll(".header-close-popup")
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const popup = button.closest(".header-popup-overlay")
+      if (popup) {
+        popup.classList.add("hidden")
+      }
+    })
+  })
+
+  // Handle switch to register
+  const switchToRegister = document.getElementById("switchToRegister")
+  if (switchToRegister) {
+    switchToRegister.addEventListener("click", () => {
+      const loginPopupOverlay = document.getElementById("loginPopupOverlay")
+      const registerPopupOverlay = document.getElementById("registerPopupOverlay")
+
+      if (loginPopupOverlay && registerPopupOverlay) {
+        loginPopupOverlay.classList.add("hidden")
+        registerPopupOverlay.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Handle switch to login
+  const switchToLogin = document.getElementById("switchToLogin")
+  if (switchToLogin) {
+    switchToLogin.addEventListener("click", () => {
+      const loginPopupOverlay = document.getElementById("loginPopupOverlay")
+      const registerPopupOverlay = document.getElementById("registerPopupOverlay")
+
+      if (loginPopupOverlay && registerPopupOverlay) {
+        registerPopupOverlay.classList.add("hidden")
+        loginPopupOverlay.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Close popups when clicking outside
+  const popupOverlays = document.querySelectorAll(".header-popup-overlay")
+  popupOverlays.forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.add("hidden")
+      }
+    })
+  })
+
+  // Handle login form submission
+  const loginForm = document.getElementById("loginForm")
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+      const email = document.getElementById("loginEmail").value
+      const password = document.getElementById("loginPassword").value
+
+      // Call login function from UserAuthTracker
+      UserAuthTracker.login(email, password)
+    })
+  }
+
+  // Handle register form submission
+  const registerForm = document.getElementById("registerForm")
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+      const email = document.getElementById("registerEmail").value
+      const password = document.getElementById("registerPassword").value
+      const confirmPassword = document.getElementById("confirmPassword").value
+      const userName = document.getElementById("userName").value
+      const phoneNumber = document.getElementById("phoneNumber").value
+      const address = document.getElementById("address").value
+      const birthDate = document.getElementById("birthDate").value
+
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        alert("Passwords do not match")
+        return
+      }
+
+      // Call register function from UserAuthTracker
+      UserAuthTracker.register(email, password, userName, phoneNumber, address, birthDate)
+    })
+  }
+
+  // Handle logout
+  const logoutButton = document.getElementById("logoutButton")
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      UserAuthTracker.logout()
+    })
+  }
+
+  // Close popups with escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const visiblePopups = document.querySelectorAll(".header-popup-overlay:not(.hidden)")
+      visiblePopups.forEach((popup) => {
+        popup.classList.add("hidden")
+      })
     }
-
-    // Function to check if the user should be redirected
-    function checkRedirect() {
-        const isAuthenticated = UserAuthTracker.isAuthenticated;
-        if (isAuthenticated) {
-            return;
-        }
-
-        const pathName = window.location.pathname;
-        if (pathName !== welcomePagePathName
-        &&  pathName !== productsPagePathName) {
-            window.location.href = URL_Mapper.WELCOME + `?errorMessage=Not Logged In`;
-        }
-    }
-    checkRedirect();
-
-    // Render header based on auth status.
-    function renderHeader() {
-        const isAuthenticated = UserAuthTracker.isAuthenticated;
-
-        const headerContainer = document.getElementById('siteHeader');
-        if (!headerContainer) {
-            console.log('Could not load the header component.');
-            return;
-        }
-
-        headerContainer.innerHTML = `
-            <div class='logo-container'>
-                <a href='${URL_Mapper.WELCOME}'>
-                    <img src='${URL_Mapper.ASSETS.LOGO}' alt='Book Alley Logo'>
-                </a>
-            </div>
-            <div class='site-title'>Book Alley</div>
-            <nav class='navbar'>
-                ${isAuthenticated ? `
-                    <a href='${URL_Mapper.PROFILE}'>
-                        <img src='${URL_Mapper.ICONS.USER}' class='user-icon' alt='Person Icon' />
-                        Profile
-                    </a>
-                    <button class='cart-button'>
-                        <img src='${URL_Mapper.ICONS.CART}' alt='Cart' />
-                    </button>
-                    <button class='auth-button logout-button'>Logout</button>
-                ` : `
-                    <button class='auth-button login-button'>Login</button>
-                    <button class='auth-button register-button'>Register</button>
-                `}
-            </nav>
-
-            <!-- Login Popup -->
-            <div class='header-popup-overlay hidden' id='loginOverlay'></div>
-            <div class='header-popup hidden' id='loginPopup'>
-                <button class='header-close-popup'>×</button>
-                <div class='header-popup-content'>
-                    <h3>Login</h3>
-                    <form id='loginForm'>
-                        <input type='email' placeholder='Email' required>
-                        <input type='password' placeholder='Password' required>
-                        <div class='header-popup-buttons'>
-                            <button type='submit'>Login</button>
-                            <button type='button' class='header-close-popup'>Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Register Popup -->
-            <div class='header-popup-overlay hidden' id='registerOverlay'></div>
-            <div class='header-popup hidden' id='registerPopup'>
-                <button class='header-close-popup'>×</button>
-                <div class='header-popup-content'>
-                    <h3>Register</h3>
-                    <form id='registerForm'>
-                        <input type='email' placeholder='Email' required>
-                        <input type='password' placeholder='Password' required>
-                        <input type='password' placeholder='Confirm Password' required>
-                        <input type='text' placeholder='User Name' required>
-                        <input type='text' placeholder='Phone Number' required>
-                        <input type='text' placeholder='Address' required>
-                        <input type='date' placeholder='Birth Date' required>
-                        <div class='header-popup-buttons'>
-                            <button type='submit'>Register</button>
-                            <button type='button' class='header-close-popup'>Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        `;
-
-        const siteTitle = document.querySelector('.site-title');
-        if (siteTitle) {
-            siteTitle.addEventListener('click', () => {
-                window.location.href = URL_Mapper.PRODUCTS;
-            });
-        }
-
-        // Add event listeners
-        if (isAuthenticated) {
-            const cartButton = headerContainer.querySelector('.cart-button');
-            if (cartButton) {
-                cartButton.addEventListener('click', () => {
-                    window.location.href = URL_Mapper.CART;
-                });
-            }
-
-            const logoutButton = headerContainer.querySelector('.logout-button');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', handleLogout);
-            }
-        } else {
-            // Login button
-            headerContainer.querySelector('.login-button')?.addEventListener('click', () => {
-                document.getElementById('loginOverlay').classList.remove('hidden');
-                document.getElementById('loginPopup').classList.remove('hidden');
-            });
-
-            // Register button
-            headerContainer.querySelector('.register-button')?.addEventListener('click', () => {
-                document.getElementById('registerOverlay').classList.remove('hidden');
-                document.getElementById('registerPopup').classList.remove('hidden');
-            });
-        }
-
-        // Close popup handlers
-        document.querySelectorAll('.header-close-popup').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.header-popup, .header-popup-overlay').forEach(el => {
-                    el.classList.add('hidden');
-                });
-            });
-        });
-
-        // Form submissions
-        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
-        document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
-    }
-
-    // Form handlers
-    async function handleLogin(e) {
-        e.preventDefault();
-        const [email, password] = Array.from(e.target.elements).map(el => el.value);
-
-        if (!DataValidator.isEmailValid(email)) {
-            MessagePopup.show('Invalid email!', true);
-            return;
-        }
-
-        if (!DataValidator.isPasswordValid(password)) {
-            MessagePopup.show('Invalid password!', true);
-            return;
-        }
-
-        ProfileManager.login(email, password, (user) => {
-            let parsedUser;
-            try {
-                parsedUser = User.fromJSON(user);
-            } catch (e) {
-                console.log('Could not parse user object in login function.');
-                return;
-            }
-
-            UserAuthTracker.userObject = parsedUser;
-            renderHeader();
-            MessagePopup.show('Login successful!', false);
-
-            document.querySelectorAll('.header-popup, .header-popup-overlay').forEach(el => {
-                el.classList.add('hidden');
-            });
-        }, (error) => {
-            MessagePopup.show(error, true);
-        });
-    }
-
-    async function handleRegister(e) {
-        e.preventDefault();
-        const [email, password, confirmPassword, userName, phoneNumber, address, birthDate] = Array.from(e.target.elements).map(el => el.value);
-
-        if (!DataValidator.isEmailValid(email)) {
-            MessagePopup.show('Invalid email!', true);
-            return;
-        }
-
-        if (!DataValidator.isPasswordValid(password)) {
-            MessagePopup.show('Invalid password!', true);
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            MessagePopup.show(`Passwords don't match!`, true);
-            return;
-        }
-
-        if (!DataValidator.isUserNameValid(userName)) {
-            MessagePopup.show('Invalid user name!', true);
-            return;
-        }
-
-        if (!DataValidator.isPhoneValid(phoneNumber)) {
-            MessagePopup.show('Invalid phone number!', true);
-            return;
-        }
-
-        if (!DataValidator.isAddressValid(address)) {
-            MessagePopup.show('Invalid address!', true);
-            return;
-        }
-
-        if (!DataValidator.isBirthDateValid(birthDate)) {
-            MessagePopup.show('Invalid birth date!', true);
-            return;
-        }
-
-        const userData = {
-            email,
-            password,
-            userName,
-            phoneNumber,
-            address,
-            birthDate
-        };
-
-        ProfileManager.register(userData, (user) => {
-            let parsedUser;
-            try {
-                parsedUser = User.fromJSON(user);
-            } catch (e) {
-                console.log('Could not parse user object in login function.');
-                return;
-            }
-
-            UserAuthTracker.userObject = parsedUser;
-            renderHeader();
-            MessagePopup.show('Registration successful!', false);
-
-            document.querySelectorAll('.header-popup, .header-popup-overlay').forEach(el => {
-                el.classList.add('hidden');
-            });
-        }, (error) => {
-            MessagePopup.show(error, true);
-        });
-    }
-
-    function handleLogout() {
-        UserAuthTracker.userObject = null;
-        window.location.href = URL_Mapper.WELCOME;
-        // renderHeader();
-        // MessagePopup.show('Logout successful!', false);
-    }
-
-    // Initial render
-    renderHeader();
-
-    // Listen for auth changes.
-    UserAuthTracker.onAuthChange = renderHeader;
-});
+  })
+})

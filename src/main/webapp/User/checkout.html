@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="CSS/Common/footer.css" />
     <link rel="stylesheet" href="CSS/Common/main.css" />
     <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
     <link rel="stylesheet" href="CSS/checkout.css" />
     <script src="JavaScript/Common/context_path.js"></script>
     <script defer type="module" src="JavaScript/Common/header.js"></script>
@@ -21,8 +22,12 @@
     <!-- Header will be injected here by JS -->
 </header>
 
-<main>
-    <button id="backToCart" class="back-button">Back to Cart</button>
+<main class="container">
+    <button id="backToCart" class="back-button" aria-label="Back to cart">
+        Back to Cart
+    </button>
+
+    <h1 class="center-title">Checkout</h1>
 
     <section id="orderSummary" class="order-summary">
         <h2>Order Summary</h2>
@@ -56,15 +61,15 @@
         <div id="creditCardForm">
             <h3>Credit Card Information</h3>
             <form id="paymentForm">
-                <label for="nameOnCard">Name on Card:</label>
-                <input type="text" id="nameOnCard" name="nameOnCard" required>
+                <label for="nameOnCard">Name on Card</label>
+                <input type="text" id="nameOnCard" name="nameOnCard" placeholder="Enter name as it appears on card" required>
 
-                <label for="cardNumber">Card Number:</label>
-                <input type="text" id="cardNumber" name="cardNumber" required>
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required>
 
                 <div class="expiry-date-container">
                     <div>
-                        <label for="expiryMonth">Expiry Month:</label>
+                        <label for="expiryMonth">Expiry Month</label>
                         <select id="expiryMonth" name="expiryMonth" required>
                             <option value="" disabled selected>MM</option>
                             <option value="01">01</option>
@@ -82,7 +87,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="expiryYear">Expiry Year:</label>
+                        <label for="expiryYear">Expiry Year</label>
                         <select id="expiryYear" name="expiryYear" required>
                             <option value="" disabled selected>YY</option>
                             <!-- Years will be populated by JavaScript -->
@@ -90,8 +95,8 @@
                     </div>
                 </div>
 
-                <label for="cvc">CVC:</label>
-                <input type="text" id="cvc" name="cvc" required>
+                <label for="cvc">CVC</label>
+                <input type="text" id="cvc" name="cvc" placeholder="123" required>
             </form>
         </div>
 
@@ -102,7 +107,7 @@
         </div>
     </section>
 
-    <button id="placeOrderButton" class="place-order-button">
+    <button id="placeOrderButton" class="place-order-button" aria-label="Place order">
         Place Order
     </button>
 </main>

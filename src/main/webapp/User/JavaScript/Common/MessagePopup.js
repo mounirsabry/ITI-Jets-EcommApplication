@@ -1,68 +1,56 @@
 class MessagePopup {
-    constructor() {
-        this.errorContainer = null;
-        this.messageText = null;
-        this.closeButton = null;
-        this.timeout = null;
-        this.createComponent();
+  static show(message, isError = false) {
+    // Check if a popup already exists and remove it
+    const existingPopup = document.querySelector(".popup-message-container")
+    if (existingPopup) {
+      existingPopup.remove()
     }
 
-    createComponent(isError = false) {
-        // Create container
-        this.errorContainer = document.createElement('div');
-        this.errorContainer.classList.add('popup-message-container');
+    // Create popup elements
+    const popupContainer = document.createElement("div")
+    popupContainer.className = `popup-message-container ${isError ? "popup-message-error" : "popup-message-info"}`
 
-        // Add error class if needed
-        if (isError) {
-            this.errorContainer.classList.add('popup-message-error');
-        } else {
-            this.errorContainer.classList.add('popup-message-info');
-        }
+    const messageText = document.createElement("p")
+    messageText.className = "popup-message-text"
+    messageText.textContent = message
 
-        // Create message text
-        this.messageText = document.createElement('p');
-        this.messageText.classList.add('popup-message-text');
+    const closeButton = document.createElement("button")
+    closeButton.className = "popup-close-button"
+    closeButton.innerHTML = "&times;"
+    closeButton.setAttribute("aria-label", "Close message")
 
-        // Create close button
-        this.closeButton = document.createElement('button');
-        this.closeButton.classList.add('popup-close-button');
-        this.closeButton.innerHTML = '&times;';
-        this.closeButton.addEventListener('click', () => this.hide());
+    // Add elements to container
+    popupContainer.appendChild(messageText)
+    popupContainer.appendChild(closeButton)
 
-        // Append elements
-        this.errorContainer.appendChild(this.messageText);
-        this.errorContainer.appendChild(this.closeButton);
-        document.body.appendChild(this.errorContainer);
-    }
+    // Add container to body
+    document.body.appendChild(popupContainer)
 
-    show(message, isError = false, duration = 3000) {
-        // If container doesn't exist or needs to change type, recreate it
-        if (!this.errorContainer ||
-            (isError && !this.errorContainer.classList.contains('popup-message-error')) ||
-            (!isError && !this.errorContainer.classList.contains('popup-message-info'))) {
-            if (this.errorContainer) {
-                this.errorContainer.remove();
-            }
-            this.createComponent(isError);
-        }
+    // Show popup with animation
+    setTimeout(() => {
+      popupContainer.classList.add("show")
+    }, 10)
 
-        this.messageText.textContent = message;
-        this.errorContainer.classList.add('show');
+    // Close button event listener
+    closeButton.addEventListener("click", () => {
+      popupContainer.classList.remove("show")
+      setTimeout(() => {
+        popupContainer.remove()
+      }, 300)
+    })
 
-        // Only auto-hide if duration is provided and > 0
-        if (duration && duration > 0) {
-            this.timeout = setTimeout(() => this.hide(), duration);
-        } else {
-            clearTimeout(this.timeout);
-        }
-    }
-
-    hide() {
-        if (this.errorContainer) {
-            this.errorContainer.classList.remove('show');
-        }
-        clearTimeout(this.timeout);
-    }
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+      if (document.body.contains(popupContainer)) {
+        popupContainer.classList.remove("show")
+        setTimeout(() => {
+          if (document.body.contains(popupContainer)) {
+            popupContainer.remove()
+          }
+        }, 300)
+      }
+    }, 5000)
+  }
 }
 
-export default new MessagePopup();
+export default MessagePopup

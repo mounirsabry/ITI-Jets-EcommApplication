@@ -1,225 +1,232 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import URL_Mapper from "./Utils/URL_Mapper.js"
+import displayProduct from "./Common/BookPopup.js"
+import OrdersManager from "./Managers/OrdersManager.js"
+import UserAuthTracker from "./Common/UserAuthTracker.js"
+import Book from "./Models/Book.js"
+import MessagePopup from "./Common/MessagePopup.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import URL_Mapper from './Utils/URL_Mapper.js';
-import displayProduct from "./Common/BookPopup.js";
-import { addOrderDateTimeAddress } from "./Utils/UICommonFunctions.js";
-import OrdersManager from "./Managers/OrdersManager.js";
-import UserAuthTracker from "./Common/UserAuthTracker.js";
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-import Order from "./Models/Order.js";
-import { BooksManager } from "./Managers/BooksManager.js";
-import Book from "./Models/Book.js";
+  // Add fade-in animation to main sections
+  const sections = document.querySelectorAll("main > section")
+  sections.forEach((section, index) => {
+    section.classList.add("fade-in")
+    section.style.animationDelay = `${index * 0.2}s`
+  })
 
-document.addEventListener("DOMContentLoaded", function () {
-    checkForErrorMessageParameter();
+  // DOM Elements
+  const orderTitle = document.getElementById("orderTitle")
+  const orderDetailsContainer = document.getElementById("orderDetails")
+  const orderItemsContainer = document.getElementById("orderItems")
+  const subtotalElement = document.getElementById("subtotal")
+  const shippingFeeElement = document.getElementById("shippingFee")
+  const totalAmountElement = document.getElementById("totalAmount")
+  const backToOrdersButton = document.getElementById("backToOrdersButton")
 
-    const userObject = UserAuthTracker.userObject;
-    if (!userObject) {
-        UserAuthTracker.handleUserInvalidState();
-        return;
-    }
+  // Get order ID from URL
+  const urlParams = new URLSearchParams(window.location.search)
+  const orderID = urlParams.get("orderID")
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let orderID = urlParams.get("orderID");
-    if (!orderID) {
-        window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('No order ID specified!')}`;
-        return;
-    }
+  // Check if user is authenticated
+  const userObject = UserAuthTracker.userObject
+  if (!userObject) {
+    UserAuthTracker.handleUserInvalidState()
+    return
+  }
 
-    try {
-        orderID = JSON.parse(orderID);
-    } catch (error) {
-        window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('Could not parse the order ID!')}`;
-        return;
-    }
+  // Check if order ID is provided
+  if (!orderID) {
+    MessagePopup.show("Order ID is missing", true)
+    window.location.href = URL_Mapper.ORDERS
+    return
+  }
 
-    const backToOrdersButton = document.getElementById('backToOrdersButton');
-    if (!backToOrdersButton) {
-        console.error('Could not locate the back to orders button.');
-    } else {
-        backToOrdersButton.addEventListener('click', () => {
-            window.location.href = URL_Mapper.ORDERS;
-        });
-    }
+  // Initialize order details page
+  function initOrderDetailsPage() {
+    // Show loading state
+    orderDetailsContainer.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Loading order details"></div>
+      </div>
+    `
+    orderItemsContainer.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Loading order items"></div>
+      </div>
+    `
 
-    const orderTitle = document.getElementById('orderTitle');
-    if (!orderTitle) {
-        console.error('Could not locate the order title component.');
-    }
+    // Fetch order details
+    OrdersManager.getOrderDetails(userObject.userID, orderID, onOrderDetailsLoaded, onError)
 
-    const orderDetails = document.getElementById('orderDetails');
+    // Event listeners
+    backToOrdersButton.addEventListener("click", () => {
+      window.location.href = URL_Mapper.ORDERS
+    })
+  }
+
+  // Handle order details loaded from API
+  function onOrderDetailsLoaded(orderDetails) {
     if (!orderDetails) {
-        console.error('Could not locate the order details component.');
+      MessagePopup.show("Order not found", true)
+      window.location.href = URL_Mapper.ORDERS
+      return
     }
 
-    const orderItemsContainer = document.getElementById('orderItems');
-    if (!orderItemsContainer) {
-        console.error('Could not locate the order items container.');
-        return;
+    // Update order title
+    orderTitle.textContent = `Order #${orderDetails.orderID}`
+
+    // Display order details
+    displayOrderDetails(orderDetails)
+
+    // Display order items
+    displayOrderItems(orderDetails.items)
+
+    // Update order summary
+    updateOrderSummary(orderDetails)
+  }
+
+  // Handle API errors
+  function onError(error) {
+    console.error("Error loading order details:", error)
+    orderDetailsContainer.innerHTML = `
+      <div class="error-container">
+        <p>Failed to load order details. Please try again later.</p>
+      </div>
+    `
+    orderItemsContainer.innerHTML = ""
+    MessagePopup.show("Error loading order details: " + error, true)
+  }
+
+  // Display order details
+  function displayOrderDetails(orderDetails) {
+    // Format date
+    const orderDate = new Date(orderDetails.orderDate)
+    const formattedDate = orderDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+    // Get status badge class
+    const statusClass = getStatusBadgeClass(orderDetails.status)
+
+    orderDetailsContainer.innerHTML = `
+      <div class="order-detail-group">
+        <h3>Order Date</h3>
+        <p>${formattedDate}</p>
+      </div>
+      
+      <div class="order-detail-group">
+        <h3>Status</h3>
+        <p class="order-status">
+          <span class="status-badge ${statusClass}">${orderDetails.status}</span>
+        </p>
+      </div>
+      
+      <div class="order-detail-group">
+        <h3>Shipping Address</h3>
+        <p>${orderDetails.shippingAddress || "Not available"}</p>
+      </div>
+      
+      <div class="order-detail-group">
+        <h3>Payment Method</h3>
+        <p>${orderDetails.paymentMethod || "Not available"}</p>
+      </div>
+    `
+  }
+
+  // Display order items
+  function displayOrderItems(items) {
+    if (!items || items.length === 0) {
+      orderItemsContainer.innerHTML = `
+        <p>No items in this order</p>
+      `
+      return
     }
 
-    const subtotalComponent = document.getElementById('subtotal');
-    if (!subtotalComponent) {
-        console.error('Could not locate subtotal component.');
+    // Clear loading state
+    orderItemsContainer.innerHTML = ""
+
+    // Create order items
+    items.forEach((item, index) => {
+      try {
+        const book = Book.fromJSON(item.book)
+        const quantity = item.quantity
+        const itemTotal = book.price * quantity
+
+        const orderItemElement = createOrderItemElement(book, quantity, itemTotal, index)
+        orderItemsContainer.appendChild(orderItemElement)
+      } catch (e) {
+        console.error("Could not parse book:", e)
+      }
+    })
+  }
+
+  // Create order item element
+  function createOrderItemElement(book, quantity, itemTotal, index) {
+    const orderItem = document.createElement("div")
+    orderItem.classList.add("order-item")
+    orderItem.style.animationDelay = `${index * 0.1}s`
+    orderItem.classList.add("fade-in")
+
+    // Get main image
+    const imagesArray = book.images
+    const mainImage = imagesArray.find((image) => image.isMain)
+    const imageUrl = mainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE
+
+    orderItem.innerHTML = `
+      <img src="${imageUrl}" alt="${book.title}" class="book-image" data-book-id="${book.bookID}">
+      
+      <div class="book-details">
+        <h2>${book.title}</h2>
+        <p class="overview">${book.overview || "No overview available"}</p>
+        <p><strong>Author:</strong> ${book.author || "Unknown"}</p>
+        <p><strong>Price:</strong> ${book.price} EGP</p>
+        <p><strong>Quantity:</strong> ${quantity}</p>
+      </div>
+      
+      <div class="price-section">
+        <p><strong>Item Total</strong></p>
+        <p class="item-total">${itemTotal.toFixed(2)} EGP</p>
+      </div>
+    `
+
+    // Add event listener for book image
+    const bookImage = orderItem.querySelector(".book-image")
+    bookImage.addEventListener("click", () => {
+      displayProduct(book)
+    })
+
+    return orderItem
+  }
+
+  // Update order summary
+  function updateOrderSummary(orderDetails) {
+    subtotalElement.textContent = orderDetails.subtotal.toFixed(2)
+    shippingFeeElement.textContent = orderDetails.shippingFee.toFixed(2)
+    totalAmountElement.textContent = orderDetails.totalAmount.toFixed(2)
+  }
+
+  // Get status badge class based on order status
+  function getStatusBadgeClass(status) {
+    switch (status.toLowerCase()) {
+      case "pending":
+        return "status-pending"
+      case "processing":
+        return "status-processing"
+      case "shipped":
+        return "status-shipped"
+      case "delivered":
+        return "status-delivered"
+      case "cancelled":
+        return "status-cancelled"
+      default:
+        return ""
     }
+  }
 
-    const shippingFeeComponent = document.getElementById('shippingFee');
-    if (!shippingFeeComponent) {
-        console.error('Could not locate shipping fee component.');
-    }
-
-    const totalAmountComponent = document.getElementById('totalAmount');
-    if (!totalAmountComponent) {
-        console.error('Could not locate total amount component.');
-    }
-
-    OrdersManager.getOrderDetails(userObject.userID, orderID, callbackOnOrderDetailsSuccessful, null);
-
-    function callbackOnOrderDetailsSuccessful(order) {
-        let parsedOrder;
-        try {
-            parsedOrder = Order.fromJSON(order);
-        } catch (_) {
-            window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('Could not find an order with this order ID!')}`;
-            return;
-        }
-
-        if (orderTitle) {
-            orderTitle.textContent = `Order #${parsedOrder.orderID}`;
-        }
-
-        if (orderDetails) {
-            addOrderDetails(parsedOrder);
-        }
-
-        renderOrderItems(parsedOrder);
-    }
-
-    function addOrderDetails(order) {
-        addOrderDateTimeAddress(orderDetails, order);
-
-        const numberOfItemsParagraph = document.createElement('p');
-        numberOfItemsParagraph.innerHTML = `<strong>Number of Items:</strong> ${order.orderItems.length}`;
-        orderDetails.appendChild(numberOfItemsParagraph);
-    }
-
-    function renderOrderItems(order) {
-        orderItemsContainer.innerHTML = '';
-
-        order.orderItems.forEach(orderItem => {
-            const bookElement = document.createElement('div');
-            bookElement.classList.add('order-item');
-            orderItemsContainer.appendChild(bookElement);
-
-            BooksManager.getBookDetails(orderItem.bookID, (book) => {
-                loadBookInfoElementOnSuccess(bookElement, orderItem, book, () => {
-                    const subtotalChange = orderItem.priceAtPurchase * orderItem.quantity;
-                    updatePriceSummarySectionOnChange(subtotalChange);
-                });
-            });
-        });
-
-
-        if (shippingFeeComponent) {
-            shippingFeeComponent.textContent = order.shippingFee.toFixed(2);
-        }
-    }
-
-    function loadBookInfoElementOnSuccess(bookElement, orderItem, book, callbackAfterLoad) {
-        let parsedBook;
-        try {
-            parsedBook = Book.fromJSON(book);
-        } catch (_) {
-            console.error('Could not parse a book.');
-            bookElement.classList.add('no-data-found');
-            bookElement.textContent = 'Could Not Find This Book.';
-            return;
-        }
-
-        const mainImage = parsedBook.images?.find(image => image.isMain);
-        let imagePath;
-        if (mainImage) {
-            imagePath = mainImage.url;
-        } else {
-            imagePath = URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-        }
-
-        let subtotalPrice = orderItem.priceAtPurchase * orderItem.quantity;
-
-        // Create the image element.
-        const img = document.createElement('img');
-        img.src = imagePath;
-        img.alt = parsedBook.title;
-        img.className = 'book-image';
-        bookElement.appendChild(img);
-
-        // Create the book details container.
-        const bookDetails = document.createElement('div');
-        bookDetails.className = 'book-details';
-
-        // Create and append the title.
-        const title = document.createElement('h2');
-        title.textContent = parsedBook.title;
-        bookDetails.appendChild(title);
-
-        // Create and append the overview.
-        const overview = document.createElement('p');
-        overview.textContent = parsedBook.overview;
-        overview.classList.add('overview');
-        bookDetails.appendChild(overview);
-
-        // Create and append the author.
-        const author = document.createElement('p');
-        author.innerHTML = `<strong>Author:</strong> ${parsedBook.author}`;
-        bookDetails.appendChild(author);
-
-        // Create and append the ISBN.
-        const isbn = document.createElement('p');
-        isbn.innerHTML = `<strong>ISBN:</strong> ${parsedBook.isbn}`;
-        bookDetails.appendChild(isbn);
-
-        // Append the book details to the main container.
-        bookElement.appendChild(bookDetails);
-
-        // Create the price section container.
-        const priceSection = document.createElement('div');
-        priceSection.className = 'price-section';
-
-        if (orderItem.quantity === 1) {
-            const priceInfo = document.createElement('p');
-            priceInfo.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(priceInfo);
-        } else {
-            const pricePerPieceParagraph = document.createElement('p');
-            pricePerPieceParagraph.innerHTML = `<strong>Price per Piece:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(pricePerPieceParagraph);
-
-            const quantityParagraph = document.createElement('p');
-            quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${orderItem.quantity}`;
-            priceSection.appendChild(quantityParagraph);
-
-            const totalItemPriceParagraph = document.createElement('p');
-            totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> ${subtotalPrice.toFixed(2)}`;
-            priceSection.appendChild(totalItemPriceParagraph);
-        }
-        bookElement.appendChild(priceSection);
-
-        img.addEventListener('click', () => {
-            displayProduct(parsedBook);
-        });
-
-        callbackAfterLoad();
-    }
-
-    function updatePriceSummarySectionOnChange(subtotalChange) {
-        if (subtotalComponent) {
-            subtotalComponent.textContent = (parseFloat(subtotalComponent.textContent) + subtotalChange).toFixed(2);
-        }
-        const shippingFee = parseFloat(shippingFeeComponent.textContent);
-
-        if (totalAmountComponent) {
-            totalAmountComponent.textContent = (parseFloat(subtotalComponent.textContent) + shippingFee).toFixed(2) + ' EGP';
-        }
-    }
-});
+  // Initialize the page
+  initOrderDetailsPage()
+})

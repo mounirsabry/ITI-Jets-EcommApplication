@@ -1,157 +1,312 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import "./Common/pageLoader.js" // Import the page loader to ensure header is loaded
+import URL_Mapper from "./Utils/URL_Mapper.js"
+import { createBookCard } from "./Utils/bookUIFunctions.js"
+import Book from "./Models/Book.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import URL_Mapper from "./Utils/URL_Mapper.js";
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-import { createBookCard } from "./Utils/bookUIFunctions.js";
-import displayProduct from "./Common/BookPopup.js";
-import BooksManager from "./Managers/BooksManager.js";
-import Book from "./Models/Book.js";
+  // Add fade-in animation to main sections
+  const sections = document.querySelectorAll("main > section")
+  sections.forEach((section, index) => {
+    section.classList.add("fade-in")
+    section.style.animationDelay = `${index * 0.2}s`
+  })
 
-document.addEventListener("DOMContentLoaded", function() {
-    checkForErrorMessageParameter();
-    
-    // Event Banner.
-    const messages = document.querySelectorAll(".banner-text");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    
-    let currentIndex = 0;
-    let autoScroll;
+  // DOM Elements
+  const topBooksContainer = document.getElementById("topBooks")
+  const topGenreBooksContainer = document.getElementById("topGenreBooks")
+  const browseButton = document.getElementById("browseButton")
+  const bannerMessages = document.getElementById("bannerMessages")
+  const prevBtn = document.getElementById("prevBtn")
+  const nextBtn = document.getElementById("nextBtn")
 
-    function updateBanner(index) {
-        messages.forEach((msg, i) => {
-            msg.classList.remove("active");
-            if (i === index) {
-                msg.classList.add("active");
-            }
-        });
+  // Event Banner Messages
+  const messages = [
+    "Summer Sale! Get 20% off on all books",
+    "Free shipping on orders over 200 EGP",
+    "New arrivals every week",
+    "Join our loyalty program for exclusive discounts",
+  ]
+
+  let currentMessageIndex = 0
+
+  // Initialize event banner
+  function initEventBanner() {
+    // Create message elements
+    messages.forEach((message, index) => {
+      const messageElement = document.createElement("div")
+      messageElement.className = `banner-text ${index === 0 ? "active" : ""}`
+      messageElement.textContent = message
+      bannerMessages.appendChild(messageElement)
+    })
+
+    // Set up event listeners for banner navigation
+    prevBtn.addEventListener("click", showPreviousMessage)
+    nextBtn.addEventListener("click", showNextMessage)
+
+    // Auto-rotate messages
+    setInterval(showNextMessage, 5000)
+  }
+
+  // Show previous message
+  function showPreviousMessage() {
+    const messages = document.querySelectorAll(".banner-text")
+    messages[currentMessageIndex].classList.remove("active")
+    currentMessageIndex = (currentMessageIndex - 1 + messages.length) % messages.length
+    messages[currentMessageIndex].classList.add("active")
+  }
+
+  // Show next message
+  function showNextMessage() {
+    const messages = document.querySelectorAll(".banner-text")
+    messages[currentMessageIndex].classList.remove("active")
+    currentMessageIndex = (currentMessageIndex + 1) % messages.length
+    messages[currentMessageIndex].classList.add("active")
+  }
+
+  // Initialize welcome page
+  function initWelcomePage() {
+    // Initialize event banner
+    initEventBanner()
+
+    // Set up browse button
+    if (browseButton) {
+      browseButton.addEventListener("click", () => {
+        window.location.href = URL_Mapper.PRODUCTS
+      })
     }
 
-    function nextMessage() {
-        currentIndex = (currentIndex + 1) % messages.length;
-        updateBanner(currentIndex);
+    // Show loading state
+    if (topBooksContainer) {
+      topBooksContainer.innerHTML = `
+        <div class="loading-container">
+          <div class="loading-spinner" aria-label="Loading top books"></div>
+        </div>
+      `
     }
 
-    function prevMessage() {
-        currentIndex = (currentIndex - 1 + messages.length) % messages.length;
-        updateBanner(currentIndex);
+    if (topGenreBooksContainer) {
+      topGenreBooksContainer.innerHTML = `
+        <div class="loading-container">
+          <div class="loading-spinner" aria-label="Loading genre books"></div>
+        </div>
+      `
     }
 
-    function startAutoScroll() {
-        autoScroll = setInterval(nextMessage, 3000);
-    }
+    // Mock data for demonstration - in a real app, this would be fetched from an API
+    const mockTopBooks = [
+      {
+        bookID: 1,
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        price: 75.0,
+        discountedPercentage: 15,
+        overview: "A classic novel about the American Dream and the Roaring Twenties.",
+        genre: "Classic",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 10,
+        isAvailable: true,
+      },
+      {
+        bookID: 2,
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        price: 85.5,
+        discountedPercentage: 0,
+        overview: "A powerful story of racial injustice and moral growth in the American South.",
+        genre: "Classic",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 5,
+        isAvailable: true,
+      },
+      {
+        bookID: 3,
+        title: "1984",
+        author: "George Orwell",
+        price: 65.25,
+        discountedPercentage: 10,
+        overview: "A dystopian novel about totalitarianism, surveillance, and thought control.",
+        genre: "Science Fiction",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 8,
+        isAvailable: true,
+      },
+      {
+        bookID: 4,
+        title: "Pride and Prejudice",
+        author: "Jane Austen",
+        price: 70.0,
+        discountedPercentage: 0,
+        overview: "A romantic novel of manners that satirizes issues of class, marriage, and misconceptions.",
+        genre: "Romance",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 12,
+        isAvailable: true,
+      },
+    ]
 
-    function resetAutoScroll() {
-        clearInterval(autoScroll);
-        startAutoScroll();
-    }
+    const mockTopGenreBooks = [
+      {
+        bookID: 5,
+        title: "Dune",
+        author: "Frank Herbert",
+        price: 95.0,
+        discountedPercentage: 5,
+        overview: "A science fiction epic set in a distant future amidst a feudal interstellar society.",
+        genre: "Science Fiction",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 7,
+        isAvailable: true,
+      },
+      {
+        bookID: 6,
+        title: "Neuromancer",
+        author: "William Gibson",
+        price: 80.0,
+        discountedPercentage: 0,
+        overview: "A groundbreaking cyberpunk novel that explores artificial intelligence and virtual reality.",
+        genre: "Science Fiction",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 3,
+        isAvailable: true,
+      },
+      {
+        bookID: 7,
+        title: "Foundation",
+        author: "Isaac Asimov",
+        price: 85.5,
+        discountedPercentage: 12,
+        overview: "A science fiction novel about the decline and fall of a galactic empire.",
+        genre: "Science Fiction",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 6,
+        isAvailable: true,
+      },
+      {
+        bookID: 8,
+        title: "The Hitchhiker's Guide to the Galaxy",
+        author: "Douglas Adams",
+        price: 75.0,
+        discountedPercentage: 0,
+        overview: "A comedic science fiction series about the adventures of an unwitting human and his alien friend.",
+        genre: "Science Fiction",
+        images: [
+          {
+            url: "/placeholder.svg?height=300&width=200",
+            isMain: true,
+          },
+        ],
+        stock: 9,
+        isAvailable: true,
+      },
+    ]
 
-    prevBtn.addEventListener("click", () => {
-        prevMessage();
-        resetAutoScroll();
-    });
+    // Simulate API call delay
+    setTimeout(() => {
+      displayTopBooks(mockTopBooks)
+      displayTopGenreBooks(mockTopGenreBooks)
+    }, 500)
+  }
 
-    nextBtn.addEventListener("click", () => {
-        nextMessage();
-        resetAutoScroll();
-    });
+  // Display top selling books
+  function displayTopBooks(books) {
+    if (!topBooksContainer) return
 
-    startAutoScroll();
-    updateBanner(currentIndex);
+    // Clear loading state
+    topBooksContainer.innerHTML = ""
 
-    // Set the browse button.
-    const browseButton = document.getElementById('browseButton');
-    if (!browseButton) {
-        console.log('Could not load the browse button.');
-        return;
-    }
-    browseButton.addEventListener('click', () => {
-        window.location.href = URL_Mapper.PRODUCTS;
-    });
+    // Create book cards
+    books.forEach((bookData) => {
+      try {
+        const book = new Book(
+          bookData.bookID,
+          bookData.title,
+          bookData.author,
+          bookData.price,
+          bookData.overview,
+          bookData.images,
+          bookData.stock,
+          bookData.isAvailable,
+          bookData.discountedPercentage,
+          bookData.genre,
+        )
 
-    const topSellingContainer = document.getElementById("topSelling");
-    if (!topSellingContainer) {
-        console.log('Could not load the top selling component.');
-        return;
-    }
+        const bookCard = createBookCard(book)
+        topBooksContainer.appendChild(bookCard)
+      } catch (e) {
+        console.error("Could not create book object:", e)
+      }
+    })
+  }
 
-    // Populate "Top Selling Books"
-    function topSellingBooksOnSuccess(topSellingBooks) {
+  // Display top genre books
+  function displayTopGenreBooks(books) {
+    if (!topGenreBooksContainer) return
 
-        topSellingBooks.forEach(book => {
-            let parsedBook;
-            try {
-                parsedBook = Book.fromJSON(book);
-            } catch (e) {
-                console.error('Could not parse a book in top selling book');
-                return;
-            }
+    // Clear loading state
+    topGenreBooksContainer.innerHTML = ""
 
-            const imagesArray = parsedBook.images;
-            const mainImage = imagesArray.find(image => image.isMain);
+    // Create book cards
+    books.forEach((bookData) => {
+      try {
+        const book = new Book(
+          bookData.bookID,
+          bookData.title,
+          bookData.author,
+          bookData.price,
+          bookData.overview,
+          bookData.images,
+          bookData.stock,
+          bookData.isAvailable,
+          bookData.discountedPercentage,
+          bookData.genre,
+        )
 
-            // Create elements
-            const bookElement = document.createElement("div");
-            bookElement.classList.add("book-card");
+        const bookCard = createBookCard(book)
+        topGenreBooksContainer.appendChild(bookCard)
+      } catch (e) {
+        console.error("Could not create book object:", e)
+      }
+    })
+  }
 
-            const imgElement = document.createElement('img');
-            imgElement.src = mainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-            imgElement.alt = book.title;
-            imgElement.className = 'product-image';
-
-            const titleElement = document.createElement('h3');
-            titleElement.textContent = book.title;
-
-            const overviewElement = document.createElement('p');
-            overviewElement.textContent = book.overview;
-
-            // Append elements
-            bookElement.append(imgElement, titleElement, overviewElement);
-
-            // Update function (closure captures elements)
-            function updateBookDetailsOnViewingPopup(updatedBook) {
-                titleElement.textContent = updatedBook.title || book.title; // Fallback to original
-                overviewElement.textContent = updatedBook.overview || book.overview;
-
-                const newImg = updatedBook.images?.find(img => img.isMain)?.url ||
-                    URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-                if (newImg !== imgElement.src) {
-                    imgElement.src = newImg;
-                }
-            }
-
-            // Click handler
-            imgElement.addEventListener('click', () => {
-                displayProduct(parsedBook, updateBookDetailsOnViewingPopup);
-            });
-
-            topSellingContainer.appendChild(bookElement);
-        });
-    }
-
-    const topSellingGenreBookContainer = document.getElementById("topSellingGenreBook");
-    if (!topSellingGenreBookContainer) {
-        console.log('Could not load the top selling genre book component.');
-        return;
-    }
-
-    // Populate "Top Selling in Genre" with cart functionality.
-    function topSellingGenreBooksOnSuccess(topSellingGenreBooks) {
-        topSellingGenreBooks.forEach(book => {
-            let parsedBook = Book.fromJSON(book);
-            try {
-                parsedBook = Book.fromJSON(book);
-            } catch (e) {
-                console.log('Could not parse a book inside top selling for genre function.');
-                return;
-            }
-
-            const bookElement = createBookCard(parsedBook);
-            topSellingGenreBookContainer.appendChild(bookElement);
-        });
-    }
-
-    BooksManager.getTopSelling(topSellingBooksOnSuccess, null);
-    BooksManager.getTopSellingInGenres(topSellingGenreBooksOnSuccess, null);
-});
+  // Initialize the page
+  initWelcomePage()
+})

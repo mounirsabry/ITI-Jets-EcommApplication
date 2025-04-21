@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="CSS/Common/main.css" />
   <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
   <link rel="stylesheet" href="CSS/Common/BookPopup.css" />
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="CSS/wish-list.css" />
 
   <script src="JavaScript/Common/context_path.js"></script>
@@ -20,19 +20,30 @@
   <script defer type="module" src="JavaScript/Common/header.js"></script>
   <script defer type="module" src="JavaScript/Common/footer.js"></script>
 
-  <script type="module" src="JavaScript/wish-list.js"></script>
+  <script defer type="module" src="JavaScript/wish-list.js"></script>
 </head>
 <body>
-  <header id="siteHeader">
-    <!-- Header will be injected here by JS -->
-  </header>
+<header id="siteHeader">
+  <!-- Header will be injected here by JS -->
+</header>
 
-  <main>
-    <p>To be implemented</p>
-  </main>
+<main class="container">
+  <button id="backToProfile" class="back-button" aria-label="Back to profile">
+    Back to Profile
+  </button>
 
-  <footer id="siteFooter">
-    <!-- Footer will be injected here by JS -->
-  </footer>
+  <h1 class="center-title">My Wish List</h1>
+
+  <section id="wishList" class="wish-list">
+    <!-- Wish list items will be injected here by JS -->
+    <div class="loading-container">
+      <div class="loading-spinner" aria-label="Loading wish list"></div>
+    </div>
+  </section>
+</main>
+
+<footer id="siteFooter">
+  <!-- Footer will be injected here by JS -->
+</footer>
 </body>
 </html>

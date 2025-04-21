@@ -1,199 +1,226 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import URL_Mapper from "./Utils/URL_Mapper.js"
+import CartManager from "./Managers/CartManager.js"
+import OrdersManager from "./Managers/OrdersManager.js"
+import UserAuthTracker from "./Common/UserAuthTracker.js"
+import MessagePopup from "./Common/MessagePopup.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import URL_Mapper from './Utils/URL_Mapper.js';
-import CartManager from "./Managers/CartManager.js";
-import OrdersManager from "./Managers/OrdersManager.js";
-import UserAuthTracker from "./Common/UserAuthTracker.js";
-import MessagePopup from "./Common/MessagePopup.js";
-import DataValidator from "./Utils/DataValidator.js";
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-document.addEventListener("DOMContentLoaded", function() {
-    checkForErrorMessageParameter();
+  // Add fade-in animation to main sections
+  const sections = document.querySelectorAll("main > section")
+  sections.forEach((section, index) => {
+    section.classList.add("fade-in")
+    section.style.animationDelay = `${index * 0.2}s`
+  })
 
-    // Initialize DOM elements
-    const backToCartButton = document.getElementById('backToCart');
-    const placeOrderButton = document.getElementById('placeOrderButton');
-    const subtotalComponent = document.getElementById('subtotal');
-    const shippingFeeComponent = document.getElementById('shippingFee');
-    const totalAmountComponent = document.getElementById('totalAmount');
-    const addressComponent = document.getElementById('address');
-    const accountBalanceElement = document.getElementById('accountBalance');
-    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
-    const deductionAmountDisplay = document.getElementById('deductionAmount');
-    const creditCardForm = document.getElementById('creditCardForm');
-    const balanceNotice = document.getElementById('balanceNotice');
-    const expiryYearSelect = document.getElementById('expiryYear');
+  // DOM Elements
+  const subtotalElement = document.getElementById("subtotal")
+  const shippingFeeElement = document.getElementById("shippingFee")
+  const totalAmountElement = document.getElementById("totalAmount")
+  const addressElement = document.getElementById("address")
+  const accountBalanceElement = document.getElementById("accountBalance")
+  const currentBalanceDisplayElement = document.getElementById("currentBalanceDisplay")
+  const deductionAmountElement = document.getElementById("deductionAmount")
+  const creditCardForm = document.getElementById("creditCardForm")
+  const balanceNotice = document.getElementById("balanceNotice")
+  const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]')
+  const backToCartButton = document.getElementById("backToCart")
+  const placeOrderButton = document.getElementById("placeOrderButton")
+  const expiryYearSelect = document.getElementById("expiryYear")
 
-    // Initialize variables
-    let subtotalAmount = 0;
-    let shippingFeeAmount = 0;
-    let totalAmount = 0;
+  // State variables
+  let subtotal = 0
+  let shippingFee = 30 // Default shipping fee
+  let totalAmount = 0
 
-    // Check authentication
-    const userObject = UserAuthTracker.userObject;
-    if (!userObject) {
-        UserAuthTracker.handleUserInvalidState();
-        return;
+  // Check if user is authenticated
+  const userObject = UserAuthTracker.userObject
+  if (!userObject) {
+    UserAuthTracker.handleUserInvalidState()
+    return
+  }
+
+  // Initialize checkout page
+  function initCheckoutPage() {
+    // Populate expiry year dropdown
+    populateExpiryYears()
+
+    // Fetch cart subtotal
+    CartManager.getSubtotal(userObject.userID, onSubtotalLoaded, onError)
+
+    // Fetch shipping fee
+    CartManager.getShippingFee(userObject.userID, onShippingFeeLoaded, onError)
+
+    // Set user address
+    addressElement.textContent = userObject.address || "No address provided"
+
+    // Set account balance
+    const balance = userObject.accountBalance || 0
+    accountBalanceElement.textContent = balance.toFixed(2)
+    currentBalanceDisplayElement.textContent = balance.toFixed(2)
+
+    // Event listeners
+    backToCartButton.addEventListener("click", () => {
+      window.location.href = URL_Mapper.CART
+    })
+
+    placeOrderButton.addEventListener("click", placeOrder)
+
+    // Payment method change handler
+    paymentMethodRadios.forEach((radio) => {
+      radio.addEventListener("change", togglePaymentMethod)
+    })
+  }
+
+  // Populate expiry years dropdown
+  function populateExpiryYears() {
+    const currentYear = new Date().getFullYear()
+    for (let i = 0; i < 10; i++) {
+      const year = currentYear + i
+      const option = document.createElement("option")
+      option.value = year.toString().slice(-2) // Last two digits
+      option.textContent = year
+      expiryYearSelect.appendChild(option)
+    }
+  }
+
+  // Handle subtotal loaded from API
+  function onSubtotalLoaded(data) {
+    subtotal = data
+    updateOrderSummary()
+  }
+
+  // Handle shipping fee loaded from API
+  function onShippingFeeLoaded(data) {
+    shippingFee = data
+    updateOrderSummary()
+  }
+
+  // Handle API errors
+  function onError(error) {
+    console.error("Error loading checkout data:", error)
+    MessagePopup.show("Error loading checkout data: " + error, true)
+  }
+
+  // Update order summary
+  function updateOrderSummary() {
+    totalAmount = subtotal + shippingFee
+
+    subtotalElement.textContent = subtotal.toFixed(2)
+    shippingFeeElement.textContent = shippingFee.toFixed(2)
+    totalAmountElement.textContent = totalAmount.toFixed(2)
+
+    // Update deduction amount for account balance payment
+    deductionAmountElement.textContent = totalAmount.toFixed(2)
+
+    // Check if account balance is sufficient
+    const balance = userObject.accountBalance || 0
+    const accountBalanceRadio = document.querySelector('input[value="accountBalance"]')
+
+    if (balance < totalAmount) {
+      accountBalanceRadio.disabled = true
+      accountBalanceRadio.parentElement.title = "Insufficient balance"
+
+      // If account balance is selected but insufficient, switch to credit card
+      if (accountBalanceRadio.checked) {
+        document.querySelector('input[value="creditCard"]').checked = true
+        togglePaymentMethod()
+      }
+    } else {
+      accountBalanceRadio.disabled = false
+      accountBalanceRadio.parentElement.title = ""
+    }
+  }
+
+  // Toggle payment method display
+  function togglePaymentMethod() {
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+
+    if (selectedMethod === "creditCard") {
+      creditCardForm.style.display = "block"
+      balanceNotice.style.display = "none"
+    } else {
+      creditCardForm.style.display = "none"
+      balanceNotice.style.display = "block"
+    }
+  }
+
+  // Place order
+  function placeOrder() {
+    // Validate shipping address
+    if (!userObject.address) {
+      MessagePopup.show("Please update your profile with a shipping address", true)
+      return
     }
 
-    // Setup event listeners
-    if (backToCartButton) {
-        backToCartButton.addEventListener('click', () => {
-            window.location.href = URL_Mapper.CART;
-        });
+    // Get selected payment method
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+
+    // Show loading state
+    placeOrderButton.textContent = "Processing..."
+    placeOrderButton.disabled = true
+
+    if (selectedMethod === "creditCard") {
+      // Validate credit card form
+      const nameOnCard = document.getElementById("nameOnCard").value.trim()
+      const cardNumber = document.getElementById("cardNumber").value.trim()
+      const expiryMonth = document.getElementById("expiryMonth").value
+      const expiryYear = document.getElementById("expiryYear").value
+      const cvc = document.getElementById("cvc").value.trim()
+
+      if (!nameOnCard || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
+        MessagePopup.show("Please fill in all credit card details", true)
+        resetPlaceOrderButton()
+        return
+      }
+
+      // Create credit card details object
+      const creditCardDetails = {
+        nameOnCard,
+        cardNumber,
+        expiryMonth,
+        expiryYear,
+        cvc,
+      }
+
+      // Place order with credit card
+      OrdersManager.checkoutUsingCreditCard(
+        userObject.userID,
+        userObject.address,
+        creditCardDetails,
+        onOrderPlaced,
+        onOrderError,
+      )
+    } else {
+      // Place order with account balance
+      OrdersManager.checkoutUsingAccountBalance(userObject.userID, userObject.address, onOrderPlaced, onOrderError)
     }
+  }
 
-    if (placeOrderButton) {
-        placeOrderButton.addEventListener('click', handlePlaceOrder);
-    }
+  // Handle successful order placement
+  function onOrderPlaced(orderData) {
+    MessagePopup.show("Order placed successfully!")
 
-    // Populate expiry years (current year + next 10 years)
-    if (expiryYearSelect) {
-        const currentYear = new Date().getFullYear() - 2000;
-        for (let i = 0; i <= 10; i++) {
-            const option = document.createElement('option');
-            option.value = (currentYear + i).toString().padStart(2, '0');
-            option.textContent = option.value;
-            expiryYearSelect.appendChild(option);
-        }
-    }
+    // Redirect to order details page
+    setTimeout(() => {
+      window.location.href = `${URL_Mapper.ORDER_DETAILS}?orderID=${orderData.orderID}`
+    }, 1500)
+  }
 
-    // Payment method toggle
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.addEventListener('change', updatePaymentUI);
-    });
+  // Handle order placement error
+  function onOrderError(error) {
+    MessagePopup.show("Failed to place order: " + error, true)
+    resetPlaceOrderButton()
+  }
 
-    // Initialize UI
-    updatePaymentUI();
-    loadUserData();
-    loadOrderSummary();
+  // Reset place order button state
+  function resetPlaceOrderButton() {
+    placeOrderButton.textContent = "Place Order"
+    placeOrderButton.disabled = false
+  }
 
-    function updatePaymentUI() {
-        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-        if (method === 'creditCard') {
-            creditCardForm.style.display = 'block';
-            balanceNotice.style.display = 'none';
-        } else {
-            creditCardForm.style.display = 'none';
-            balanceNotice.style.display = 'block';
-            updateBalanceDisplay();
-        }
-    }
-
-    function loadUserData() {
-        // Display user address
-        if (addressComponent) {
-            addressComponent.textContent = userObject.address || 'Unspecified Address';
-        }
-
-        // Display account balance
-        if (accountBalanceElement && currentBalanceDisplay) {
-            const balance = userObject.accountBalance?.toFixed(2) || '0.00';
-            accountBalanceElement.textContent = balance;
-            currentBalanceDisplay.textContent = balance;
-        }
-    }
-
-    function loadOrderSummary() {
-        // Load subtotal.
-        CartManager.getSubtotal(userObject.userID, (data) => {
-            console.log(data);
-            const subtotal = data || 0;
-            if (subtotalComponent) {
-                subtotalComponent.textContent = subtotal.toFixed(2);
-            }
-            subtotalAmount = subtotal;
-            updateTotalAmount();
-        }, null);
-
-        // Load shipping fee
-        CartManager.getShippingFee(userObject.userID, (data) => {
-            const shippingFee = data || 0;
-            if (shippingFeeComponent) {
-                shippingFeeComponent.textContent = shippingFee.toFixed(2);
-            }
-            shippingFeeAmount = shippingFee;
-            updateTotalAmount();
-        }, null);
-    }
-
-    function updateTotalAmount() {
-        totalAmount = subtotalAmount + shippingFeeAmount;
-        if (totalAmountComponent) {
-            totalAmountComponent.textContent = totalAmount.toFixed(2);
-        }
-        if (deductionAmountDisplay) {
-            deductionAmountDisplay.textContent = totalAmount.toFixed(2);
-        }
-    }
-
-    function handlePlaceOrder(event) {
-        event.preventDefault();
-        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-        const total = subtotalAmount + shippingFeeAmount;
-
-        if (method === 'accountBalance') {
-            handleBalancePayment(total);
-        } else {
-            handleCreditCardPayment();
-        }
-    }
-
-    function handleBalancePayment(total) {
-        if (userObject.accountBalance < total) {
-            MessagePopup.show(`Insufficient balance. Your balance is ${userObject.accountBalance.toFixed(2)} EGP`, true);
-            return;
-        }
-        placeOrderWithBalance(userObject.userID, userObject.address, total);
-    }
-
-    function handleCreditCardPayment() {
-        const formData = new FormData(document.getElementById('paymentForm'));
-        const nameOnCard = formData.get('nameOnCard');
-        const cardNumber = formData.get('cardNumber');
-        const expiryMonth = formData.get('expiryMonth');
-        const expiryYear = formData.get('expiryYear');
-        const cvc = formData.get('cvc');
-
-        // Validate required fields
-        if (!nameOnCard || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
-            MessagePopup.show('Please fill in all payment information.', true);
-            return;
-        }
-
-        // Validate credit card details
-        const creditCardDetails = {
-            nameOnCard,
-            cardNumber,
-            expiryMonth,
-            expiryYear: expiryYear + 2000,
-            cvc
-        };
-
-        const validationError = DataValidator.isCreditCardValid(creditCardDetails);
-        if (validationError) {
-            MessagePopup.show(validationError, true);
-            return;
-        }
-
-        placeOrderWithCreditCard(userObject.userID, userObject.address, creditCardDetails);
-    }
-
-    function handleSuccessfulOrder(message) {
-        MessagePopup.show(message);
-        setTimeout(() => {
-            window.location.href = URL_Mapper.ORDERS;
-        }, 5000); // 5 seconds delay
-    }
-
-    function placeOrderWithCreditCard(userID, address, creditCardDetails) {
-        OrdersManager.checkoutUsingCreditCard(userID, address, creditCardDetails,
-            handleSuccessfulOrder, null);
-    }
-
-    function placeOrderWithBalance(userID, address) {
-        OrdersManager.checkoutUsingAccountBalance(userID, address,
-            handleSuccessfulOrder, null);
-    }
-});
+  // Initialize the page
+  initCheckoutPage()
+})

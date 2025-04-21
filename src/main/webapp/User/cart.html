@@ -1,65 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart | Book Alley</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart | Book Alley</title>
 
-    <link rel="stylesheet" href="CSS/Common/reset.css" />
-    <link rel="stylesheet" href="CSS/Common/root.css" />
-    <link rel="stylesheet" href="CSS/Common/header.css" />
-    <link rel="stylesheet" href="CSS/Common/footer.css" />
-    <link rel="stylesheet" href="CSS/Common/main.css" />
-    <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
-    <link rel="stylesheet" href="CSS/Common/BookPopup.css" />
+  <link rel="stylesheet" href="CSS/Common/reset.css" />
+  <link rel="stylesheet" href="CSS/Common/root.css" />
+  <link rel="stylesheet" href="CSS/Common/header.css" />
+  <link rel="stylesheet" href="CSS/Common/footer.css" />
+  <link rel="stylesheet" href="CSS/Common/main.css" />
+  <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+  <link rel="stylesheet" href="CSS/Common/BookPopup.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="CSS/cart.css" />
 
-    <link rel="stylesheet" href="CSS/cart.css" />
+  <script src="JavaScript/Common/context_path.js"></script>
 
-    <script src="JavaScript/Common/context_path.js"></script>
+  <script defer type="module" src="JavaScript/Common/header.js"></script>
+  <script defer type="module" src="JavaScript/Common/footer.js"></script>
 
-    <script defer type="module" src="JavaScript/Common/header.js"></script>
-    <script defer type="module" src="JavaScript/Common/footer.js"></script>
+  <script defer type="module" src="JavaScript/cart.js"></script>
+</head>
+<body>
+<header id="siteHeader">
+  <!-- Header will be injected here by JS -->
+</header>
 
-    <script defer type="module" src="JavaScript/cart.js"></script>
-  </head>
-  <body>
-    <header id="siteHeader">
-      <!-- Header will be injected here by JS -->
-    </header>
+<main class="container">
+  <h1 class="center-title">Shopping Cart</h1>
 
-    <main>
-      <h1 class="center-title">My Cart</h1>
+  <button id="truncateCartButton" aria-label="Clear cart">
+    Clear Cart
+  </button>
 
-      <button id="truncateCartButton">Truncate Cart</button>
+  <section id="cartItems" class="cart-items-list">
+    <!-- Cart Items will be injected here by JS -->
+    <div class="loading-container">
+      <div class="loading-spinner" aria-label="Loading cart items"></div>
+    </div>
+  </section>
 
-      <section id="cartItems" class="cart-items-list">
-        <!-- Cart Items will be injected here by JS -->
-      </section>
+  <div class="total">
+    <p>
+      <strong>Number of Different Books:</strong>
+      <span id="numberOfDifferentBooks">0</span>
+    </p>
 
-      <div class="total">
-        <p>
-          <strong>Number of Different Books:</strong>
-          <span id="numberOfDifferentBooks">0</span>
-        </p>
+    <p>
+      <strong>Total Number of Books:</strong>
+      <span id="totalNumberOfBooks">0</span>
+    </p>
 
-        <p>
-          <strong>Total Number of Books:</strong>
-          <span id="totalNumberOfBooks">0</span>
-        </p>
+    <p>
+      <strong>Subtotal:</strong>
+      <span id="subtotalAmount">0.00 EGP</span>
+    </p>
+  </div>
 
-        <p>
-          <strong>Subtotal Amount:</strong>
-          <span id="subtotalAmount">0.00 EGP</span>
-        </p>
-      </div>
+  <button id="checkoutButton" class="checkout-button" aria-label="Proceed to checkout">
+    Proceed to Checkout
+  </button>
+</main>
 
-      <button id="checkoutButton" class="checkout-button">
-        Proceed to Checkout
-      </button>
-    </main>
-
-    <footer id="siteFooter">
-      <!-- Footer will be injected here by JS -->
-    </footer>
-  </body>
+<footer id="siteFooter">
+  <!-- Footer will be injected here by JS -->
+</footer>
+</body>
 </html>

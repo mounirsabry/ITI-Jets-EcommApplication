@@ -1,480 +1,303 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import "./Common/pageLoader.js" // Import the page loader to ensure header is loaded
+import URL_Mapper from "./Utils/URL_Mapper.js"
+import UserAuthTracker from "./Common/UserAuthTracker.js"
+import MessagePopup from "./Common/MessagePopup.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import URL_Mapper from "./Utils/URL_Mapper.js";
-import { appendStockValue, updateStockValue } from "./Utils/bookUIFunctions.js";
-import displayProduct from "./Common/BookPopup.js";
-import BooksManager from "./Managers/BooksManager.js";
-import CartManager from "./Managers/CartManager.js";
-import UserAuthTracker from "./Common/UserAuthTracker.js";
-import CartItem from "./Models/CartItem.js";
-import Book from "./Models/Book.js";
-import MessagePopup from "./Common/MessagePopup.js";
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-function appendUpdateQuantityControls(bookDiv, book, quantity, callbackOnQuantityUpdate) {
-    if (!bookDiv) {
-        throw new Error('Invalid bookDiv!');
-    }
+  // DOM Elements
+  const cartItemsContainer = document.getElementById("cartItems")
+  const cartSummaryContainer = document.getElementById("cartSummary")
+  const checkoutButton = document.getElementById("checkoutButton")
+  const emptyCartMessage = document.getElementById("emptyCartMessage")
 
-    // Create the quantity selector container
-    const quantitySelector = document.createElement('div');
-    quantitySelector.className = 'quantity-selector';
+  // Check if user is authenticated
+  const userObject = UserAuthTracker.userObject
+  if (!userObject) {
+    UserAuthTracker.handleUserInvalidState()
+    return
+  }
 
-    // Create the decrease button
-    const decreaseButton = document.createElement('button');
-    decreaseButton.className = 'decrease';
-    decreaseButton.textContent = '-';
+  // Initialize cart page
+  function initCartPage() {
+    // Show loading state
+    cartItemsContainer.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Loading cart"></div>
+      </div>
+    `
 
-    // Create the input element
-    const quantityInput = document.createElement('input');
-    quantityInput.type = 'number';
-    quantityInput.value = '1';
-    quantityInput.min = '1';
-    quantityInput.max = Math.min(book.stock, 20).toString();
-    quantityInput.readOnly = true;
+    // In a real app, this would fetch from CartManager
+    // For now, we'll use mock data
+    const mockCartItems = [
+      {
+        bookID: 1,
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        price: 75.0,
+        quantity: 1,
+        image: "/placeholder.svg?height=300&width=200",
+        stock: 10,
+      },
+      {
+        bookID: 2,
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        price: 85.5,
+        quantity: 2,
+        image: "/placeholder.svg?height=300&width=200",
+        stock: 5,
+      },
+    ]
 
-    // Create the increase button
-    const increaseButton = document.createElement('button');
-    increaseButton.className = 'increase';
-    increaseButton.textContent = '+';
+    // Simulate API call delay
+    setTimeout(() => {
+      if (mockCartItems.length === 0) {
+        displayEmptyCart()
+      } else {
+        displayCartItems(mockCartItems)
+        updateCartSummary(mockCartItems)
+      }
+    }, 500)
+  }
 
-    // Append the buttons and input to the quantity selector
-    quantitySelector.appendChild(decreaseButton);
-    quantitySelector.appendChild(quantityInput);
-    quantitySelector.appendChild(increaseButton);
+  // Display cart items
+  function displayCartItems(cartItems) {
+    cartItemsContainer.innerHTML = ""
+    emptyCartMessage.classList.add("hidden")
 
-    // Create the add to cart button
-    const updateQuantityButton = document.createElement('button');
-    updateQuantityButton.className = 'update-quantity-button';
-    updateQuantityButton.textContent = 'Update';
-    updateQuantityButton.disabled = true; // Initially disabled.
+    cartItems.forEach((item, index) => {
+      const cartItemElement = document.createElement("div")
+      cartItemElement.classList.add("cart-item")
+      cartItemElement.style.animationDelay = `${index * 0.1}s`
 
-    bookDiv.appendChild(quantitySelector);
-    bookDiv.appendChild(updateQuantityButton);
+      cartItemElement.innerHTML = `
+        <div class="cart-item-image">
+          <img src="${item.image}" alt="${item.title}">
+        </div>
 
-    function updateQuantity(quantity, inputValue) {
-        decreaseButton.disabled = (inputValue === 1);
-        increaseButton.disabled = inputValue >= Math.min(book.stock, 20);
+        <div class="cart-item-details">
+          <h3>${item.title}</h3>
+          <p class="cart-item-author">By ${item.author}</p>
+          <p class="cart-item-price">${item.price.toFixed(2)} EGP</p>
 
-        // Disable update button if value hasn't changed
-        updateQuantityButton.disabled = (quantity === inputValue);
-    }
-    updateQuantity(quantity, 1);
+          <div class="cart-item-quantity">
+            <button class="quantity-button decrease-quantity" data-book-id="${item.bookID}">-</button>
+            <input type="number" min="1" max="${item.stock}" value="${item.quantity}" class="quantity-input" data-book-id="${item.bookID}">
+            <button class="quantity-button increase-quantity" data-book-id="${item.bookID}">+</button>
+          </div>
+        </div>
 
-    decreaseButton.addEventListener('click', () => {
-        let value = parseInt(quantityInput.value);
-        if (value > 1) {
-            quantityInput.value = `${value - 1}`;
-            updateQuantity(quantity, value - 1);
+        <div class="cart-item-actions">
+          <span class="cart-item-subtotal">${(item.price * item.quantity).toFixed(2)} EGP</span>
+          <button class="remove-item" data-book-id="${item.bookID}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+      `
+
+      cartItemsContainer.appendChild(cartItemElement)
+    })
+
+    // Add event listeners
+    const decreaseButtons = document.querySelectorAll(".decrease-quantity")
+    const increaseButtons = document.querySelectorAll(".increase-quantity")
+    const quantityInputs = document.querySelectorAll(".quantity-input")
+    const removeButtons = document.querySelectorAll(".remove-item")
+
+    decreaseButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const bookID = button.dataset.bookId
+        const input = document.querySelector(`.quantity-input[data-book-id="${bookID}"]`)
+        const currentValue = Number.parseInt(input.value)
+        if (currentValue > 1) {
+          input.value = currentValue - 1
+          updateCartItemQuantity(bookID, currentValue - 1)
         }
-    });
+      })
+    })
 
-    increaseButton.addEventListener('click', () => {
-        let value = parseInt(quantityInput.value);
-        if (value < Math.min(book.stock, 20)) {
-            quantityInput.value = `${value + 1}`;
-            updateQuantity(quantity, value + 1);
+    increaseButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const bookID = button.dataset.bookId
+        const input = document.querySelector(`.quantity-input[data-book-id="${bookID}"]`)
+        const currentValue = Number.parseInt(input.value)
+        const maxValue = Number.parseInt(input.max)
+        if (currentValue < maxValue) {
+          input.value = currentValue + 1
+          updateCartItemQuantity(bookID, currentValue + 1)
         }
-    });
+      })
+    })
 
-    // Also handle direct input changes if you make the input editable later
-    quantityInput.addEventListener('input', () => {
-        const value = parseInt(quantityInput.value) || quantity;
-        updateQuantity(quantity, value);
-    });
+    quantityInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        const bookID = input.dataset.bookId
+        let value = Number.parseInt(input.value)
+        const maxValue = Number.parseInt(input.max)
 
-    if (callbackOnQuantityUpdate) {
-        updateQuantityButton.addEventListener('click', () => {
-            let newQuantity = parseInt(quantityInput.value);
-            callbackOnQuantityUpdate(book.bookID, newQuantity);
+        if (value < 1) value = 1
+        if (value > maxValue) value = maxValue
 
-            // Disable the button after update until next change.
-            updateQuantityButton.disabled = true;
-            quantity = newQuantity;
-        });
-    }
+        input.value = value
+        updateCartItemQuantity(bookID, value)
+      })
+    })
 
-    return quantityInput;
-}
+    removeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const bookID = button.dataset.bookId
+        removeCartItem(bookID)
+      })
+    })
+  }
 
-function updatePriceSection(priceSection, price, quantity) {
-    if (!priceSection) {
-        throw new Error('Price Section component must be provided.');
-    }
+  // Update cart summary
+  function updateCartSummary(cartItems) {
+    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    const shipping = subtotal > 0 ? 15 : 0
+    const total = subtotal + shipping
 
-    priceSection.innerHTML = '';
+    cartSummaryContainer.innerHTML = `
+      <h2>Order Summary</h2>
 
-    if (quantity === 1) {
-        const priceInfo = document.createElement('p');
-        priceInfo.innerHTML = `<strong>Price:</strong> ${price.toFixed(2)} EGP`;
-        priceSection.appendChild(priceInfo);
-    } else {
-        const subtotalPrice = price * quantity;
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${subtotal.toFixed(2)} EGP</span>
+      </div>
 
-        const pricePerPieceParagraph = document.createElement('p');
-        pricePerPieceParagraph.innerHTML = `<strong>Price per Piece:</strong> ${price.toFixed(2)} EGP`;
-        priceSection.appendChild(pricePerPieceParagraph);
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span>${shipping.toFixed(2)} EGP</span>
+      </div>
 
-        const quantityParagraph = document.createElement('p');
-        quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${quantity} `;
-        priceSection.appendChild(quantityParagraph);
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>${total.toFixed(2)} EGP</span>
+      </div>
 
-        const totalItemPriceParagraph = document.createElement('p');
-        totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> ${subtotalPrice.toFixed(2)} EGP`;
-        priceSection.appendChild(totalItemPriceParagraph);
-    }
-}
+      <button id="checkoutButton" class="checkout-button">
+        Proceed to Checkout
+      </button>
 
-document.addEventListener("DOMContentLoaded", function() {
-    checkForErrorMessageParameter();
+      <a href="${URL_Mapper.PRODUCTS}" class="continue-shopping">
+        Continue Shopping
+      </a>
+    `
 
-    const checkoutButton = document.getElementById('checkoutButton');
-    if (!checkoutButton) {
-        console.error('Could not locate the checkout button.');
-    } else {
-        checkoutButton.addEventListener('click', () => {
-            CartManager.validateCart(userObject.userID,() => {
-                if (subtotalAmountComponent) {
-                    let currentText = subtotalAmountComponent.textContent;
-                    let currentValue = parseFloat(currentText);
+    // Add event listener to checkout button
+    document.getElementById("checkoutButton").addEventListener("click", () => {
+      // In a real app, this would navigate to checkout page
+      alert("Proceeding to checkout...")
+    })
+  }
 
-                    window.location.href = URL_Mapper.CHECKOUT + `?subtotal=${currentValue}`;
-                }
-            }, null);
-        });
-    }
+  // Display empty cart message
+  function displayEmptyCart() {
+    cartItemsContainer.innerHTML = ""
+    emptyCartMessage.classList.remove("hidden")
+    cartSummaryContainer.innerHTML = `
+      <h2>Order Summary</h2>
 
-    const numberOfDifferentBooksComponent
-        = document.getElementById('numberOfDifferentBooks');
-    if (!numberOfDifferentBooksComponent) {
-        console.error('Could not locate number of different books component.');
-    }
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>0.00 EGP</span>
+      </div>
 
-    const totalNumberOfBooksComponent = document.getElementById('totalNumberOfBooks');
-    if (!totalNumberOfBooksComponent) {
-        console.error('Could not locate total number of books.');
-    }
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span>0.00 EGP</span>
+      </div>
 
-    const subtotalAmountComponent = document.getElementById('subtotalAmount');
-    if (!subtotalAmountComponent) {
-        console.error('Could not locate total amount component.');
-    }
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>0.00 EGP</span>
+      </div>
 
-    const cartItemsContainer = document.getElementById('cartItems');
-    if (!cartItemsContainer) {
-        console.error('Could not locate the cart items component.');
-        return;
-    }
-    cartItemsContainer.innerHTML = '<div class="loading-data">Loading your cart...</div>';
+      <a href="${URL_Mapper.PRODUCTS}" class="continue-shopping">
+        Browse Books
+      </a>
+    `
+  }
 
-    const userObject = UserAuthTracker.userObject;
-    if (!userObject) {
-        UserAuthTracker.handleUserInvalidState();
-        return;
-    }
+  // Update cart item quantity
+  function updateCartItemQuantity(bookID, quantity) {
+    // In a real app, this would call CartManager.updateItemQuantity
+    // For now, we'll simulate a successful update
+    setTimeout(() => {
+      // Update subtotal display
+      const cartItems = document.querySelectorAll(".cart-item")
+      const updatedItems = []
 
-    const truncateCartButton = document.getElementById('truncateCartButton');
-    if (!truncateCartButton) {
-        console.error('Could not locate truncate cart button!');
-    } else {
-        truncateCartButton.addEventListener('click', () => {
-            CartManager.truncate(userObject.userID, (data) => {
-                handleEmptyCart();
+      cartItems.forEach((item) => {
+        const itemBookID = item.querySelector(".quantity-input").dataset.bookId
+        const itemQuantity = Number.parseInt(item.querySelector(".quantity-input").value)
+        const itemPrice = Number.parseFloat(item.querySelector(".cart-item-price").textContent)
+        const subtotalElement = item.querySelector(".cart-item-subtotal")
 
-                if (numberOfDifferentBooksComponent) {
-                    numberOfDifferentBooksComponent.textContent = '0';
-                }
+        if (itemBookID === bookID) {
+          subtotalElement.textContent = `${(itemPrice * quantity).toFixed(2)} EGP`
+        }
 
-                if (totalNumberOfBooksComponent) {
-                    totalNumberOfBooksComponent.textContent = '0';
-                }
-
-                if (subtotalAmountComponent) {
-                    subtotalAmountComponent.textContent = '0.00 EGP';
-                }
-
-                MessagePopup.show(data);
-                truncateCartButton.disabled = true;
-            }, null);
+        updatedItems.push({
+          bookID: itemBookID,
+          price: itemPrice,
+          quantity: itemBookID === bookID ? quantity : itemQuantity,
         })
-    }
+      })
 
-    CartManager.getCart(userObject.userID, renderCartItemsList, null);
+      // Update cart summary
+      updateCartSummary(updatedItems)
+    }, 100)
+  }
 
-    function handleEmptyCart() {
-        cartItemsContainer.innerHTML = '';
+  // Remove cart item
+  function removeCartItem(bookID) {
+    // In a real app, this would call CartManager.removeItem
+    // For now, we'll simulate a successful removal
+    const itemToRemove = document
+      .querySelector(`.cart-item .quantity-input[data-book-id="${bookID}"]`)
+      .closest(".cart-item")
 
-        const emptyMsg = document.createElement('div');
-        emptyMsg.className = 'no-data-found';
-        emptyMsg.textContent = 'Your cart is empty';
-        cartItemsContainer.appendChild(emptyMsg);
+    // Add removal animation
+    itemToRemove.classList.add("removing")
 
-        truncateCartButton.disabled = true;
-        checkoutButton.disabled = true;
-    }
+    setTimeout(() => {
+      itemToRemove.remove()
 
-    function renderCartItemsList(cartItems) {
-        cartItemsContainer.innerHTML = '';
+      // Check if cart is empty
+      const remainingItems = document.querySelectorAll(".cart-item")
+      if (remainingItems.length === 0) {
+        displayEmptyCart()
+      } else {
+        // Update cart summary
+        const updatedItems = []
+        remainingItems.forEach((item) => {
+          const itemBookID = item.querySelector(".quantity-input").dataset.bookId
+          const itemQuantity = Number.parseInt(item.querySelector(".quantity-input").value)
+          const itemPrice = Number.parseFloat(item.querySelector(".cart-item-price").textContent)
 
-        let parsedCartItems;
-        if (typeof cartItems !== 'object') {
-            try {
-                parsedCartItems = JSON.parse(cartItems);
-            } catch (_) {
-                console.log('Could not parse cart items in render cart file.');
-                return;
-            }
-        } else {
-            parsedCartItems = cartItems;
-        }
+          updatedItems.push({
+            bookID: itemBookID,
+            price: itemPrice,
+            quantity: itemQuantity,
+          })
+        })
 
-        if (parsedCartItems.length === 0) {
-            handleEmptyCart();
-            return;
-        }
+        updateCartSummary(updatedItems)
+      }
 
-        const cartItemsList = parsedCartItems
-            .map(parsedCartItem => {
-                try {
-                    return CartItem.fromJSON(parsedCartItem);
-                } catch (e) {
-                    console.error(`Error parsing cart item: ${e.message}`);
-                    return null; // This will be filtered out by the next step.
-                }
-            })
-            .filter(item => item !== null); // Filters out null values explicitly.
+      MessagePopup.show("Item removed from cart")
+    }, 300)
+  }
 
-        cartItemsList.forEach(cartItem => {
-            const bookDiv = document.createElement('div');
-            bookDiv.classList.add('cart-item');
-            cartItemsContainer.appendChild(bookDiv);
-
-            function callbackOnSuccess(book) {
-                fillBookElementOnSuccess(bookDiv, cartItem.quantity, book);
-            }
-
-            BooksManager.getBookDetails(cartItem.bookID, callbackOnSuccess, null);
-        });
-    }
-
-    function fillBookElementOnSuccess(bookDiv, quantity, book) {
-        let parsedBook;
-        try {
-            parsedBook = Book.fromJSON(book);
-        } catch (_) {
-            console.log('Could not parse a book!');
-            parsedBook = null;
-        }
-
-        if (parsedBook === null) {
-            bookDiv.classList.add('no-data-found');
-            bookDiv.textContent = 'Could Not Find This Book.';
-            return;
-        }
-
-        const mainImage = parsedBook.images?.find(image => image.isMain);
-        let imagePath;
-        if (mainImage) {
-            imagePath = mainImage.url;
-        } else {
-            imagePath = URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-        }
-
-        let finalBookPrice = parsedBook.price * ((100 - parsedBook.discountedPercentage) / 100);
-        let subtotalPrice = finalBookPrice * quantity;
-
-        updatePriceSummarySectionOnChange(1, quantity, subtotalPrice);
-
-        // Create the image element.
-        const img = document.createElement('img');
-        img.src = imagePath;
-        img.alt = parsedBook.title;
-        img.className = 'book-image';
-        bookDiv.appendChild(img);
-
-        // Create the book details container
-        const bookDetails = document.createElement('div');
-        bookDetails.className = 'book-details';
-
-        // Create and append the title
-        const title = document.createElement('h3');
-        title.textContent = parsedBook.title;
-        bookDetails.appendChild(title);
-
-        // Create and append the overview
-        const overview = document.createElement('p');
-        overview.textContent = parsedBook.overview;
-        overview.classList.add('overview');
-        bookDetails.appendChild(overview);
-
-        // Create and append the author
-        const author = document.createElement('p');
-        author.innerHTML = `<strong>Author:</strong> ${parsedBook.author}`;
-        bookDetails.appendChild(author);
-
-        // Create and append the ISBN
-        const isbn = document.createElement('p');
-        isbn.innerHTML = `<strong>ISBN:</strong> ${parsedBook.isbn}`;
-        bookDetails.appendChild(isbn);
-
-        // Append the book details to the main container
-        bookDiv.appendChild(bookDetails);
-
-        // Create the price section container here, so it can be referenced.
-        const priceSection = document.createElement('div');
-        priceSection.className = 'price-section';
-
-        const quantitySection = document.createElement('div');
-        quantitySection.classList.add('quantity-section');
-
-        // Append stock/availability.
-        appendStockValue(quantitySection, parsedBook);
-
-        let quantityInput; // Declare here so it's in closure
-        // After the product is available and there is some stock, then add update quantity section.
-        if (parsedBook.isAvailable && parsedBook.stock >= 1) {
-            function callbackOnUpdateQuantity(bookID, newQuantity) {
-                // Calculate the difference from old quantity
-                const quantityDifference = newQuantity - quantity;
-                const priceDifference = finalBookPrice * quantityDifference;
-
-                CartManager.updateCartItem(userObject.userID, bookID, newQuantity,
-                    (data) => {
-                        MessagePopup.show(data);
-                        updatePriceSection(priceSection, finalBookPrice, newQuantity);
-
-                        updatePriceSummarySectionOnChange(
-                            0, quantityDifference, priceDifference);
-                        quantity = newQuantity;
-                    }
-                );
-            }
-
-            quantityInput = appendUpdateQuantityControls(quantitySection, parsedBook,
-                quantity,
-                callbackOnUpdateQuantity);
-        }
-        bookDiv.appendChild(quantitySection);
-
-        updatePriceSection(priceSection, finalBookPrice, quantity);
-        bookDiv.appendChild(priceSection);
-
-        const trashCanCoveredPath = URL_Mapper.ICONS.TRASH_CAN_COVERED;
-        const trashCanUncoveredPath = URL_Mapper.ICONS.TRASH_CAN_UNCOVERED;
-
-        const removeItemButton = document.createElement('button');
-        removeItemButton.classList.add('remove-item-button');
-
-        const removeItemButtonDefaultImg = document.createElement('img');
-        removeItemButtonDefaultImg.classList.add('default-img');
-        removeItemButtonDefaultImg.src = `${trashCanCoveredPath}`;
-        removeItemButtonDefaultImg.alt = 'X';
-        removeItemButton.appendChild(removeItemButtonDefaultImg);
-
-        const removeItemButtonHoveredImg = document.createElement('img');
-        removeItemButtonHoveredImg.classList.add('hover-img');
-        removeItemButtonHoveredImg.src = `${trashCanUncoveredPath}`;
-        removeItemButtonHoveredImg.alt = 'X';
-        removeItemButton.appendChild(removeItemButtonHoveredImg);
-
-        removeItemButton.addEventListener('click', () => {
-            CartManager.removeCartItem(userObject.userID, parsedBook.bookID,
-                (data) => {
-                MessagePopup.show(data);
-
-                updatePriceSummarySectionOnChange(-1,
-                    -1 * quantity,
-                    -1 * subtotalPrice);
-                bookDiv.remove();
-
-                if (cartItemsContainer.innerHTML === '') {
-                    handleEmptyCart();
-                }
-            }, null);
-        });
-
-        bookDiv.appendChild(removeItemButton);
-
-        function updateBookInfoOnDisplay(updatedAndParsedBook) {
-            // Update the book image if it changed
-            const mainImage = updatedAndParsedBook.images?.find(image => image.isMain);
-            if (mainImage && img.src !== mainImage.url) {
-                img.src = mainImage.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-            }
-
-            // Update the title if changed
-            if (title.textContent !== updatedAndParsedBook.title) {
-                title.textContent = updatedAndParsedBook.title;
-            }
-
-            // Update the overview if changed
-            if (overview.textContent !== updatedAndParsedBook.overview) {
-                overview.textContent = updatedAndParsedBook.overview;
-            }
-
-            // Update the author if changed
-            const newAuthorHTML = `<strong>Author:</strong> ${updatedAndParsedBook.author}`;
-            if (author.innerHTML !== newAuthorHTML) {
-                author.innerHTML = newAuthorHTML;
-            }
-
-            // Update the ISBN if changed
-            const newIsbnHTML = `<strong>ISBN:</strong> ${updatedAndParsedBook.isbn}`;
-            if (isbn.innerHTML !== newIsbnHTML) {
-                isbn.innerHTML = newIsbnHTML;
-            }
-
-            // Update stock status
-            updateStockValue(quantitySection, updatedAndParsedBook);
-
-            // Calculate new price
-            const newFinalPrice = updatedAndParsedBook.price * ((100 - updatedAndParsedBook.discountedPercentage) / 100);
-            const oldFinalPrice = finalBookPrice;
-
-            // Only update if price changed
-            if (newFinalPrice !== oldFinalPrice) {
-                finalBookPrice = newFinalPrice;
-                const quantity = parseInt(quantityInput.value) || 1;
-                const priceDifference = (newFinalPrice - oldFinalPrice) * quantity;
-
-                updatePriceSection(priceSection, newFinalPrice, quantity);
-                updatePriceSummarySectionOnChange(0, 0, priceDifference);
-            }
-
-            // Update the local parsedBook reference
-            parsedBook = updatedAndParsedBook;
-        }
-
-        img.addEventListener('click', () => {
-            displayProduct(parsedBook, updateBookInfoOnDisplay, true);
-        });
-    }
-
-    function updatePriceSummarySectionOnChange(differentBooksChange, totalBooksChange, subtotalAmountChange) {
-        // Update the summary displays
-        if (numberOfDifferentBooksComponent) {
-            const current = parseInt(numberOfDifferentBooksComponent.textContent) || 0;
-            numberOfDifferentBooksComponent.textContent = current + differentBooksChange;
-        }
-
-        if (totalNumberOfBooksComponent) {
-            const current = parseInt(totalNumberOfBooksComponent.textContent) || 0;
-            totalNumberOfBooksComponent.textContent = current + totalBooksChange;
-        }
-
-        if (subtotalAmountComponent) {
-            // Handle the EGP suffix if present
-            let currentText = subtotalAmountComponent.textContent;
-            let currentValue = parseFloat(currentText) || 0;
-
-            // Calculate new value
-            let newValue = currentValue + subtotalAmountChange;
-
-            // Ensure we don't show negative values
-            newValue = Math.max(0, newValue);
-
-            // Format with 2 decimal places and EGP suffix
-            subtotalAmountComponent.textContent = `${newValue.toFixed(2)} EGP`;
-        }
-    }
-});
+  // Initialize the page
+  initCartPage()
+})

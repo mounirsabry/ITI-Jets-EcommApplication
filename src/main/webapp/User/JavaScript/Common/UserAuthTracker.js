@@ -1,82 +1,82 @@
-'use strict';
-
-import User from "../Models/User.js";
-import URL_Mapper from "../Utils/URL_Mapper.js";
+import URL_Mapper from "../Utils/URL_Mapper.js"
+import MessagePopup from "./MessagePopup.js"
 
 class UserAuthTracker {
-    #isAuthenticated = false;
-    #userObject = null;
-    #COOKIE_NAME = 'user_auth';
-    #COOKIE_EXPIRY_DAYS = 7;
+  static get userObject() {
+    const userJSON = localStorage.getItem("currentUser")
+    return userJSON ? JSON.parse(userJSON) : null
+  }
 
-    #onAuthChange = null;
-
-    constructor() {
-        let cookieData = this.#getCookie();
-        if (cookieData) {
-            try {
-                cookieData = JSON.parse(cookieData);
-                this.#userObject = User.fromJSON(cookieData);
-                this.#isAuthenticated = true;
-            } catch (e) {
-                console.error('Failed to parse user cookie:', e);
-                this.#clearCookie();
-            }
-        }
+  static set userObject(user) {
+    if (user) {
+      localStorage.setItem("currentUser", JSON.stringify(user))
+    } else {
+      localStorage.removeItem("currentUser")
     }
+  }
 
-    get isAuthenticated() {
-        return this.#isAuthenticated;
-    }
+  static login(email, password) {
+    // In a real app, this would be an API call
+    // For now, we'll simulate a successful login
+    setTimeout(() => {
+      // Mock user data
+      const user = {
+        userID: 1,
+        email: email,
+        userName: "Demo User",
+        phoneNumber: "+20 123 456 789",
+        address: "123 Book St, Reading City",
+        birthDate: "1990-01-01",
+        accountBalance: 500,
+      }
 
-    get userObject() {
-        return this.#userObject;
-    }
+      this.userObject = user
+      MessagePopup.show("Login successful!")
 
-    set userObject(userObject) {
-        this.#userObject = userObject;
-        this.#isAuthenticated = !!userObject;
+      // Reload the page to update the UI
+      window.location.reload()
+    }, 1000)
+  }
 
-        if (userObject) {
-            const jsonUserObject = userObject.toJSON();
-            this.#setCookie(JSON.stringify(jsonUserObject));
-        } else {
-            this.#clearCookie();
-        }
+  static register(email, password, userName, phoneNumber, address, birthDate) {
+    // In a real app, this would be an API call
+    // For now, we'll simulate a successful registration
+    setTimeout(() => {
+      // Mock user data
+      const user = {
+        userID: 1,
+        email: email,
+        userName: userName,
+        phoneNumber: phoneNumber,
+        address: address,
+        birthDate: birthDate,
+        accountBalance: 500,
+      }
 
-        if (this.#onAuthChange && typeof this.#onAuthChange === 'function') {
-            this.#onAuthChange();
-        }
-    }
+      this.userObject = user
+      MessagePopup.show("Registration successful!")
 
-    set onAuthChange(onAuthChange) {
-        if (typeof onAuthChange !== 'function') {
-            throw new Error('onAuthChange must be a function');
-        }
-        this.#onAuthChange = onAuthChange;
-    }
+      // Reload the page to update the UI
+      window.location.reload()
+    }, 1000)
+  }
 
-    // Private cookie methods now use the class's cookie name
-    #setCookie(value) {
-        const date = new Date();
-        date.setTime(date.getTime() + (this.#COOKIE_EXPIRY_DAYS * 24 * 60 * 60 * 1000));
-        document.cookie = `${this.#COOKIE_NAME}=${value};expires=${date.toUTCString()};path=/`;
-    }
+  static logout() {
+    this.userObject = null
+    MessagePopup.show("Logout successful!")
 
-    #getCookie() {
-        const cookies = `; ${document.cookie}`;
-        const parts = cookies.split(`; ${this.#COOKIE_NAME}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
+    // Redirect to welcome page
+    window.location.href = URL_Mapper.WELCOME
+  }
 
-    #clearCookie() {
-        document.cookie = `${this.#COOKIE_NAME}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-    }
+  static handleUserInvalidState() {
+    MessagePopup.show("Please login to continue", true)
 
-    handleUserInvalidState() {
-        //window.location.href = URL_Mapper.WELCOME + `?errorMessage=Not logged in!`;
-    }
+    // Redirect to welcome page after a short delay
+    setTimeout(() => {
+      window.location.href = URL_Mapper.WELCOME
+    }, 2000)
+  }
 }
 
-export default new UserAuthTracker();
+export default UserAuthTracker

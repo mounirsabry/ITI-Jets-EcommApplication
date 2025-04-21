@@ -1,126 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profile | Book Alley</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile | Book Alley</title>
 
-    <link rel="stylesheet" href="CSS/Common/reset.css" />
-    <link rel="stylesheet" href="CSS/Common/root.css" />
-    <link rel="stylesheet" href="CSS/Common/header.css" />
-    <link rel="stylesheet" href="CSS/Common/footer.css" />
-    <link rel="stylesheet" href="CSS/Common/main.css" />
-    <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+  <link rel="stylesheet" href="CSS/Common/reset.css" />
+  <link rel="stylesheet" href="CSS/Common/root.css" />
+  <link rel="stylesheet" href="CSS/Common/header.css" />
+  <link rel="stylesheet" href="CSS/Common/footer.css" />
+  <link rel="stylesheet" href="CSS/Common/main.css" />
+  <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="CSS/profile.css" />
 
-    <link rel="stylesheet" href="CSS/profile.css" />
+  <script src="JavaScript/Common/context_path.js"></script>
 
-    <script src="JavaScript/Common/context_path.js"></script>
+  <script defer type="module" src="JavaScript/Common/header.js"></script>
+  <script defer type="module" src="JavaScript/Common/footer.js"></script>
 
-    <script defer type="module" src="JavaScript/Common/header.js"></script>
-    <script defer type="module" src="JavaScript/Common/footer.js"></script>
+  <script defer type="module" src="JavaScript/profile.js"></script>
+</head>
+<body>
+<header id="siteHeader">
+  <!-- Header will be injected here by JS -->
+</header>
 
-    <script defer type="module" src="JavaScript/profile.js"></script>
-  </head>
-  <body>
-    <header id="siteHeader">
-      <!-- Header will be injected here by JS -->
-    </header>
+<main class="container">
+  <div class="popup-overlay hidden">
+    <!-- Will be controlled by JS -->
+  </div>
 
-    <main>
-      <div class="popup-overlay">
-        <!-- Will be controlled by JS -->
+  <h1 class="center-title">My Profile</h1>
+
+  <div class="profile-actions">
+    <button id="viewOrders">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      View Orders
+    </button>
+    <button id="viewPurchaseHistory">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      Purchase History
+    </button>
+    <button id="viewWishList">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      View Wish List
+    </button>
+  </div>
+
+  <!-- Email Section -->
+  <section id="emailSection">
+    <p>
+      <strong>Email Address:</strong>
+      <span id="displayEmail"><!-- email will be written here by JavaScript --></span>
+    </p>
+    <button id="openChangeEmailPopupButton">Update Email</button>
+  </section>
+
+  <!-- Change Password Section -->
+  <section id="changePasswordSection">
+    <button id="openChangePasswordPopupButton">Change Password</button>
+  </section>
+
+  <!-- Profile Information -->
+  <section id="profileInfo" class="profile-section">
+    <h2>Personal Information</h2>
+    <form id="editProfileForm">
+      <div>
+        <label for="editUserName">User Name</label>
+        <input type="text" id="editUserName" required />
       </div>
 
-      <div class="profile-actions">
-        <button id="viewOrders">View Orders</button>
-        <button id="viewPurchaseHistory">View Purchase History</button>
-        <button id="viewWishList">View Wish List</button>
+      <div>
+        <label for="editPhone">Phone Number</label>
+        <input type="tel" id="editPhone" required />
       </div>
 
-      <h1 class="center-title">My Profile</h1>
-
-      <!-- Change Password Section -->
-      <section id="changePasswordSection">
-        <button id="openChangePasswordPopupButton">Change Password</button>
-      </section>
-
-      <!-- Change Password Popup -->
-      <div id="passwordPopup" class="popup hidden">
-        <div class="popup-content">
-          <h2>Change Password</h2>
-          <p id="passwordChangeError" class="error"></p>
-          <label for="currentPassword">Current Password:</label>
-          <input type="password" id="currentPassword" required />
-
-          <label for="newPassword">New Password:</label>
-          <input type="password" id="newPassword" required />
-
-          <label for="confirmPassword">Confirm New Password:</label>
-          <input type="password" id="confirmPassword" required />
-
-          <div class="popup-buttons">
-            <button id="confirmPasswordChangeButton">Change</button>
-            <button id="cancelPasswordChangeButton">Cancel</button>
-          </div>
-        </div>
+      <div>
+        <label for="editAddress">Address</label>
+        <input type="text" id="editAddress" required />
       </div>
 
-      <!-- Email Section -->
-      <section id="emailSection">
-        <p>
-          <strong>Email:</strong>
-          <span id="displayEmail"><!-- email will be written here by JavaScript --></span>
-        </p>
-        <button id="openChangeEmailPopupButton">Update Email</button>
-      </section>
-
-      <!-- Email Update Popup -->
-      <div id="emailPopup" class="popup hidden">
-        <div class="popup-content">
-          <h2>Update Email</h2>
-          <p id="emailChangeError" class="error">
-            <!-- Error message will be injected here by JS when needed. -->
-          </p>
-          <label for="newEmail">New Email:</label>
-          <input
-            type="email"
-            id="newEmail"
-            placeholder="Enter new email"
-            required
-          />
-          <div class="popup-buttons">
-            <button id="confirmEmailUpdate">Confirm</button>
-            <button id="cancelEmailUpdate">Cancel</button>
-          </div>
-        </div>
+      <div>
+        <label for="editBirthDate">Birth Date</label>
+        <input type="date" id="editBirthDate" required />
       </div>
 
-      <!-- Profile Information -->
-      <section id="profileInfo" class="profile-section">
-        <h2>Update Profile Info</h2>
-        <form id="editProfileForm">
-          <label for="editUserName">User Name:</label>
-          <input type="text" id="editUserName" required />
+      <p id="profileChangesError" class="error">
+        <!-- Error message will be injected here by JS when needed. -->
+      </p>
+      <button type="submit">Save Changes</button>
+    </form>
+  </section>
 
-          <label for="editPhone">Phone:</label>
-          <input type="tel" id="editPhone"  required />
+  <!-- Change Password Popup -->
+  <div id="passwordPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Change Password</h2>
+      <p id="passwordChangeError" class="error"></p>
 
-          <label for="editAddress">Address:</label>
-          <input type="text" id="editAddress" required />
+      <label for="currentPassword">Current Password</label>
+      <input type="password" id="currentPassword" required />
 
-          <label for="editBirthDate">Birth Date:</label>
-          <input type="date" id="editBirthDate" required />
+      <label for="newPassword">New Password</label>
+      <input type="password" id="newPassword" required />
 
-          <p id="profileChangesError" class="error">
-            <!-- Error message will be injected here by JS when needed. -->
-          </p>
-          <button type="submit">Save Changes</button>
-        </form>
-      </section>
-    </main>
+      <label for="confirmPassword">Confirm New Password</label>
+      <input type="password" id="confirmPassword" required />
 
-    <footer id="siteFooter">
-      <!-- Footer will be injected here by JS -->
-    </footer>
-  </body>
+      <div class="popup-buttons">
+        <button id="confirmPasswordChangeButton">Update Password</button>
+        <button id="cancelPasswordChangeButton">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Update Popup -->
+  <div id="emailPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Update Email</h2>
+      <p id="emailChangeError" class="error">
+        <!-- Error message will be injected here by JS when needed. -->
+      </p>
+
+      <label for="newEmail">New Email Address</label>
+      <input
+              type="email"
+              id="newEmail"
+              placeholder="Enter your new email address"
+              required
+      />
+
+      <div class="popup-buttons">
+        <button id="confirmEmailUpdate">Update Email</button>
+        <button id="cancelEmailUpdate">Cancel</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer id="siteFooter">
+  <!-- Footer will be injected here by JS -->
+</footer>
+</body>
 </html>

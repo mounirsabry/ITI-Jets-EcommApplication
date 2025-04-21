@@ -1,10 +1,39 @@
 :root {
-  --main-border: 1px solid black;
-  --main-border-radius: 8px;
-  --main-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary: #f97316;
+  --secondary-hover: #ea580c;
+  --background: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 0.5rem;
+  --radius-lg: 1rem;
+  --transition: all 0.2s ease-in-out;
+  --container-width: 1200px;
+  --container-padding: 1rem;
+}
 
-  /* Screen Sizes, Cannot be used directly in media query, left for reference. */
-  --main-big-screen-width: 1200px;
-  --main-medium-screen-width: 820px;
-  --main-small-screen-width: 520px;
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Ensure all buttons have proper styling */
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Fix for container class */
+.container {
+  width: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
 }

@@ -1,192 +1,273 @@
-'use strict';
+import checkForErrorMessageParameter from "./Common/checkForError.js"
+import { createBookCard } from "./Utils/bookUIFunctions.js"
+import BooksManager from "./Managers/BooksManager.js"
+import Book from "./Models/Book.js"
 
-import checkForErrorMessageParameter from "./Common/checkForError.js";
-import { createBookCard } from './Utils/bookUIFunctions.js';
-import BooksManager from './Managers/BooksManager.js';
-import Book from './Models/Book.js';
-import Genres from './Models/Genres.js';
+document.addEventListener("DOMContentLoaded", () => {
+  checkForErrorMessageParameter()
 
-document.addEventListener("DOMContentLoaded", function() {
-    checkForErrorMessageParameter();
+  // DOM Elements
+  const searchBar = document.getElementById("searchBar")
+  const searchButton = document.getElementById("searchButton")
+  const genreFilter = document.getElementById("genreFilter")
+  const unavailableToggle = document.getElementById("unavailableToggle")
+  const booksList = document.getElementById("booksList")
+  const prevPageBtn = document.getElementById("prevPage")
+  const nextPageBtn = document.getElementById("nextPage")
+  const pageInput = document.getElementById("pageInput")
+  const pageIndicator = document.getElementById("pageIndicator")
 
-    // Constants
-    const BOOKS_PER_PAGE = 12; // Can be easily changed here
+  // State variables
+  let allBooks = []
+  let filteredBooks = []
+  let currentPage = 1
+  const booksPerPage = 12
+  let totalPages = 1
+  const genres = new Set(["All Genres"])
 
-    // DOM Elements
-    const booksList = document.getElementById('booksList');
-    const searchBar = document.getElementById('searchBar');
-    const searchButton = document.getElementById('searchButton');
-    const unavailableToggle = document.getElementById('unavailableToggle');
-    const genreFilter = document.getElementById('genreFilter');
-    const prevPageButton = document.getElementById('prevPage');
-    const nextPageButton = document.getElementById('nextPage');
-    const pageInput = document.getElementById('pageInput');
-    const pageIndicator = document.getElementById('pageIndicator');
+  // Add fade-in animation to main sections
+  const sections = document.querySelectorAll("main > section")
+  sections.forEach((section, index) => {
+    section.classList.add("fade-in")
+    section.style.animationDelay = `${index * 0.2}s`
+  })
 
-    // State variables
-    let allBooksPossiblySearched = null;
-    const currentDisplayedMap = new Map();
-    let currentPage = 1;
-    let totalPages = 1;
+  // Initialize the page
+  function init() {
+    // Show loading state
+    booksList.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Loading books"></div>
+      </div>
+    `
 
-    // Initialize
-    populateGenreFilter();
-    BooksManager.getAllBooks(loadAllBooks, null);
+    // Fetch all books
+    BooksManager.getAllBooks(onBooksLoaded, onError)
 
-    function populateGenreFilter() {
-        Object.values(Genres).forEach(genre => {
-            const option = document.createElement('option');
-            option.value = genre;
-            option.textContent = genre;
-            genreFilter.appendChild(option);
-        });
+    // Event listeners
+    searchButton.addEventListener("click", handleSearch)
+    searchBar.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleSearch()
+      }
+    })
+    genreFilter.addEventListener("change", filterBooks)
+    unavailableToggle.addEventListener("change", filterBooks)
+    prevPageBtn.addEventListener("click", goToPrevPage)
+    nextPageBtn.addEventListener("click", goToNextPage)
+    pageInput.addEventListener("change", goToSpecificPage)
+  }
+
+  // Handle books loaded from API
+  function onBooksLoaded(books) {
+    if (!books || books.length === 0) {
+      booksList.innerHTML = `
+        <div class="no-results">
+          <p>No books available at the moment.</p>
+        </div>
+      `
+      return
     }
 
-    function filterBooks() {
-        currentDisplayedMap.clear();
-        const selectedGenre = genreFilter.value;
+    allBooks = books
+      .map((book) => {
+        try {
+          return Book.fromJSON(book)
+        } catch (e) {
+          console.error("Could not parse book:", e)
+          return null
+        }
+      })
+      .filter((book) => book !== null)
 
-        allBooksPossiblySearched.forEach(book => {
-            if (selectedGenre !== 'all' && book.genre !== selectedGenre) {
-                return;
-            }
-            if (unavailableToggle && !unavailableToggle.checked && (book.stock === 0 || !book.isAvailable)) {
-                return;
-            }
-            currentDisplayedMap.set(book.bookID, book);
-        });
+    // Extract genres for filter
+    allBooks.forEach((book) => {
+      if (book.genre) {
+        genres.add(book.genre)
+      }
+    })
 
-        // Reset to page 1 when filtering changes.
-        currentPage = 1;
-        updatePagination();
+    // Populate genre filter
+    populateGenreFilter()
+
+    // Initial filtering and display
+    filterBooks()
+  }
+
+  // Handle API errors
+  function onError(error) {
+    console.error("Error loading books:", error)
+    booksList.innerHTML = `
+      <div class="no-results">
+        <p>Failed to load books. Please try again later.</p>
+      </div>
+    `
+  }
+
+  // Populate genre filter dropdown
+  function populateGenreFilter() {
+    genreFilter.innerHTML = '<option value="all">All Genres</option>'
+
+    // Sort genres alphabetically
+    const sortedGenres = Array.from(genres).sort()
+
+    sortedGenres.forEach((genre) => {
+      if (genre !== "All Genres") {
+        const option = document.createElement("option")
+        option.value = genre
+        option.textContent = genre
+        genreFilter.appendChild(option)
+      }
+    })
+  }
+
+  // Handle search button click
+  function handleSearch() {
+    const searchTerm = searchBar.value.trim()
+
+    if (searchTerm === "") {
+      // If search is empty, show all books
+      filterBooks()
+      return
     }
 
-    function renderBooks() {
-        booksList.innerHTML = '';
+    // Show loading state
+    booksList.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner" aria-label="Searching books"></div>
+      </div>
+    `
 
-        if (currentDisplayedMap.size === 0) {
-            const emptyElement = document.createElement('div');
-            emptyElement.textContent = 'No books found matching your criteria!';
-            emptyElement.classList.add('no-data-found');
-            booksList.appendChild(emptyElement);
+    // Search via API
+    BooksManager.search(searchTerm, onSearchResults, onError)
+  }
 
-            currentPage = 0;
-            totalPages = 0;
-            updatePagination();
-            return;
-        }
-
-        const booksArray = Array.from(currentDisplayedMap.values());
-
-        // Calculate pagination.
-        totalPages = Math.ceil(booksArray.length / BOOKS_PER_PAGE);
-        updatePagination();
-
-        // Get books for current page.
-        const startIndex = (currentPage - 1) * BOOKS_PER_PAGE;
-        const endIndex = Math.min(startIndex + BOOKS_PER_PAGE, booksArray.length);
-        const booksToDisplay = booksArray.slice(startIndex, endIndex);
-
-        // Render books.
-        booksToDisplay.forEach(book => {
-            const bookElement = createBookCard(book);
-            booksList.appendChild(bookElement);
-        });
+  // Handle search results
+  function onSearchResults(books) {
+    if (!books || books.length === 0) {
+      booksList.innerHTML = `
+        <div class="no-results">
+          <p>No books found matching your search.</p>
+        </div>
+      `
+      return
     }
 
-    function updatePagination() {
-        // Update page indicator
-        pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+    allBooks = books
+      .map((book) => {
+        try {
+          return Book.fromJSON(book)
+        } catch (e) {
+          console.error("Could not parse book:", e)
+          return null
+        }
+      })
+      .filter((book) => book !== null)
 
-        // Update input value.
-        pageInput.value = currentPage;
+    // Apply filters to search results
+    filterBooks()
+  }
 
-        // Update button states.
-        prevPageButton.disabled = currentPage <= 1;
-        nextPageButton.disabled = currentPage >= totalPages;
+  // Filter books based on selected criteria
+  function filterBooks() {
+    const selectedGenre = genreFilter.value
+    const includeUnavailable = unavailableToggle.checked
+
+    filteredBooks = allBooks.filter((book) => {
+      // Filter by genre
+      const genreMatch = selectedGenre === "all" || book.genre === selectedGenre
+
+      // Filter by availability
+      const availabilityMatch = includeUnavailable || (book.isAvailable && book.stock > 0)
+
+      return genreMatch && availabilityMatch
+    })
+
+    // Reset pagination
+    currentPage = 1
+    totalPages = Math.ceil(filteredBooks.length / booksPerPage)
+
+    // Update UI
+    updatePagination()
+    displayBooks()
+  }
+
+  // Display books for current page
+  function displayBooks() {
+    if (filteredBooks.length === 0) {
+      booksList.innerHTML = `
+        <div class="no-results">
+          <p>No books match your current filters.</p>
+        </div>
+      `
+      return
     }
 
-    function goToPage(page) {
-        const pageNum = parseInt(page);
-        if (isNaN(pageNum)) {
-            return;
-        }
+    // Calculate start and end indices for current page
+    const startIndex = (currentPage - 1) * booksPerPage
+    const endIndex = Math.min(startIndex + booksPerPage, filteredBooks.length)
 
-        currentPage = Math.max(1, Math.min(pageNum, totalPages));
-        renderBooks();
+    // Clear previous books
+    booksList.innerHTML = ""
+
+    // Display books for current page
+    for (let i = startIndex; i < endIndex; i++) {
+      const book = filteredBooks[i]
+      const bookElement = createBookCard(book)
+      bookElement.classList.add("fade-in")
+      bookElement.style.animationDelay = `${(i - startIndex) * 0.1}s`
+      booksList.appendChild(bookElement)
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    pageInput.value = currentPage
+    pageInput.max = totalPages
+    pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`
+
+    // Enable/disable navigation buttons
+    prevPageBtn.disabled = currentPage <= 1
+    nextPageBtn.disabled = currentPage >= totalPages
+  }
+
+  // Navigation functions
+  function goToPrevPage() {
+    if (currentPage > 1) {
+      currentPage--
+      updatePagination()
+      displayBooks()
+      // Scroll to top of book list
+      booksList.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  function goToNextPage() {
+    if (currentPage < totalPages) {
+      currentPage++
+      updatePagination()
+      displayBooks()
+      // Scroll to top of book list
+      booksList.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  function goToSpecificPage() {
+    const pageNum = Number.parseInt(pageInput.value)
+
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      currentPage = pageNum
+    } else {
+      // Reset to valid value
+      pageInput.value = currentPage
     }
 
-    // Event Listeners.
-    searchButton.addEventListener('click', () => {
-        const searchBarValue = searchBar.value;
-        if (!searchBarValue) {
-            BooksManager.getAllBooks(loadAllBooks, null);
-            return;
-        }
+    updatePagination()
+    displayBooks()
+    // Scroll to top of book list
+    booksList.scrollIntoView({ behavior: "smooth" })
+  }
 
-        const searchTerm = searchBarValue.toLowerCase();
-        BooksManager.search(searchTerm, (searchResult) => {
-            allBooksPossiblySearched = searchResult.reduce((validBooks, book) => {
-                try {
-                    const parsedBook = Book.fromJSON(book);
-                    validBooks.push(parsedBook);
-                } catch (e) {
-                    console.log('Could not parse a book in search book function!', e);
-                }
-                return validBooks;
-            }, []);
-
-            filterBooks();
-            renderBooks();
-        });
-    });
-
-    unavailableToggle.addEventListener("change", () => {
-        filterBooks();
-        renderBooks();
-    });
-
-    genreFilter.addEventListener("change", () => {
-        filterBooks();
-        renderBooks();
-    });
-
-    prevPageButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderBooks();
-        }
-    });
-
-    nextPageButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderBooks();
-        }
-    });
-
-    pageInput.addEventListener('change', (e) => {
-        goToPage(e.target.value);
-    });
-
-    pageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            goToPage(e.target.value);
-        }
-    });
-
-    function loadAllBooks(allBooks) {
-        allBooksPossiblySearched = allBooks.reduce((validBooks, book) => {
-            try {
-                const parsedBook = Book.fromJSON(book);
-                validBooks.push(parsedBook);
-            } catch (e) {
-                console.log('Could not parse a book in search book function!', e);
-            }
-            return validBooks;
-        }, []);
-
-        filterBooks();
-        renderBooks();
-    }
-});
+  // Initialize the page
+  init()
+})

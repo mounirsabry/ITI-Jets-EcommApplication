@@ -39,7 +39,6 @@ export default class BookImage {
     }
 
     static fromJSON(json) {
-        console.log("hello");
         if (typeof json !== 'object' || json === null) {
             throw new Error('Invalid JSON object!');
         }
