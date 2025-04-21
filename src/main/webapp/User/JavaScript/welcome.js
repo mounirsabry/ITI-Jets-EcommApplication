@@ -15,62 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   // DOM Elements
-  const topBooksContainer = document.getElementById("topBooks")
-  const topGenreBooksContainer = document.getElementById("topGenreBooks")
   const browseButton = document.getElementById("browseButton")
   const bannerMessages = document.getElementById("bannerMessages")
   const prevBtn = document.getElementById("prevBtn")
   const nextBtn = document.getElementById("nextBtn")
-
-  // Event Banner Messages
-  const messages = [
-    "Summer Sale! Get 20% off on all books",
-    "Free shipping on orders over 200 EGP",
-    "New arrivals every week",
-    "Join our loyalty program for exclusive discounts",
-  ]
-
-  let currentMessageIndex = 0
-
-  // Initialize event banner
-  function initEventBanner() {
-    // Create message elements
-    messages.forEach((message, index) => {
-      const messageElement = document.createElement("div")
-      messageElement.className = `banner-text ${index === 0 ? "active" : ""}`
-      messageElement.textContent = message
-      bannerMessages.appendChild(messageElement)
-    })
-
-    // Set up event listeners for banner navigation
-    prevBtn.addEventListener("click", showPreviousMessage)
-    nextBtn.addEventListener("click", showNextMessage)
-
-    // Auto-rotate messages
-    setInterval(showNextMessage, 5000)
-  }
-
-  // Show previous message
-  function showPreviousMessage() {
-    const messages = document.querySelectorAll(".banner-text")
-    messages[currentMessageIndex].classList.remove("active")
-    currentMessageIndex = (currentMessageIndex - 1 + messages.length) % messages.length
-    messages[currentMessageIndex].classList.add("active")
-  }
-
-  // Show next message
-  function showNextMessage() {
-    const messages = document.querySelectorAll(".banner-text")
-    messages[currentMessageIndex].classList.remove("active")
-    currentMessageIndex = (currentMessageIndex + 1) % messages.length
-    messages[currentMessageIndex].classList.add("active")
-  }
+  const topSellingSection = document.getElementById("topSellingSection")
+  const topSellingGenreSection = document.getElementById("topSellingGenreSection")
 
   // Initialize welcome page
   function initWelcomePage() {
-    // Initialize event banner
-    initEventBanner()
-
     // Set up browse button
     if (browseButton) {
       browseButton.addEventListener("click", () => {
@@ -78,21 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     }
 
-    // Show loading state
-    if (topBooksContainer) {
-      topBooksContainer.innerHTML = `
-        <div class="loading-container">
-          <div class="loading-spinner" aria-label="Loading top books"></div>
-        </div>
-      `
+    // Set up event listeners for banner navigation
+    if (prevBtn && nextBtn) {
+      prevBtn.addEventListener("click", showPreviousMessage)
+      nextBtn.addEventListener("click", showNextMessage)
+
+      // Auto-rotate messages
+      setInterval(showNextMessage, 5000)
     }
 
-    if (topGenreBooksContainer) {
-      topGenreBooksContainer.innerHTML = `
-        <div class="loading-container">
-          <div class="loading-spinner" aria-label="Loading genre books"></div>
-        </div>
-      `
+    // Create containers for book sections if they don't exist
+    if (topSellingSection) {
+      const topBooksContainer = document.getElementById("topSelling")
+      if (topBooksContainer) {
+        topBooksContainer.innerHTML = `
+          <div class="loading-container">
+            <div class="loading-spinner" aria-label="Loading top books"></div>
+          </div>
+        `
+      }
+    }
+
+    if (topSellingGenreSection) {
+      const topGenreBooksContainer = document.getElementById("topSellingGenreBook")
+      if (topGenreBooksContainer) {
+        topGenreBooksContainer.innerHTML = `
+          <div class="loading-container">
+            <div class="loading-spinner" aria-label="Loading genre books"></div>
+          </div>
+        `
+      }
     }
 
     // Mock data for demonstration - in a real app, this would be fetched from an API
@@ -245,9 +213,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500)
   }
 
+  // Show previous message
+  function showPreviousMessage() {
+    const messages = document.querySelectorAll(".banner-text")
+    if (!messages.length) return
+
+    let currentMessageIndex = Array.from(messages).findIndex((msg) => msg.classList.contains("active"))
+    if (currentMessageIndex === -1) currentMessageIndex = 0
+
+    messages[currentMessageIndex].classList.remove("active")
+    currentMessageIndex = (currentMessageIndex - 1 + messages.length) % messages.length
+    messages[currentMessageIndex].classList.add("active")
+  }
+
+  // Show next message
+  function showNextMessage() {
+    const messages = document.querySelectorAll(".banner-text")
+    if (!messages.length) return
+
+    let currentMessageIndex = Array.from(messages).findIndex((msg) => msg.classList.contains("active"))
+    if (currentMessageIndex === -1) currentMessageIndex = 0
+
+    messages[currentMessageIndex].classList.remove("active")
+    currentMessageIndex = (currentMessageIndex + 1) % messages.length
+    messages[currentMessageIndex].classList.add("active")
+  }
+
   // Display top selling books
   function displayTopBooks(books) {
-    if (!topBooksContainer) return
+    const topBooksContainer = document.getElementById("topSelling")
+    if (!topBooksContainer) {
+      console.error("Top selling books container not found")
+      return
+    }
 
     // Clear loading state
     topBooksContainer.innerHTML = ""
@@ -255,18 +253,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create book cards
     books.forEach((bookData) => {
       try {
-        const book = new Book(
-          bookData.bookID,
-          bookData.title,
-          bookData.author,
-          bookData.price,
-          bookData.overview,
-          bookData.images,
-          bookData.stock,
-          bookData.isAvailable,
-          bookData.discountedPercentage,
-          bookData.genre,
-        )
+        // Create a proper Book object with all required properties
+        const book = new Book()
+        Object.assign(book, bookData)
+
+        // Ensure images are properly set
+        if (!book.images || !book.images.length) {
+          book.images = [
+            {
+              url: URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE,
+              isMain: true,
+            },
+          ]
+        }
 
         const bookCard = createBookCard(book)
         topBooksContainer.appendChild(bookCard)
@@ -278,7 +277,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Display top genre books
   function displayTopGenreBooks(books) {
-    if (!topGenreBooksContainer) return
+    const topGenreBooksContainer = document.getElementById("topSellingGenreBook")
+    if (!topGenreBooksContainer) {
+      console.error("Top genre books container not found")
+      return
+    }
 
     // Clear loading state
     topGenreBooksContainer.innerHTML = ""
@@ -286,18 +289,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create book cards
     books.forEach((bookData) => {
       try {
-        const book = new Book(
-          bookData.bookID,
-          bookData.title,
-          bookData.author,
-          bookData.price,
-          bookData.overview,
-          bookData.images,
-          bookData.stock,
-          bookData.isAvailable,
-          bookData.discountedPercentage,
-          bookData.genre,
-        )
+        // Create a proper Book object with all required properties
+        const book = new Book()
+        Object.assign(book, bookData)
+
+        // Ensure images are properly set
+        if (!book.images || !book.images.length) {
+          book.images = [
+            {
+              url: URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE,
+              isMain: true,
+            },
+          ]
+        }
 
         const bookCard = createBookCard(book)
         topGenreBooksContainer.appendChild(bookCard)

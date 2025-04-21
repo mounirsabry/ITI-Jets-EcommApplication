@@ -107,6 +107,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.header-popup-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .header-popup {
@@ -116,6 +125,12 @@
   width: 90%;
   max-width: 400px;
   position: relative;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+.hidden .header-popup {
+  transform: translateY(-20px);
 }
 
 .header-close-popup {
@@ -205,10 +220,6 @@
 
 .header-popup-buttons button[type="button"]:hover {
   background-color: var(--border);
-}
-
-.hidden {
-  display: none !important;
 }
 
 /* Responsive */

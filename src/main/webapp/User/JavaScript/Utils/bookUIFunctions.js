@@ -21,10 +21,15 @@ export function createBookCard(book) {
   // Check if book is in wishlist
   const isInWishlist = WishlistManager.isInWishlist(book.bookID)
 
+  // Check if book is available
+  const isAvailable = book.isAvailable && book.stock > 0
+  const stockStatusClass = isAvailable ? "stock-status" : "stock-status out-of-stock"
+  const stockStatusText = isAvailable ? "In Stock" : "Out of Stock"
+
   // Create HTML structure
   bookElement.innerHTML = `
     <div class="book-image-container">
-      <img src="${imageUrl}" alt="${book.title}" class="product-image">
+      <img src="${imageUrl}" alt="${book.title}" class="product-image" loading="lazy">
       ${hasDiscount ? `<div class="discount-badge">-${book.discountedPercentage}%</div>` : ""}
       <div class="book-overview">${book.overview || "No overview available"}</div>
       <button class="wishlist-button ${isInWishlist ? "in-wishlist" : ""}" data-book-id="${book.bookID}" aria-label="${isInWishlist ? "Remove from wishlist" : "Add to wishlist"}">
@@ -34,24 +39,23 @@ export function createBookCard(book) {
       </button>
     </div>
     <div class="book-content">
-      <div class="book-description">${book.overview || "No description available."}</div>
       <h3 class="book-title">${book.title}</h3>
-      <p class="book-author">${book.author || "Unknown author"}</p>
-      <p class="book-category">${book.genre || "Business & Finance"}</p>
+      <p class="book-author">by ${book.author || "Unknown author"}</p>
+      <div class="book-category">${book.genre || "General"}</div>
       <div class="book-price">
         ${hasDiscount ? `<span class="original-price">${originalPrice.toFixed(2)} EGP</span>` : ""}
         <span class="current-price">${discountedPrice.toFixed(2)} EGP</span>
       </div>
-      <div class="stock-status">
-        In Stock
+      <div class="${stockStatusClass}">
+        ${stockStatusText}
       </div>
       <div class="cart-controls">
         <div class="quantity-controls">
-          <button class="quantity-button decrease-quantity" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>-</button>
-          <input type="number" min="1" max="${book.stock}" value="1" class="quantity-input">
-          <button class="quantity-button increase-quantity" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>+</button>
+          <button class="quantity-button decrease-quantity" ${!isAvailable ? "disabled" : ""} aria-label="Decrease quantity">-</button>
+          <input type="number" min="1" max="${book.stock}" value="1" class="quantity-input" aria-label="Quantity">
+          <button class="quantity-button increase-quantity" ${!isAvailable ? "disabled" : ""} aria-label="Increase quantity">+</button>
         </div>
-        <button class="add-to-cart" ${!book.isAvailable || book.stock <= 0 ? "disabled" : ""}>
+        <button class="add-to-cart" ${!isAvailable ? "disabled" : ""}>
           Add to Cart
         </button>
       </div>
@@ -100,7 +104,7 @@ export function createBookCard(book) {
     })
   }
 
-  if (addToCartBtn && book.isAvailable && book.stock > 0) {
+  if (addToCartBtn && isAvailable) {
     addToCartBtn.addEventListener("click", (e) => {
       e.preventDefault() // Prevent form submission
       e.stopPropagation() // Prevent event bubbling
@@ -150,6 +154,7 @@ export function createBookCard(book) {
           wishlistButton.classList.add("in-wishlist")
           wishlistButton.setAttribute("aria-label", "Remove from wishlist")
           wishlistButton.querySelector("svg").setAttribute("fill", "currentColor")
+          MessagePopup.show("Added to wishlist")
         }
       }
     })
@@ -169,6 +174,6 @@ function addToCart(bookID, quantity) {
   // In a real app, this would call the CartManager.addItem method
   // For now, we'll simulate a successful addition
   setTimeout(() => {
-    MessagePopup.show("Item added to cart!")
+    MessagePopup.show(`Added ${quantity} item(s) to cart!`)
   }, 500)
 }

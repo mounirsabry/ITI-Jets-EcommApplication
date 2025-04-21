@@ -36,8 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `
 
-    // In a real app, this would fetch from an API
-    // For now, we'll use localStorage for demo purposes
+    // Get wishlist items from localStorage
     let wishlistIds = []
     try {
       wishlistIds = JSON.parse(localStorage.getItem(`wishlist_${userObject.userID}`)) || []
@@ -52,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Mock data for demonstration - in a real app, this would be fetched from an API
-    // We'll filter the mock data based on the wishlist IDs
     const mockBooks = [
       {
         bookID: 1,
@@ -129,9 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500)
 
     // Event listeners
-    backToProfileButton.addEventListener("click", () => {
-      window.location.href = URL_Mapper.PROFILE
-    })
+    if (backToProfileButton) {
+      backToProfileButton.addEventListener("click", () => {
+        window.location.href = URL_Mapper.PROFILE
+      })
+    }
   }
 
   // Handle wish list loaded
@@ -147,16 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create wish list items
     wishListItems.forEach((item, index) => {
       try {
-        const book = new Book(
-          item.bookID,
-          item.title,
-          item.author,
-          item.price,
-          item.overview,
-          item.images,
-          item.stock,
-          item.isAvailable,
-        )
+        // Create a proper Book object with all required properties
+        const book = new Book()
+        Object.assign(book, item)
+
+        // Ensure images are properly set
+        if (!book.images || !book.images.length) {
+          book.images = [
+            {
+              url: URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE,
+              isMain: true,
+            },
+          ]
+        }
 
         const wishListItemElement = createWishListItemElement(book, index, item.dateAdded)
         wishListContainer.appendChild(wishListItemElement)
@@ -173,9 +176,15 @@ document.addEventListener("DOMContentLoaded", () => {
     wishListItem.style.animationDelay = `${index * 0.1}s`
 
     // Get main image
-    const imagesArray = book.images
-    const mainImage = imagesArray.find((image) => image.isMain)
-    const imageUrl = mainImage?.url || URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE
+    let imageUrl = URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE
+    if (book.images && book.images.length > 0) {
+      const mainImage = book.images.find((img) => img.isMain)
+      if (mainImage && mainImage.url) {
+        imageUrl = mainImage.url
+      } else if (book.images[0].url) {
+        imageUrl = book.images[0].url
+      }
+    }
 
     // Determine availability status
     const isAvailable = book.isAvailable && book.stock > 0
@@ -189,12 +198,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="wishlist-item-details">
         <h3>${book.title}</h3>
-        <p class="author">By ${book.author}</p>
-        <p class="overview">${book.overview}</p>
+        <p class="author">By ${book.author || "Unknown Author"}</p>
+        <p class="overview">${book.overview || "No overview available"}</p>
         <span class="availability ${isAvailable ? "in-stock" : "out-of-stock"}">
           ${isAvailable ? `In Stock (${book.stock} available)` : "Out of Stock"}
         </span>
-        <p class="price">${book.price.toFixed(2)} EGP</p>
+        <p class="price">${book.price ? book.price.toFixed(2) : "0.00"} EGP</p>
 
         <div class="wishlist-actions">
           <button class="add-to-cart-button" data-book-id="${book.bookID}" ${!isAvailable ? "disabled" : ""}>
@@ -209,19 +218,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add event listeners
     const bookImage = wishListItem.querySelector(".wishlist-image")
-    bookImage.addEventListener("click", () => {
-      displayProduct(book)
-    })
+    if (bookImage) {
+      bookImage.addEventListener("click", () => {
+        displayProduct(book)
+      })
+    }
 
     const addToCartButton = wishListItem.querySelector(".add-to-cart-button")
-    addToCartButton.addEventListener("click", () => {
-      addToCart(book.bookID)
-    })
+    if (addToCartButton) {
+      addToCartButton.addEventListener("click", () => {
+        addToCart(book.bookID)
+      })
+    }
 
     const removeButton = wishListItem.querySelector(".remove-from-wishlist-button")
-    removeButton.addEventListener("click", () => {
-      removeFromWishList(book.bookID)
-    })
+    if (removeButton) {
+      removeButton.addEventListener("click", () => {
+        removeFromWishList(book.bookID)
+      })
+    }
 
     return wishListItem
   }
@@ -241,17 +256,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Format date
   function formatDate(dateString) {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now - date)
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    if (!dateString) {
+      return "Recently added"
+    }
 
-    if (diffDays === 0) {
-      return "Added today"
-    } else if (diffDays === 1) {
-      return "Added yesterday"
-    } else {
-      return `Added ${diffDays} days ago`
+    try {
+      const date = new Date(dateString)
+      const now = new Date()
+      const diffTime = Math.abs(now - date)
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+      if (diffDays === 0) {
+        return "Added today"
+      } else if (diffDays === 1) {
+        return "Added yesterday"
+      } else {
+        return `Added ${diffDays} days ago`
+      }
+    } catch (e) {
+      console.error("Error formatting date:", e)
+      return "Recently added"
     }
   }
 

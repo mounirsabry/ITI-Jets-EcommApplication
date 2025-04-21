@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextPageBtn = document.getElementById("nextPage")
   const pageInput = document.getElementById("pageInput")
   const pageIndicator = document.getElementById("pageIndicator")
+  const resultsCount = document.getElementById("resultsCount")
+  const gridViewBtn = document.getElementById("gridViewBtn")
+  const listViewBtn = document.getElementById("listViewBtn")
 
   // State variables
   let allBooks = []
@@ -24,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const booksPerPage = 12
   let totalPages = 1
   const genres = new Set(["All Genres"])
+  let currentView = "grid" // Default view
 
   // Add fade-in animation to main sections
   const sections = document.querySelectorAll("main > section")
@@ -56,6 +60,35 @@ document.addEventListener("DOMContentLoaded", () => {
     prevPageBtn.addEventListener("click", goToPrevPage)
     nextPageBtn.addEventListener("click", goToNextPage)
     pageInput.addEventListener("change", goToSpecificPage)
+
+    // View toggle buttons
+    gridViewBtn.addEventListener("click", () => setView("grid"))
+    listViewBtn.addEventListener("click", () => setView("list"))
+
+    // Check for saved view preference
+    const savedView = localStorage.getItem("bookViewPreference")
+    if (savedView) {
+      setView(savedView)
+    }
+  }
+
+  // Set view (grid or list)
+  function setView(view) {
+    currentView = view
+
+    // Update buttons
+    gridViewBtn.classList.toggle("active", view === "grid")
+    listViewBtn.classList.toggle("active", view === "list")
+
+    // Update book list
+    booksList.classList.toggle("grid-view", view === "grid")
+    booksList.classList.toggle("list-view", view === "list")
+
+    // Save preference
+    localStorage.setItem("bookViewPreference", view)
+
+    // Redisplay books to ensure proper layout
+    displayBooks()
   }
 
   // Handle books loaded from API
@@ -66,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>No books available at the moment.</p>
         </div>
       `
+      resultsCount.textContent = "No books found"
       return
     }
 
@@ -102,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p>Failed to load books. Please try again later.</p>
       </div>
     `
+    resultsCount.textContent = "Error loading books"
   }
 
   // Populate genre filter dropdown
@@ -137,6 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="loading-spinner" aria-label="Searching books"></div>
       </div>
     `
+    resultsCount.textContent = "Searching..."
 
     // Search via API
     BooksManager.search(searchTerm, onSearchResults, onError)
@@ -150,6 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>No books found matching your search.</p>
         </div>
       `
+      resultsCount.textContent = "No books found"
       return
     }
 
@@ -187,9 +224,23 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = 1
     totalPages = Math.ceil(filteredBooks.length / booksPerPage)
 
+    // Update results count
+    updateResultsCount()
+
     // Update UI
     updatePagination()
     displayBooks()
+  }
+
+  // Update results count text
+  function updateResultsCount() {
+    if (filteredBooks.length === 0) {
+      resultsCount.textContent = "No books found"
+    } else if (filteredBooks.length === 1) {
+      resultsCount.textContent = "Showing 1 book"
+    } else {
+      resultsCount.textContent = `Showing ${filteredBooks.length} books`
+    }
   }
 
   // Display books for current page

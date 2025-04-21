@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
   headerContainer.innerHTML = `
     <div>
       <div class="logo-container">
-        <img src="${URL_Mapper.ASSETS.LOGO}" alt="Book Alley Logo" />
+        <a href="${URL_Mapper.WELCOME}">
+          <img src="${URL_Mapper.ASSETS.LOGO}" alt="Book Alley Logo" />
+        </a>
         <h1 class="site-title">Book Alley</h1>
       </div>
 
@@ -77,59 +79,68 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `
 
-  // Create login popup
-  const loginPopupOverlay = document.createElement("div")
-  loginPopupOverlay.id = "loginPopupOverlay"
-  loginPopupOverlay.className = "header-popup-overlay hidden"
-  loginPopupOverlay.innerHTML = `
-    <div id="loginPopup" class="header-popup">
-      <button class="header-close-popup" id="closeLoginPopup">&times;</button>
-      <div class="header-popup-content">
-        <h3>Login</h3>
-        <form id="loginForm">
-          <input type="email" id="loginEmail" placeholder="Email" required />
-          <input type="password" id="loginPassword" placeholder="Password" required />
-          <div class="header-popup-buttons">
-            <button type="submit">Login</button>
-            <button type="button" id="switchToRegister">Register</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  `
-  document.body.appendChild(loginPopupOverlay)
+  // Check if popups already exist to avoid duplicates
+  let loginPopupOverlay = document.getElementById("loginPopupOverlay")
+  let registerPopupOverlay = document.getElementById("registerPopupOverlay")
 
-  // Create register popup
-  const registerPopupOverlay = document.createElement("div")
-  registerPopupOverlay.id = "registerPopupOverlay"
-  registerPopupOverlay.className = "header-popup-overlay hidden"
-  registerPopupOverlay.innerHTML = `
-    <div id="registerPopup" class="header-popup">
-      <button class="header-close-popup" id="closeRegisterPopup">&times;</button>
-      <div class="header-popup-content">
-        <h3>Register</h3>
-        <form id="registerForm">
-          <input type="email" id="registerEmail" placeholder="Email" required />
-          <input type="password" id="registerPassword" placeholder="Password" required />
-          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-          <input type="text" id="userName" placeholder="User Name" required />
-          <input type="tel" id="phoneNumber" placeholder="Phone Number" required />
-          <input type="text" id="address" placeholder="Address" required />
-          <input type="date" id="birthDate" required />
-          <div class="header-popup-buttons">
-            <button type="submit">Register</button>
-            <button type="button" id="switchToLogin">Login</button>
-          </div>
-        </form>
+  // Create login popup if it doesn't exist
+  if (!loginPopupOverlay) {
+    loginPopupOverlay = document.createElement("div")
+    loginPopupOverlay.id = "loginPopupOverlay"
+    loginPopupOverlay.className = "header-popup-overlay hidden"
+    loginPopupOverlay.innerHTML = `
+      <div id="loginPopup" class="header-popup">
+        <button class="header-close-popup" id="closeLoginPopup">&times;</button>
+        <div class="header-popup-content">
+          <h3>Login</h3>
+          <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email" required />
+            <input type="password" id="loginPassword" placeholder="Password" required />
+            <div class="header-popup-buttons">
+              <button type="submit">Login</button>
+              <button type="button" id="switchToRegister">Register</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  `
-  document.body.appendChild(registerPopupOverlay)
+    `
+    document.body.appendChild(loginPopupOverlay)
+  }
+
+  // Create register popup if it doesn't exist
+  if (!registerPopupOverlay) {
+    registerPopupOverlay = document.createElement("div")
+    registerPopupOverlay.id = "registerPopupOverlay"
+    registerPopupOverlay.className = "header-popup-overlay hidden"
+    registerPopupOverlay.innerHTML = `
+      <div id="registerPopup" class="header-popup">
+        <button class="header-close-popup" id="closeRegisterPopup">&times;</button>
+        <div class="header-popup-content">
+          <h3>Register</h3>
+          <form id="registerForm">
+            <input type="email" id="registerEmail" placeholder="Email" required />
+            <input type="password" id="registerPassword" placeholder="Password" required />
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            <input type="text" id="userName" placeholder="User Name" required />
+            <input type="tel" id="phoneNumber" placeholder="Phone Number" required />
+            <input type="text" id="address" placeholder="Address" required />
+            <input type="date" id="birthDate" required />
+            <div class="header-popup-buttons">
+              <button type="submit">Register</button>
+              <button type="button" id="switchToLogin">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `
+    document.body.appendChild(registerPopupOverlay)
+  }
 
   // Handle login button click
   const loginButton = document.getElementById("loginButton")
   if (loginButton) {
-    loginButton.addEventListener("click", () => {
+    loginButton.addEventListener("click", (e) => {
+      e.preventDefault()
       const loginPopupOverlay = document.getElementById("loginPopupOverlay")
       if (loginPopupOverlay) {
         loginPopupOverlay.classList.remove("hidden")
@@ -140,7 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle register button click
   const registerButton = document.getElementById("registerButton")
   if (registerButton) {
-    registerButton.addEventListener("click", () => {
+    registerButton.addEventListener("click", (e) => {
+      e.preventDefault()
       const registerPopupOverlay = document.getElementById("registerPopupOverlay")
       if (registerPopupOverlay) {
         registerPopupOverlay.classList.remove("hidden")
