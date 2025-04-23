@@ -16,55 +16,27 @@
   <link rel="stylesheet" href="CSS/cart.css" />
 
   <script src="JavaScript/Common/context_path.js"></script>
-
   <script defer type="module" src="JavaScript/Common/header.js"></script>
   <script defer type="module" src="JavaScript/Common/footer.js"></script>
-
   <script defer type="module" src="JavaScript/cart.js"></script>
 </head>
 <body>
-<header id="siteHeader">
-  <!-- Header will be injected here by JS -->
-</header>
+<header id="siteHeader"></header>
 
 <main class="container">
   <h1 class="center-title">Shopping Cart</h1>
 
-  <button id="truncateCartButton" aria-label="Clear cart">
-    Clear Cart
-  </button>
-
-  <section id="cartItems" class="cart-items-list">
-    <!-- Cart Items will be injected here by JS -->
-    <div class="loading-container">
-      <div class="loading-spinner" aria-label="Loading cart items"></div>
-    </div>
-  </section>
-
-  <div class="total">
-    <p>
-      <strong>Number of Different Books:</strong>
-      <span id="numberOfDifferentBooks">0</span>
-    </p>
-
-    <p>
-      <strong>Total Number of Books:</strong>
-      <span id="totalNumberOfBooks">0</span>
-    </p>
-
-    <p>
-      <strong>Subtotal:</strong>
-      <span id="subtotalAmount">0.00 EGP</span>
-    </p>
+  <div id="emptyCartMessage" class="empty-cart hidden">
+    <p>Your cart is empty.</p>
+    <a href="/products.html" class="continue-shopping">Browse Books</a>
   </div>
 
-  <button id="checkoutButton" class="checkout-button" aria-label="Proceed to checkout">
-    Proceed to Checkout
-  </button>
+  <section class="cart-content">
+    <div id="cartItems" class="cart-items-list"></div>
+    <aside id="cartSummary" class="cart-summary"></aside>
+  </section>
 </main>
 
-<footer id="siteFooter">
-  <!-- Footer will be injected here by JS -->
-</footer>
+<footer id="siteFooter"></footer>
 </body>
 </html>
