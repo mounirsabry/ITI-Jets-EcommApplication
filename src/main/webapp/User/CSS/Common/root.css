@@ -1,0 +1,10 @@
+:root {
+  --main-border: 1px solid black;
+  --main-border-radius: 8px;
+  --main-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  /* Screen Sizes, Cannot be used directly in media query, left for reference. */
+  --main-big-screen-width: 1200px;
+  --main-medium-screen-width: 820px;
+  --main-small-screen-width: 520px;
+}

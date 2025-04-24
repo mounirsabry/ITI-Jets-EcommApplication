@@ -1,0 +1,61 @@
+/* Orders List Styles */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual Order Card */
+.order-item {
+  width: 100%;
+  padding: 15px;
+  background: white;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
+  box-shadow: var(--main-box-shadow);
+}
+
+/* Order Details */
+.order-details h2 {
+  font-size: 1.2em;
+  color: #333;
+}
+
+.order-details p {
+  margin: 5px 0;
+  font-size: 0.95em;
+  color: #666;
+}
+
+.order-details p strong {
+  font-weight: bold;
+}
+
+/* View Order Button */
+.view-order-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.view-order-button:hover {
+  background-color: #218838;
+}
+
+/* Responsive adjustments */
+@media (max-width: 820px) {
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .view-order-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

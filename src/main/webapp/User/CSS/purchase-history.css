@@ -1,0 +1,76 @@
+main .back-button:hover {
+  background-color: #0056b3;
+}
+
+/* History List Styles */
+main .history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Each history item card */
+main .history-item {
+  background: #fff;
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--main-box-shadow);
+}
+
+/* History details */
+main .history-details {
+  flex: 1;
+}
+
+main .history-details h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+main .history-details p {
+  margin: 5px 0;
+  font-size: 0.95em;
+  color: #666;
+}
+
+main .history-details p strong {
+  font-weight: bold;
+}
+
+/* Download Receipt Button */
+main .download-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
+
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+main .download-button:hover {
+  background-color: #218838;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  main .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  main .download-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

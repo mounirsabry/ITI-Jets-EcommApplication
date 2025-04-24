@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Purchase History | Book Alley</title>
+
+    <script type="module">
+        import LoadingOverlay from "./JavaScript/Common/LoadingOverlay.js";
+
+        const loadingOverlay = new LoadingOverlay();
+        loadingOverlay.createAndDisplay();
+
+        window.addEventListener('load', () => {
+            loadingOverlay.remove();
+        });
+    </script>
+
+    <link rel="stylesheet" href="CSS/Common/reset.css"/>
+    <link rel="stylesheet" href="CSS/Common/root.css"/>
+    <link rel="stylesheet" href="CSS/Common/header.css"/>
+    <link rel="stylesheet" href="CSS/Common/footer.css"/>
+    <link rel="stylesheet" href="CSS/Common/main.css"/>
+    <link rel="stylesheet" href="CSS/Common/MessagePopup.css"/>
+
+    <link rel="stylesheet" href="CSS/purchase-history.css"/>
+
+    <script src="JavaScript/Common/context_path.js"></script>
+
+    <script defer type="module" src="JavaScript/Common/header.js"></script>
+    <script defer type="module" src="JavaScript/Common/footer.js"></script>
+
+    <script defer type="module" src="JavaScript/purchase-history.js"></script>
+</head>
+<body>
+<header id="siteHeader">
+    <!-- Header will be injected here by JS -->
+</header>
+
+<main>
+    <button id="backToProfile" class="back-button">Back to Profile</button>
+
+    <h1 class="center-title">Purchase History</h1>
+    <section id="historyList" class="history-list">
+        <!-- History items will be injected here by JS -->
+    </section>
+</main>
+
+<footer id="siteFooter">
+    <!-- Footer will be injected here by JS -->
+</footer>
+</body>
+</html>

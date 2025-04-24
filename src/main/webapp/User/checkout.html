@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Checkout | Book Alley</title>
+
+    <script type="module">
+        import LoadingOverlay from "./JavaScript/Common/LoadingOverlay.js";
+
+        const loadingOverlay = new LoadingOverlay();
+        loadingOverlay.createAndDisplay();
+
+        window.addEventListener('load', () => {
+            loadingOverlay.remove();
+        });
+    </script>
+
+    <link rel="stylesheet" href="CSS/Common/reset.css"/>
+    <link rel="stylesheet" href="CSS/Common/root.css"/>
+    <link rel="stylesheet" href="CSS/Common/header.css"/>
+    <link rel="stylesheet" href="CSS/Common/footer.css"/>
+    <link rel="stylesheet" href="CSS/Common/main.css"/>
+    <link rel="stylesheet" href="CSS/Common/MessagePopup.css"/>
+    <link rel="stylesheet" href="CSS/checkout.css"/>
+    <script src="JavaScript/Common/context_path.js"></script>
+    <script defer type="module" src="JavaScript/Common/header.js"></script>
+    <script defer type="module" src="JavaScript/Common/footer.js"></script>
+    <script defer type="module" src="JavaScript/checkout.js"></script>
+</head>
+<body>
+<header id="siteHeader">
+    <!-- Header will be injected here by JS -->
+</header>
+
+<main>
+    <button id="backToCart" class="back-button">Back to Cart</button>
+
+    <section id="orderSummary" class="order-summary">
+        <h2>Order Summary</h2>
+        <div class="order-totals">
+            <p><strong>Subtotal:</strong> <span id="subtotal">0</span> EGP</p>
+            <p><strong>Shipping Fee:</strong> <span id="shippingFee">0</span> EGP</p>
+            <hr/>
+            <p class="total"><strong>Total Amount:</strong> <span id="totalAmount">0</span> EGP</p>
+        </div>
+    </section>
+
+    <section id="shippingInfo" class="shipping-info">
+        <h2>Shipping Information</h2>
+        <p><strong>Address:</strong> <span id="address">Loading...</span></p>
+    </section>
+
+    <section id="paymentInfo" class="payment-info">
+        <h2>Payment Method</h2>
+
+        <div class="payment-method-selector">
+            <label>
+                <input type="radio" name="paymentMethod" value="creditCard" checked>
+                Credit Card
+            </label>
+            <label>
+                <input type="radio" name="paymentMethod" value="accountBalance">
+                Account Balance (<span id="accountBalance">0.00</span> EGP)
+            </label>
+        </div>
+
+        <div id="creditCardForm">
+            <h3>Credit Card Information</h3>
+            <form id="paymentForm">
+                <label for="nameOnCard">Name on Card:</label>
+                <input type="text" id="nameOnCard" name="nameOnCard" required>
+
+                <label for="cardNumber">Card Number:</label>
+                <input type="text" id="cardNumber" name="cardNumber" required>
+
+                <div class="expiry-date-container">
+                    <div>
+                        <label for="expiryMonth">Expiry Month:</label>
+                        <select id="expiryMonth" name="expiryMonth" required>
+                            <option value="" disabled selected>MM</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expiryYear">Expiry Year:</label>
+                        <select id="expiryYear" name="expiryYear" required>
+                            <option value="" disabled selected>YY</option>
+                            <!-- Years will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+
+                <label for="cvc">CVC:</label>
+                <input type="text" id="cvc" name="cvc" required>
+            </form>
+        </div>
+
+        <div id="balanceNotice" style="display: none;">
+            <p>The amount will be deducted from your account balance.</p>
+            <p>Current Balance: <span id="currentBalanceDisplay">0.00</span> EGP</p>
+            <p>Amount to Deduct: <span id="deductionAmount">0.00</span> EGP</p>
+        </div>
+    </section>
+
+    <button id="placeOrderButton" class="place-order-button">
+        Place Order
+    </button>
+</main>
+
+<footer id="siteFooter">
+    <!-- Footer will be injected here by JS -->
+</footer>
+</body>
+</html>
