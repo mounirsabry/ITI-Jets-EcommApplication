@@ -31,10 +31,8 @@
   font-size: 0.9rem;
 }
 
-#backToOrdersButton::before {
-  content: "\f060";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+#backToOrdersButton i {
+  font-size: 1.1rem;
 }
 
 #backToOrdersButton:hover {
@@ -53,7 +51,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--spacing-sm);
-  border-left: 3px solid var(--primary-color);
 }
 
 #orderDetails p {
@@ -78,17 +75,13 @@
   position: relative;
   padding-bottom: var(--spacing-xs);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.order-items-section h2::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 2px;
-  background: var(--primary-color);
-  border-radius: 2px;
+.order-items-section h2 i {
+  font-size: 1.2rem;
 }
 
 /* Order Items List */
@@ -202,7 +195,6 @@
   border-radius: var(--main-border-radius);
   margin-top: var(--spacing-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 3px solid var(--primary-color);
 }
 
 .order-summary h2 {
@@ -212,17 +204,13 @@
   position: relative;
   padding-bottom: var(--spacing-xs);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.order-summary h2::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 2px;
-  background: var(--primary-color);
-  border-radius: 2px;
+.order-summary h2 i {
+  font-size: 1.2rem;
 }
 
 .order-summary-details {

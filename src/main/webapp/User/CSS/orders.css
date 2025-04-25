@@ -17,7 +17,6 @@
   border-radius: var(--main-border-radius);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-normal);
-  border-left: 3px solid var(--primary-color);
 }
 
 .order-item:hover {

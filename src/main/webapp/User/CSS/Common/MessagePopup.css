@@ -1,72 +1,94 @@
-/* Main Message Container */
+/* Message Popup Styles */
 .popup-message-container {
   position: fixed;
-  top: -100px; /* Initially hidden above the viewport */
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 300px;
-  max-width: 80%;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: top 0.5s ease-in-out;
-  z-index: 2000;
-}
-
-/* Different styles for message types */
-.popup-message-info {
-  background: rgba(59, 130, 246, 0.9); /* Blue */
-}
-
-.popup-message-error {
-  background: rgba(239, 68, 68, 0.9); /* Red */
-}
-
-/* Show class to slide down the message */
-.popup-message-container.show {
   top: 20px;
+  right: 20px;
+  max-width: 350px;
+  min-width: 280px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateX(120%);
+  transition: transform 0.3s ease-out;
+  overflow: hidden;
 }
 
-/* Close Button */
+.popup-message-container.show {
+  transform: translateX(0);
+}
+
+.popup-message-container::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.popup-message-info::before {
+  background-color: var(--primary-color);
+}
+
+.popup-message-error::before {
+  background-color: var(--error);
+}
+
+.popup-message-text {
+  margin: 0;
+  padding-right: 16px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
 .popup-close-button {
   background: none;
   border: none;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
   cursor: pointer;
-  margin-left: 10px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .popup-message-container {
-    max-width: 75%;
-    font-size: 0.95rem;
-  }
+.popup-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
 }
 
-@media (max-width: 820px) {
-  .popup-message-container {
-    max-width: 90%;
-    font-size: 0.9rem;
-  }
+.popup-message-info .popup-message-text::before {
+  content: "\f05a";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
+.popup-message-error .popup-message-text::before {
+  content: "\f06a";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--error);
+  margin-right: 8px;
 }
 
 @media (max-width: 520px) {
   .popup-message-container {
-    max-width: 95%;
-    font-size: 0.85rem;
-    padding: 12px 16px;
-  }
-  .popup-close-button {
-    font-size: 1.2rem;
+    left: 20px;
+    right: 20px;
+    max-width: none;
   }
 }

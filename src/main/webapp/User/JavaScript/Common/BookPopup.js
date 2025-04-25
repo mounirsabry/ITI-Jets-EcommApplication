@@ -85,7 +85,8 @@ const displayProduct = (book, updateCallback = null) => {
     imageContainer.appendChild(nextButton)
 
     // Navigation event listeners
-    prevButton.addEventListener("click", () => {
+    prevButton.addEventListener("click", (e) => {
+      e.stopPropagation()
       if (currentImageIndex > 0) {
         currentImageIndex--
         imageElement.src = images[currentImageIndex].url
@@ -95,7 +96,8 @@ const displayProduct = (book, updateCallback = null) => {
       }
     })
 
-    nextButton.addEventListener("click", () => {
+    nextButton.addEventListener("click", (e) => {
+      e.stopPropagation()
       if (currentImageIndex < images.length - 1) {
         currentImageIndex++
         imageElement.src = images[currentImageIndex].url
@@ -163,7 +165,8 @@ const displayProduct = (book, updateCallback = null) => {
   document.body.style.overflow = "hidden"
 
   // Close modal when clicking close button
-  closeButton.addEventListener("click", () => {
+  closeButton.addEventListener("click", (e) => {
+    e.stopPropagation()
     document.body.removeChild(overlay)
     document.body.style.overflow = ""
   })
@@ -171,6 +174,7 @@ const displayProduct = (book, updateCallback = null) => {
   // Close modal when clicking outside
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) {
+      e.stopPropagation()
       document.body.removeChild(overlay)
       document.body.style.overflow = ""
     }

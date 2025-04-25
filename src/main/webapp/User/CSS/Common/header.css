@@ -1,8 +1,8 @@
-/* header.css */
+/* Header Styles */
 #siteHeader {
   display: flex;
   align-items: center;
-  background-color: var(--bg-primary);
+  background-color: white;
   padding: var(--spacing-md) var(--spacing-xl);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   position: sticky;
@@ -15,11 +15,11 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex: 1;
+  margin-right: var(--spacing-xl);
 }
 
 #siteHeader .logo-container img {
-  height: 50px;
+  height: 40px;
   cursor: pointer;
   border-radius: var(--main-border-radius);
   transition: transform var(--transition-normal);
@@ -36,20 +36,19 @@
   color: var(--primary-color);
   transition: color var(--transition-normal);
   margin: 0;
+  cursor: pointer;
 }
 
 #siteHeader .site-title:hover {
   color: var(--primary-dark);
-  cursor: pointer;
 }
 
-/* Navigation links - centered */
+/* Main navigation - following UX guidelines */
 #siteHeader .navbar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  flex: 2;
+  gap: var(--spacing-md);
+  flex: 1;
 }
 
 #siteHeader .navbar a {
@@ -61,6 +60,17 @@
   border-radius: var(--main-border-radius);
   transition: all var(--transition-normal);
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+#siteHeader .navbar a i {
+  font-size: 1.1rem;
+  display: inline-block !important;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 4px;
 }
 
 #siteHeader .navbar a::after {
@@ -88,50 +98,40 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  flex: 1;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
-/* Wishlist link styling */
-#siteHeader .auth-container .wishlist-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-primary);
-  font-weight: 500;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--main-border-radius);
-  transition: all var(--transition-normal);
-}
-
-#siteHeader .auth-container .wishlist-link:hover {
-  background-color: rgba(79, 70, 229, 0.1);
-  color: var(--primary-color);
-  transform: translateY(-2px);
-}
-
+/* Wishlist and Cart link styling */
+#siteHeader .auth-container .wishlist-link,
+#siteHeader .auth-container .cart-link,
 #siteHeader .auth-container .profile-link {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
   text-decoration: none;
   color: var(--text-primary);
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--main-border-radius);
   transition: all var(--transition-normal);
+  gap: var(--spacing-xs);
 }
 
+#siteHeader .auth-container .wishlist-link i,
+#siteHeader .auth-container .cart-link i,
+#siteHeader .auth-container .profile-link i {
+  font-size: 1.1rem;
+  display: inline-block !important;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+#siteHeader .auth-container .wishlist-link:hover,
+#siteHeader .auth-container .cart-link:hover,
 #siteHeader .auth-container .profile-link:hover {
   background-color: rgba(79, 70, 229, 0.1);
   color: var(--primary-color);
   transform: translateY(-2px);
-}
-
-#siteHeader .auth-container .profile-link img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
 }
 
 #siteHeader .auth-button {
@@ -140,12 +140,15 @@
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 #siteHeader .login-button {
   background-color: transparent;
   color: var(--primary-color);
-  border: 2px solid var(--primary-color);
+  border: 1px solid var(--primary-color);
 }
 
 #siteHeader .login-button:hover {
@@ -156,50 +159,28 @@
 #siteHeader .register-button {
   background-color: var(--primary-color);
   color: white;
-  border: 2px solid var(--primary-color);
+  border: 1px solid var(--primary-color);
 }
 
 #siteHeader .register-button:hover {
   background-color: var(--primary-dark);
   border-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: var(--main-box-shadow);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #siteHeader .logout-button {
   background-color: var(--error);
   color: white;
-  border: 2px solid var(--error);
+  border: 1px solid var(--error);
 }
 
 #siteHeader .logout-button:hover {
   background-color: #dc2626;
   border-color: #dc2626;
   transform: translateY(-2px);
-  box-shadow: var(--main-box-shadow);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
-#siteHeader .cart-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  transition: all var(--transition-normal);
-}
-
-#siteHeader .cart-button:hover {
-  background-color: rgba(79, 70, 229, 0.1);
-  transform: translateY(-2px);
-}
-
-#siteHeader .cart-button img {
-  width: 24px;
-  height: 24px;
-}
-
-/* Removed the cart-count class that was showing the red dot */
 
 /* Auth Modal Styles */
 .auth-modal-overlay {
@@ -208,13 +189,13 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 @keyframes fadeIn {
@@ -229,13 +210,13 @@
 .auth-modal {
   position: relative;
   width: 90%;
-  max-width: 450px;
-  background: var(--bg-primary);
-  padding: var(--spacing-xl);
+  max-width: 420px;
+  background: white;
+  padding: var(--spacing-lg);
   border-radius: var(--main-border-radius);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.2s ease-out;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -254,15 +235,16 @@
 .auth-modal-content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .auth-modal-content h2 {
   text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: var(--spacing-lg);
+  font-size: 1.6rem;
+  margin-bottom: var(--spacing-md);
   color: var(--primary-color);
   font-family: var(--font-heading);
+  font-weight: 600;
 }
 
 .auth-modal-content .form-group {
@@ -275,12 +257,13 @@
   margin-bottom: var(--spacing-xs);
   font-weight: 500;
   color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
 .auth-modal-content .form-group input {
   width: 100%;
   padding: var(--spacing-md);
-  border: 1px solid var(--bg-accent);
+  border: 1px solid #e5e7eb;
   border-radius: var(--main-border-radius);
   font-size: 1rem;
   transition: all var(--transition-normal);
@@ -289,7 +272,7 @@
 
 .auth-modal-content .form-group input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
   outline: none;
 }
 
@@ -318,18 +301,18 @@
 .auth-modal-buttons .submit-button:hover {
   background-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .auth-modal-buttons .cancel-button {
-  background-color: var(--bg-accent);
+  background-color: #f3f4f6;
   color: var(--text-primary);
 }
 
 .auth-modal-buttons .cancel-button:hover {
-  background-color: #d1d5db;
+  background-color: #e5e7eb;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .auth-close-button {
@@ -383,7 +366,6 @@
   #siteHeader {
     padding: var(--spacing-md);
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
   }
 
   .header-left {
@@ -391,11 +373,11 @@
   }
 
   #siteHeader .logo-container img {
-    height: 40px;
+    height: 36px;
   }
 
   #siteHeader .site-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   #siteHeader .navbar {
@@ -403,7 +385,6 @@
     width: 100%;
     justify-content: center;
     margin: var(--spacing-sm) 0;
-    flex: none;
   }
 
   #siteHeader .auth-container {
@@ -413,7 +394,7 @@
 
   .auth-modal {
     width: 95%;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
 }
 
@@ -423,11 +404,11 @@
   }
 
   #siteHeader .logo-container img {
-    height: 35px;
+    height: 32px;
   }
 
   #siteHeader .site-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   #siteHeader .navbar {

@@ -179,7 +179,8 @@ const createBookCard = (book) => {
       return
     }
 
-    // Fix: Call displayProduct directly
+    // Fix: Call displayProduct directly with stopPropagation
+    e.stopPropagation()
     displayProduct(book, updateCard)
   })
 
