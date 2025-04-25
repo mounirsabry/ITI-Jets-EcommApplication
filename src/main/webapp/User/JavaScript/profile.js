@@ -76,6 +76,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // DOM Elements
     const elements = {
+        // Profile sections
+        profileName: document.getElementById("profileName"),
+        profileEmail: document.getElementById("profileEmail"),
+        profileSections: document.querySelectorAll(".profile-section"),
+        navItems: document.querySelectorAll(".profile-nav-item"),
         // Navigation buttons
         viewOrdersButton: document.getElementById("viewOrders"),
         viewPurchaseHistoryButton: document.getElementById("viewPurchaseHistory"),
@@ -84,6 +89,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         popupOverlay: document.querySelector(".popup-overlay"),
         passwordPopup: document.getElementById("passwordPopup"),
         emailPopup: document.getElementById("emailPopup"),
+        rechargePopup: document.getElementById("rechargePopup"),
+        popupCloseButtons: document.querySelectorAll(".popup-close"),
         // Password change elements
         openChangePasswordPopupButton: document.getElementById("openChangePasswordPopupButton"),
         passwordChangeError: document.getElementById("passwordChangeError"),
@@ -109,12 +116,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Balance section
         balanceInput: document.getElementById("userBalance"),
         rechargeBalanceButton: document.getElementById("rechargeBalanceButton"),
-        // Balance recharge popup
-        rechargePopup: document.getElementById("rechargePopup"),
+        // Balance recharge form
         rechargeAmountInput: document.getElementById("rechargeAmount"),
         confirmRechargeButton: document.getElementById("confirmRecharge"),
         cancelRechargeButton: document.getElementById("cancelRecharge"),
-        // Balance recharge form
         nameOnCardInput: document.getElementById("rechargeNameOnCard"),
         cardNumberInput: document.getElementById("rechargeCardNumber"),
         expiryMonthSelect: document.getElementById("rechargeExpiryMonth"),
@@ -124,11 +129,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Check if critical DOM elements exist
     const missingElements = Object.entries(elements)
-        .filter(([key, value]) => !value && key !== 'popupOverlay') // Allow popupOverlay to be checked separately
+        .filter(([key, value]) => !value && key !== "popupOverlay") // Allow popupOverlay to be checked separately
         .map(([key]) => key);
     if (missingElements.length > 0) {
-        console.error(`Missing DOM elements: ${missingElements.join(', ')}`);
-        MessagePopup.show('Error: Page layout is broken. Some components are missing.', true);
+        console.error(`Missing DOM elements: ${missingElements.join(", ")}`);
+        MessagePopup.show("Error: Page layout is broken. Some components are missing.", true);
         return;
     }
 
@@ -147,6 +152,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupEventListeners();
     await loadUserProfile();
 
+    // Tab navigation
+    function setupTabNavigation() {
+        elements.navItems.forEach((item) => {
+            item.addEventListener("click", function () {
+                const sectionId = this.getAttribute("data-section");
+
+                // If it's a navigation link, handle it separately
+                if (!sectionId) return;
+
+                // Remove active class from all nav items and sections
+                elements.navItems.forEach((navItem) => navItem.classList.remove("active"));
+                elements.profileSections.forEach((section) => section.classList.remove("active"));
+
+                // Add active class to clicked nav item and corresponding section
+                this.classList.add("active");
+                const activeSection = document.getElementById(sectionId);
+                if (activeSection) {
+                    activeSection.classList.add("active");
+                    // Scroll to the top of the section for better UX
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+    }
+
     async function loadUserProfile() {
         try {
             const response = await ProfileManager.getProfile(userObject.userID);
@@ -162,8 +192,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             updateUserProfile(response.data);
         } catch (error) {
-            console.error('Error loading profile:', error);
-            MessagePopup.show('Failed to load profile due to a network error.', true);
+            console.error("Error loading profile:", error);
+            MessagePopup.show("Failed to load profile due to a network error.", true);
         }
     }
 
@@ -172,48 +202,82 @@ document.addEventListener("DOMContentLoaded", async () => {
             const parsedUser = User.fromJSON(userData);
             UserAuthTracker.userObject = parsedUser;
 
+            // Update profile header
+            if (elements.profileName) {
+                elements.profileName.textContent = parsedUser.userName || "User";
+            }
+
+            if (elements.profileEmail) {
+                elements.profileEmail.textContent = parsedUser.email || "";
+            }
+
             // Update UI with null checks
             if (elements.displayEmail) {
-                elements.displayEmail.textContent = parsedUser.email || '';
+                elements.displayEmail.textContent = parsedUser.email || "";
             }
             if (elements.editUserName) {
-                elements.editUserName.value = parsedUser.userName || '';
+                elements.editUserName.value = parsedUser.userName || "";
             }
             if (elements.editPhone) {
-                elements.editPhone.value = parsedUser.phoneNumber || '';
+                elements.editPhone.value = parsedUser.phoneNumber || "";
             }
             if (elements.editAddress) {
-                elements.editAddress.value = parsedUser.address || '';
+                elements.editAddress.value = parsedUser.address || "";
             }
             if (elements.editBirthDate && parsedUser.birthDate) {
                 const birthDate = new Date(parsedUser.birthDate);
-                elements.editBirthDate.value = isNaN(birthDate) ? '' : birthDate.toISOString().split("T")[0];
+                elements.editBirthDate.value = isNaN(birthDate) ? "" : birthDate.toISOString().split("T")[0];
             }
             if (elements.balanceInput) {
-                elements.balanceInput.value = parsedUser.accountBalance != null ? `${parsedUser.accountBalance} EGP` : '0 EGP';
+                elements.balanceInput.textContent = parsedUser.accountBalance != null ? `${parsedUser.accountBalance} EGP` : "0 EGP";
             }
         } catch (error) {
             console.error("Could not parse user object:", error);
-            MessagePopup.show('Error: Failed to update profile display.', true);
+            MessagePopup.show("Error: Failed to update profile display.", true);
         }
     }
 
     function setupEventListeners() {
+        // Tab navigation
+        setupTabNavigation();
+
         // Navigation
         if (elements.viewOrdersButton) {
-            elements.viewOrdersButton.addEventListener("click", () => navigateTo(URL_Mapper.ORDERS));
+            elements.viewOrdersButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                navigateTo(URL_Mapper.ORDERS);
+            });
         }
         if (elements.viewPurchaseHistoryButton) {
-            elements.viewPurchaseHistoryButton.addEventListener("click", () => navigateTo(URL_Mapper.PURCHASE_HISTORY));
+            elements.viewPurchaseHistoryButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                navigateTo(URL_Mapper.PURCHASE_HISTORY);
+            });
         }
         if (elements.viewWishList) {
-            elements.viewWishList.addEventListener("click", () => navigateTo(URL_Mapper.WISH_LIST));
+            elements.viewWishList.addEventListener("click", (e) => {
+                e.preventDefault();
+                navigateTo(URL_Mapper.WISH_LIST);
+            });
         }
 
         // Popups
         if (elements.popupOverlay) {
             elements.popupOverlay.addEventListener("click", handleOverlayClick);
         }
+
+        // Close popup buttons
+        elements.popupCloseButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const popup = button.closest(".popup");
+                if (popup) {
+                    const popupId = popup.id;
+                    const type = popupId.replace("Popup", "").toLowerCase();
+                    closePopup(type);
+                }
+            });
+        });
+
         if (elements.openChangePasswordPopupButton) {
             elements.openChangePasswordPopupButton.addEventListener("click", () => openPopup("password"));
         }
@@ -279,14 +343,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function closePopup(type) {
         const popup = elements[`${type}Popup`];
-        const errorElement = elements[`${type}Error`] || elements[`${type}ChangeError`];
+        const errorElement = elements[`${type}ChangeError`] || elements[`${type}Error`];
 
         if (!popup) {
             console.error(`Cannot close ${type} popup: Popup element is missing.`);
             return;
         }
 
-        if (type === "password" && elements.currentPasswordInput && elements.newPasswordInput && elements.confirmPasswordInput) {
+        if (
+            type === "password" &&
+            elements.currentPasswordInput &&
+            elements.newPasswordInput &&
+            elements.confirmPasswordInput
+        ) {
             elements.currentPasswordInput.value = "";
             elements.newPasswordInput.value = "";
             elements.confirmPasswordInput.value = "";
@@ -294,6 +363,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             elements.emailInput.value = "";
         } else if (type === "recharge" && elements.rechargeAmountInput) {
             elements.rechargeAmountInput.value = "";
+            if (elements.nameOnCardInput) elements.nameOnCardInput.value = "";
+            if (elements.cardNumberInput) elements.cardNumberInput.value = "";
+            if (elements.cvcInput) elements.cvcInput.value = "";
         }
 
         if (errorElement) {
@@ -340,8 +412,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 closePopup("password");
             }
         } catch (error) {
-            console.error('Error updating password:', error);
-            MessagePopup.show('Failed to update password due to a network error.', true);
+            console.error("Error updating password:", error);
+            MessagePopup.show("Failed to update password due to a network error.", true);
         }
     }
 
@@ -377,13 +449,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (elements.displayEmail) {
                     elements.displayEmail.textContent = newEmail;
                 }
+                if (elements.profileEmail) {
+                    elements.profileEmail.textContent = newEmail;
+                }
                 userObject.email = newEmail;
                 UserAuthTracker.userObject = userObject;
                 closePopup("email");
             }
         } catch (error) {
-            console.error('Error updating email:', error);
-            MessagePopup.show('Failed to update email due to a network error.', true);
+            console.error("Error updating email:", error);
+            MessagePopup.show("Failed to update email due to a network error.", true);
         }
     }
 
@@ -425,14 +500,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             MessagePopup.show("Profile details updated successfully.");
             updateUserProfile(response.data);
         } catch (error) {
-            console.error('Error updating profile:', error);
-            MessagePopup.show('Failed to update profile due to a network error.', true);
+            console.error("Error updating profile:", error);
+            MessagePopup.show("Failed to update profile due to a network error.", true);
         }
     }
 
     async function handleRechargeBalance() {
-        if (!elements.rechargeAmountInput || !elements.nameOnCardInput || !elements.cardNumberInput ||
-            !elements.expiryMonthSelect || !elements.expiryYearSelect || !elements.cvcInput) {
+        if (
+            !elements.rechargeAmountInput ||
+            !elements.nameOnCardInput ||
+            !elements.cardNumberInput ||
+            !elements.expiryMonthSelect ||
+            !elements.expiryYearSelect ||
+            !elements.cvcInput
+        ) {
             MessagePopup.show("Error: Recharge form is incomplete.", true);
             return;
         }
@@ -493,12 +574,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             userObject.accountBalance += amount;
             if (elements.balanceInput) {
-                elements.balanceInput.value = `${userObject.accountBalance} EGP`;
+                elements.balanceInput.textContent = `${userObject.accountBalance} EGP`;
             }
             UserAuthTracker.userObject = userObject;
         } catch (error) {
-            console.error('Error recharging balance:', error);
-            MessagePopup.show('Failed to recharge balance due to a network error.', true);
+            console.error("Error recharging balance:", error);
+            MessagePopup.show("Failed to recharge balance due to a network error.", true);
         }
     }
 });

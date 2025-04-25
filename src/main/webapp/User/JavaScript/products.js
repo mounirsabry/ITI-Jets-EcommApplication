@@ -27,6 +27,16 @@ document.addEventListener("DOMContentLoaded", async function() {
         pageIndicator: document.getElementById('pageIndicator')
     };
 
+    // Validate DOM elements
+    const missingElements = Object.entries(elements)
+        .filter(([key, value]) => !value)
+        .map(([key]) => key);
+    if (missingElements.length > 0) {
+        console.error(`Missing DOM elements: ${missingElements.join(", ")}`);
+        MessagePopup.show("Error: Page layout is broken. Some components are missing.", true);
+        return;
+    }
+
     // State variables
     let allBooksPossiblySearched = null;
     const currentDisplayedMap = new Map();
@@ -38,6 +48,11 @@ document.addEventListener("DOMContentLoaded", async function() {
     await loadInitialBooks();
 
     function populateGenreFilter() {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = 'all';
+        defaultOption.textContent = 'All Genres';
+        elements.genreFilter.appendChild(defaultOption);
+
         Object.values(Genres).forEach(genre => {
             const option = document.createElement('option');
             option.value = genre;
@@ -47,8 +62,14 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
 
     function handleIncomingResponse(response) {
-        if (!response) return;
-        if (!response.success) return MessagePopup.show(response.data, true);
+        if (!response) {
+            MessagePopup.show("Unknown error: Could not load books.", true);
+            return;
+        }
+        if (!response.success) {
+            MessagePopup.show(response.data || "Failed to load books.", true);
+            return;
+        }
 
         allBooksPossiblySearched = parseBooksFromData(response.data);
         filterBooks();
@@ -102,7 +123,8 @@ document.addEventListener("DOMContentLoaded", async function() {
         const booksToDisplay = booksArray.slice(startIndex, startIndex + BOOKS_PER_PAGE);
 
         booksToDisplay.forEach(book => {
-            elements.booksList.appendChild(createBookCard(book));
+            const bookCard = createBookCard(book);
+            elements.booksList.appendChild(bookCard);
         });
     }
 
@@ -132,16 +154,17 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     });
 
-    elements.searchButton.addEventListener('click', async () => {
+    elements.searchButton.addEventListener('click', async (e) => {
+        e.preventDefault();
         const searchingLoadingOverlay = new LoadingOverlay();
         searchingLoadingOverlay.createAndDisplay('Searching...');
 
         const searchTerm = elements.searchBar.value.trim().toLowerCase();
         if (!searchTerm) {
             searchingLoadingOverlay.updateMessage('Loading Books List...');
-            const response = await loadInitialBooks();
+            await loadInitialBooks();
             searchingLoadingOverlay.remove();
-            return response;
+            return;
         }
 
         const response = await BooksManager.search(searchTerm);
@@ -178,4 +201,10 @@ document.addEventListener("DOMContentLoaded", async function() {
     elements.pageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') goToPage(e.target.value);
     });
+
+    // Prevent any global click handlers from interfering with book cards
+    document.addEventListener('click', (e) => {
+        // Only log for debugging purposes; no action needed
+        console.log("Global click event captured on:", e.target);
+    }, { capture: true });
 });
