@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="CSS/Common/main.css"/>
     <link rel="stylesheet" href="CSS/Common/MessagePopup.css"/>
     <link rel="stylesheet" href="CSS/Common/BookPopup.css"/>
-
     <link rel="stylesheet" href="CSS/order-details.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <script src="JavaScript/Common/context_path.js"></script>
 
@@ -39,36 +39,39 @@
 </header>
 
 <main>
-    <button id="backToOrdersButton" class="back-button">
-        Back to Orders
-    </button>
-
-    <h1 id="orderTitle" class="center-title">
-        <!-- Order title/ID will be injected here by JS -->
-    </h1>
-
-    <section id="orderDetails" class="order-details">
-        <!-- Order Details will be injected here by JS -->
-    </section>
-
-    <section id="orderItems" class="order-items-list">
-        <!-- Order Items will be injected here by JS -->
-    </section>
-
-    <div class="order-summary">
-        <p>
-            <strong>Subtotal:</strong>
-            <span id="subtotal">0.00</span> EGP
-        </p>
-        <p>
-            <strong>Shipping Fee:</strong>
-            <span id="shippingFee">0.00</span> EGP
-        </p>
-        <p class="total">
-            <strong>Total Amount:</strong>
-            <span id="totalAmount">0.00</span> EGP
-        </p>
+    <div class="order-header">
+        <h1 id="orderTitle">Order Details</h1>
+        <button id="backToOrdersButton">Back to Orders</button>
     </div>
+
+    <section id="orderDetails">
+        <!-- Order details will be injected here by JS -->
+    </section>
+
+    <section class="order-items-section">
+        <h2>Order Items</h2>
+        <div id="orderItems" class="order-items-list">
+            <!-- Order items will be injected here by JS -->
+        </div>
+    </section>
+
+    <section class="order-summary">
+        <h2>Order Summary</h2>
+        <div class="order-summary-details">
+            <p>
+                <strong>Subtotal:</strong>
+                <span id="subtotal">0.00</span> EGP
+            </p>
+            <p>
+                <strong>Shipping Fee:</strong>
+                <span id="shippingFee">0.00</span> EGP
+            </p>
+            <p>
+                <strong>Total Amount:</strong>
+                <span id="totalAmount">0.00</span> EGP
+            </p>
+        </div>
+    </section>
 </main>
 
 <footer id="siteFooter">
