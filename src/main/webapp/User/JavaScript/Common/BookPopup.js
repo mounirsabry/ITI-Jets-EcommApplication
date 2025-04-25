@@ -1,273 +1,191 @@
-'use strict';
+import URL_Mapper from "../Utils/URL_Mapper.js"
 
-import URL_Mapper from '../Utils/URL_Mapper.js';
-import MessagePopup from "./MessagePopup.js";
+// Function to display a product popup
+const displayProduct = (book, updateCallback = null) => {
+  // Check if there's already a popup open and remove it
+  const existingOverlay = document.getElementById("bookPopupOverlay")
+  if (existingOverlay) {
+    document.body.removeChild(existingOverlay)
+    document.body.style.overflow = ""
+  }
 
-import {
-    appendAddToCartControls,
-    appendStockValue, createWishListButton,
-    updateAddToCartControls,
-    updateStockValue
-} from "../Utils/bookUIFunctions.js";
+  // Create overlay
+  const overlay = document.createElement("div")
+  overlay.className = "popup-overlay"
+  overlay.setAttribute("id", "bookPopupOverlay")
 
-import BooksManager from "../Managers/BooksManager.js";
-import Book from "../Models/Book.js";
+  // Create modal
+  const modal = document.createElement("div")
+  modal.className = "popup-modal"
 
-export default function displayProduct(book,
-        updateOriginalBookCallback,
-        isInfoOnly = false, isWishListButtonVisible = true) {
+  // Close button
+  const closeButton = document.createElement("button")
+  closeButton.className = "close-popup"
+  closeButton.innerHTML = "&times;"
+  closeButton.setAttribute("aria-label", "Close popup")
 
-    if (isInfoOnly !== false && isInfoOnly !== true) {
-        throw new Error('Invalid value for isInfoOnly.');
-    }
+  // Image container
+  const imageContainer = document.createElement("div")
+  imageContainer.className = "image-container"
 
-    if (isWishListButtonVisible !== false && isWishListButtonVisible !== true) {
-        throw new Error('Invalid value for isWishListButtonVisible.');
-    }
+  // Get book images
+  const images = book.images || []
+  let currentImageIndex = 0
 
-    let bookImagesPaths = book.images.map(image => image.url);
+  // Find main image
+  const mainImageIndex = images.findIndex((img) => img.isMain)
+  if (mainImageIndex !== -1) {
+    currentImageIndex = mainImageIndex
+  }
 
-    let currentImageIndex = -1;
-    for (let i = 0; i < book.images.length; i++) {
-        if (book.images[i].isMain === true) {
-            currentImageIndex = i;
-            break;
-        }
-    }
+  // Create image element
+  const imageElement = document.createElement("img")
+  imageElement.className = "popup-image"
 
-    // Create the overlay (semi-transparent background)
-    const overlay = document.createElement('div');
-    overlay.className = 'popup-overlay';
+  // Set image source
+  if (images.length > 0) {
+    imageElement.src = images[currentImageIndex].url
+    imageElement.alt = book.title
+  } else {
+    imageElement.src = URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE
+    imageElement.alt = "No image available"
+  }
 
-    // Create the modal container
-    const modal = document.createElement('div');
-    modal.className = 'popup-modal';
+  // Add discount badge if applicable
+  if (book.discountedPercentage && book.discountedPercentage > 0) {
+    const discountBadge = document.createElement("div")
+    discountBadge.className = "discount-badge"
+    discountBadge.textContent = `-${book.discountedPercentage}%`
+    imageContainer.appendChild(discountBadge)
+  }
 
-    // Close button
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.className = 'close-popup';
-    closeButton.ariaLabel = 'Close';
-    closeButton.textContent = '×';
-    modal.appendChild(closeButton);
+  // Add image navigation if there are multiple images
+  if (images.length > 1) {
+    // Previous button
+    const prevButton = document.createElement("button")
+    prevButton.className = "image-nav prev"
+    prevButton.innerHTML = "&#10094;"
+    prevButton.setAttribute("aria-label", "Previous image")
+    prevButton.disabled = currentImageIndex === 0
 
-    // Image container
-    const imageContainer = document.createElement('div');
-    imageContainer.className = 'image-container';
-
-    // Previous image button
-    const prevButton = document.createElement('button');
-    prevButton.className = 'image-nav prev';
-    prevButton.ariaLabel = 'Previous Image';
-    prevButton.disabled = true;
-    prevButton.textContent = '<';
-    imageContainer.appendChild(prevButton);
-
-    // Image element
-    let imageSrc;
-    if (currentImageIndex !== -1) {
-        imageSrc = bookImagesPaths[currentImageIndex];
-    } else {
-        imageSrc = URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE;
-    }
-    const imageElement = document.createElement('img');
-    imageElement.src = imageSrc;
-    imageElement.alt = book.title;
-    imageElement.className = 'popup-image';
-    imageContainer.appendChild(imageElement);
-
-    // Next image button
-    const nextButton = document.createElement('button');
-    nextButton.className = 'image-nav next';
-    nextButton.ariaLabel = 'Next Image';
-    nextButton.textContent = '>';
-    imageContainer.appendChild(nextButton);
-
-    modal.appendChild(imageContainer);
+    // Next button
+    const nextButton = document.createElement("button")
+    nextButton.className = "image-nav next"
+    nextButton.innerHTML = "&#10095;"
+    nextButton.setAttribute("aria-label", "Next image")
+    nextButton.disabled = currentImageIndex === images.length - 1
 
     // Image indicator
-    let indicator;
-    if (bookImagesPaths?.length > 0) {
-        indicator = `Image ${currentImageIndex + 1} of ${bookImagesPaths.length}`;
-    } else {
-        indicator = 'Not Images Were Specified for this book.';
+    const imageIndicator = document.createElement("div")
+    imageIndicator.className = "image-indicator"
+    imageIndicator.textContent = `Image ${currentImageIndex + 1} of ${images.length}`
+
+    // Add navigation to container
+    imageContainer.appendChild(prevButton)
+    imageContainer.appendChild(nextButton)
+
+    // Navigation event listeners
+    prevButton.addEventListener("click", () => {
+      if (currentImageIndex > 0) {
+        currentImageIndex--
+        imageElement.src = images[currentImageIndex].url
+        imageIndicator.textContent = `Image ${currentImageIndex + 1} of ${images.length}`
+        prevButton.disabled = currentImageIndex === 0
+        nextButton.disabled = false
+      }
+    })
+
+    nextButton.addEventListener("click", () => {
+      if (currentImageIndex < images.length - 1) {
+        currentImageIndex++
+        imageElement.src = images[currentImageIndex].url
+        imageIndicator.textContent = `Image ${currentImageIndex + 1} of ${images.length}`
+        nextButton.disabled = currentImageIndex === images.length - 1
+        prevButton.disabled = false
+      }
+    })
+
+    // Add image indicator after image
+    modal.appendChild(imageIndicator)
+  }
+
+  // Add image to container
+  imageContainer.appendChild(imageElement)
+
+  // Book title
+  const titleElement = document.createElement("h2")
+  titleElement.textContent = book.title
+
+  // Book overview
+  const overviewElement = document.createElement("div")
+  overviewElement.className = "overview"
+  overviewElement.textContent = book.overview || "No overview available"
+
+  // Book details
+  const detailsElement = document.createElement("div")
+  detailsElement.className = "description"
+
+  // Calculate price with discount if applicable
+  let priceDisplay = `${book.price} EGP`
+  if (book.discountedPercentage && book.discountedPercentage > 0) {
+    const discountAmount = (book.price * book.discountedPercentage) / 100
+    const discountedPrice = book.price - discountAmount
+    priceDisplay = `<span class="original-price">${book.price} EGP</span> <span class="discounted-price">${discountedPrice.toFixed(2)} EGP</span>`
+  }
+
+  // Populate details
+  detailsElement.innerHTML = `
+    <p><strong>Author:</strong> ${book.author || "Unknown"}</p>
+    <p><strong>Genre:</strong> ${book.genre || "Unspecified"}</p>
+    <p><strong>Price:</strong> ${priceDisplay}</p>
+    <p><strong>ISBN:</strong> ${book.isbn || "N/A"}</p>
+    <p><strong>Publication Date:</strong> ${book.publicationDate || "Unknown"}</p>
+    <p><strong>Publisher:</strong> ${book.publisher || "Unknown"}</p>
+    <p><strong>Pages:</strong> ${book.pages || "Unknown"}</p>
+    <p><strong>Language:</strong> ${book.language || "Unknown"}</p>
+    <p><strong>Availability:</strong> ${book.isAvailable ? `<span class="in-stock">In Stock (${book.stock} available)</span>` : '<span class="out-stock">Out of Stock</span>'}</p>
+  `
+
+  // Assemble modal
+  modal.appendChild(closeButton)
+  modal.appendChild(imageContainer)
+  modal.appendChild(titleElement)
+  modal.appendChild(overviewElement)
+  modal.appendChild(detailsElement)
+
+  // Add modal to overlay
+  overlay.appendChild(modal)
+
+  // Add overlay to body
+  document.body.appendChild(overlay)
+
+  // Prevent scrolling of background
+  document.body.style.overflow = "hidden"
+
+  // Close modal when clicking close button
+  closeButton.addEventListener("click", () => {
+    document.body.removeChild(overlay)
+    document.body.style.overflow = ""
+  })
+
+  // Close modal when clicking outside
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      document.body.removeChild(overlay)
+      document.body.style.overflow = ""
     }
+  })
 
-    const imageIndicator = document.createElement('p');
-    imageIndicator.className = 'image-indicator';
-    imageIndicator.textContent = indicator;
-    modal.appendChild(imageIndicator);
-
-    // Book title
-    const titleElement = document.createElement('h2');
-    titleElement.textContent = book.title ? book.title : 'Not Specified';
-    modal.appendChild(titleElement);
-
-    // Book overview
-    const overviewElement = document.createElement('p');
-    overviewElement.textContent = `${book.overview ? book.overview : 'Not Specified'}`;
-    overviewElement.className = 'overview';
-    modal.appendChild(overviewElement);
-
-    // Book author
-    const authorElement = document.createElement('p');
-    authorElement.innerHTML = `<strong>By:</strong> ${book.author ? book.author : 'Not Specified'}`;
-    modal.appendChild(authorElement);
-
-    // Book genre
-    const genreElement = document.createElement('p');
-    genreElement.innerHTML = `<strong>Genre:</strong> ${book.genre ? book.genre : 'Not Specified'}`;
-    modal.appendChild(genreElement);
-
-    // Book price
-    const price = book.price ? `${book.price} EGP` : 'Not Specified';
-    const priceElement = document.createElement('p');
-    priceElement.innerHTML = `<strong>Price:</strong> ${price}`;
-    modal.appendChild(priceElement);
-
-    // Book publisher
-    const publisherElement = document.createElement('p');
-    publisherElement.innerHTML = `<strong>Publisher:</strong> ${book.publisher ? book.publisher : 'Not Specified'}`;
-    modal.appendChild(publisherElement);
-
-    // Book ISBN
-    const isbnElement = document.createElement('p');
-    isbnElement.innerHTML = `<strong>ISBN:</strong> ${book.isbn ? book.isbn : 'Not Specified'}`;
-    modal.appendChild(isbnElement);
-
-    // Book language
-    const languageElement = document.createElement('p');
-    languageElement.innerHTML = `<strong>Language:</strong> ${book.language ? book.language : 'Not Specified'}`;
-    modal.appendChild(languageElement);
-
-    // Book pages
-    const pagesElement = document.createElement('p');
-    pagesElement.innerHTML = `<strong>Pages:</strong> ${book.numberOfPages}`;
-    modal.appendChild(pagesElement);
-
-    // Book availability
-    const availabilityElement = document.createElement('p');
-    availabilityElement.innerHTML = `<strong>Availability:</strong> ${book.isAvailable ? 'Available' : 'Not Available'}`;
-    modal.appendChild(availabilityElement);
-
-    // Book description
-    const descriptionElement = document.createElement('p');
-    descriptionElement.innerHTML = `<strong>Description:</strong> ${book.description}`;
-    descriptionElement.className = 'description';
-    modal.appendChild(descriptionElement);
-
-    appendStockValue(modal, book);
-
-    if (isWishListButtonVisible) {
-        const wishListButton = createWishListButton(book);
-        modal.appendChild(wishListButton);
+  // Close modal on escape key
+  document.addEventListener("keydown", function escHandler(e) {
+    if (e.key === "Escape") {
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay)
+        document.body.style.overflow = ""
+      }
+      document.removeEventListener("keydown", escHandler)
     }
-
-    if (isInfoOnly === false) {
-        appendAddToCartControls(modal, book);
-    }
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    closeButton.addEventListener('click', () => {
-        document.body.removeChild(overlay);
-    });
-
-    // Clicking outside the modal closes the popup
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            document.body.removeChild(overlay);
-        }
-    });
-
-    // Update image function
-    function updateImage() {
-        if (currentImageIndex !== -1) {
-            imageElement.src = bookImagesPaths[currentImageIndex];
-            imageIndicator.textContent = `Image ${currentImageIndex + 1} of ${bookImagesPaths.length}`;
-            prevButton.disabled = currentImageIndex <= 0;
-            nextButton.disabled = currentImageIndex === bookImagesPaths.length - 1;
-        } else {
-            imageElement.src = `${URL_Mapper.ASSETS.FALLBACK_BOOK_IMAGE}`;
-            prevButton.disabled = true;
-            nextButton.disabled = true;
-        }
-    }
-
-    // Image navigation event listeners
-    prevButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (currentImageIndex > 0) {
-            currentImageIndex--;
-            updateImage();
-        }
-    });
-
-    nextButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (currentImageIndex < bookImagesPaths.length - 1) {
-            currentImageIndex++;
-            updateImage();
-        }
-    });
-    updateImage();
-
-    const updateBookDisplay = async function() {
-        const response = await BooksManager.getBookDetails(book.bookID);
-        if (response == null) {
-            return Promise.reject('response was null!');
-        }
-
-        if (!response.success) {
-            MessagePopup.show(response.data, true);
-            return Promise.reject('response was not successful!');
-        }
-
-        let updatedBook;
-        try {
-            updatedBook = Book.fromJSON(response.data);
-        } catch (e) {
-            MessagePopup.show(e, true);
-        }
-
-        // 1. Update images if changed
-        if (updatedBook.images?.length > 0) {
-            const newMainIndex = updatedBook.images.findIndex(img => img.isMain);
-            if (newMainIndex !== -1 && newMainIndex !== currentImageIndex) {
-                currentImageIndex = newMainIndex;
-                bookImagesPaths = updatedBook.images.map(img => img.url);
-                updateImage(); // Reuses your existing image update logic
-            }
-        }
-
-        // 2. Directly update DOM elements using closure references
-        titleElement.textContent = updatedBook.title;
-        overviewElement.textContent = updatedBook.overview;
-        authorElement.innerHTML = `<strong>By:</strong> ${updatedBook.author}`;
-        genreElement.innerHTML = `<strong>Genre:</strong> ${updatedBook.genre}`;
-        priceElement.innerHTML = `<strong>Price:</strong> ${updatedBook.price} EGP`;
-        publisherElement.innerHTML = `<strong>Publisher:</strong> ${updatedBook.publisher}`;
-        isbnElement.innerHTML = `<strong>ISBN:</strong> ${updatedBook.isbn}`;
-        languageElement.innerHTML = `<strong>Language:</strong> ${updatedBook.language}`;
-        pagesElement.innerHTML = `<strong>Pages:</strong> ${updatedBook.numberOfPages}`;
-        availabilityElement.innerHTML = `<strong>Availability:</strong> ${updatedBook.isAvailable ? 'Available' : 'Not Available'}`;
-        descriptionElement.innerHTML = `<strong>Description:</strong> ${updatedBook.description}`;
-
-        updateStockValue(modal, updatedBook);
-
-        if (isInfoOnly === false) {
-            updateAddToCartControls(modal, book);
-        }
-
-        if (typeof updateOriginalBookCallback == 'function') {
-            updateOriginalBookCallback(updatedBook);
-        }
-
-        return Promise.resolve('Book details loaded successfully.');
-    };
-
-    // Consume the promise to remove the warning.
-    updateBookDisplay()
-        .then(_ => {})
-        .catch(_ => {});
+  })
 }
+
+export default displayProduct

@@ -12,7 +12,7 @@ export default class Order {
     #paymentMethod = PaymentMethods.ACCOUNT_BALANCE;
     #shippingFee;
     #orderItems = [];
-    #status = OrderStatus.UNSPECIFIED;
+    #status = OrderStatus.PENDING;
 
     constructor() {
     }
@@ -34,7 +34,7 @@ export default class Order {
 
     set userID(value) {
         if (!DataValidator.isIDValid(value)) {
-            throw new Error('Invalid order ID!');
+            throw new Error('Invalid user ID!');
         }
         this.#userID = value;
     }
@@ -106,7 +106,7 @@ export default class Order {
         return {
             orderID: this.#orderID,
             userID: this.#userID,
-            date: this.#date,
+            date: this.#date.toISOString(),
             address: this.#address,
             paymentMethod: this.#paymentMethod,
             shippingFee: this.#shippingFee,
@@ -135,7 +135,8 @@ export default class Order {
             throw new Error('Invalid user ID in JSON!');
         }
 
-        if (!DataValidator.isDateValid(new Date(date))) {
+        const parsedDate = new Date(date);
+        if (!DataValidator.isDateValid(parsedDate)) {
             throw new Error('Invalid date in JSON!');
         }
 
@@ -158,7 +159,7 @@ export default class Order {
         const newOrder = new Order();
         newOrder.orderID = parseInt(orderID);
         newOrder.userID = parseInt(userID);
-        newOrder.date = new Date(date).toISOString();
+        newOrder.date = parsedDate;
         newOrder.address = address;
         newOrder.paymentMethod = paymentMethod;
         newOrder.shippingFee = parseFloat(shippingFee);

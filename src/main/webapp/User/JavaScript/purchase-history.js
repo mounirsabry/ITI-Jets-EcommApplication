@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Validate DOM elements
     if (!elements.historyList) {
         console.error('Could not locate the history list component!');
+        MessagePopup.show('Error: Page layout is broken.', true);
         return;
     }
 
@@ -55,18 +56,28 @@ document.addEventListener('DOMContentLoaded', async function () {
         const loadingOverlay = new LoadingOverlay();
         loadingOverlay.createAndDisplay('Loading Purchase History...');
 
-        const response = await PurchaseHistoryManager.getAllPurchaseHistory(userObject.userID);
-        loadingOverlay.remove();
+        try {
+            const response = await PurchaseHistoryManager.getAllPurchaseHistory(userObject.userID);
+            loadingOverlay.remove();
 
-        if (!response) {
-            showNoHistoryMessage()
-            MessagePopup.show('Failed to load history items pages!', true);
-        }
-        else if (!response.success) {
-            showNoHistoryMessage();
-            MessagePopup.show(response.data, true);
-        } else {
+            if (!response) {
+                showNoHistoryMessage();
+                MessagePopup.show('Unknown error: Could not load purchase history.', true);
+                return;
+            }
+
+            if (!response.success) {
+                showNoHistoryMessage();
+                MessagePopup.show(response.data || 'Failed to load purchase history.', true);
+                return;
+            }
+
             renderHistoryList(response.data);
+        } catch (error) {
+            loadingOverlay.remove();
+            showNoHistoryMessage();
+            console.error('Error loading purchase history:', error);
+            MessagePopup.show('Failed to load purchase history due to a network error.', true);
         }
     }
 
@@ -102,28 +113,41 @@ document.addEventListener('DOMContentLoaded', async function () {
         itemDiv.classList.add('history-item');
 
         const date = new Date(item.date);
-        const formattedDate = date.toISOString().split('T')[0];
-        const formattedTime = date.toTimeString().split(' ')[0];
-        const totalPaid = item.totalPaid.toFixed(2) + ' EGP';
+        const formattedDate = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const formattedTime = date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const totalPaid = item.totalPaid.toFixed(2);
 
         itemDiv.innerHTML = `
-            <div class='history-details'>
+            <div class="history-details">
                 <h3>Receipt #${item.itemID}</h3>
                 <p><strong>Date:</strong> ${formattedDate}</p>
                 <p><strong>Time:</strong> ${formattedTime}</p>
-                <p><strong>Total:</strong> ${totalPaid} </p>
+                <p><strong>Total:</strong> $${totalPaid}</p>
             </div>
-            <button class='download-button'>Download Receipt</button>
+            <button class="download-button">Download Receipt</button>
         `;
 
-        itemDiv.querySelector('.download-button').addEventListener('click', () => {
-            window.open(item.receiptFileURL, '_blank');
+        const downloadButton = itemDiv.querySelector('.download-button');
+        downloadButton.addEventListener('click', () => {
+            if (item.receiptFileUrl) {
+                window.open(item.receiptFileUrl, '_blank');
+            } else {
+                MessagePopup.show('Receipt file is unavailable.', true);
+            }
         });
 
         return itemDiv;
     }
 
     function showNoHistoryMessage() {
-        elements.historyList.innerHTML = '<div class="no-data-found">No purchase history found</div>';
+        elements.historyList.innerHTML = '<div class="no-data-found">No purchase history found.</div>';
     }
 });

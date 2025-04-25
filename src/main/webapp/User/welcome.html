@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="CSS/Common/BookPopup.css"/>
 
     <link rel="stylesheet" href="CSS/welcome.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <script src="JavaScript/Common/context_path.js"></script>
 
@@ -43,16 +44,16 @@
         <h1>Welcome to Book Alley</h1>
         <p>Where Every Book Finds Its Home</p>
         <button type="button" id="browseButton" class="browse-button">
-            Explore Books
+            <i class="fas fa-book-open"></i> Explore Books
         </button>
     </section>
 
     <section id="eventBanner">
-        <button id="prevBtn">&#10094;</button>
+        <button id="prevBtn" aria-label="Previous announcement"><i class="fas fa-chevron-left"></i></button>
         <div id="bannerMessages">
             <!-- Will be injected by JS. -->
         </div>
-        <button id="nextBtn">&#10095;</button>
+        <button id="nextBtn" aria-label="Next announcement"><i class="fas fa-chevron-right"></i></button>
     </section>
 
     <section id="topSellingSection">

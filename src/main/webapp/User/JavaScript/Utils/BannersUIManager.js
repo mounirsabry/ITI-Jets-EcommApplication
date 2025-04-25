@@ -1,120 +1,78 @@
-'use strict';
-
-import PromotionsManager from '../Managers/PromotionsManager.js';
-import MessagePopup from "../Common/MessagePopup.js";
+import PromotionsManager from "../Managers/PromotionsManager.js"
 
 export default async function loadBanners() {
-    const bannerContainer = document.getElementById('bannerMessages');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+  const response = await PromotionsManager.getActivePromotions()
+  if (response === null || !response.success) {
+    return
+  }
 
-    let currentIndex = 0;
-    let autoScroll;
-    let bannerElements = []; // Store DOM elements instead of messages
+  const bannerMessages = document.getElementById("bannerMessages")
+  if (!bannerMessages) {
+    console.error("Banner messages container not found!")
+    return
+  }
 
-    // Try to load banners from server.
-    const response = await PromotionsManager.getBannersList();
-    let messages;
+  const bannerTexts = response.data.map((promo) => promo.message)
+  if (bannerTexts.length === 0) {
+    // If no promotions, add a default message
+    bannerTexts.push("Welcome to Book Alley! Explore our collection of books.")
+  }
 
-    if (!response) {
-        messages = getFallbackMessages();
-    } else if (!response.success) {
-        MessagePopup.show(response.data, true);
-        messages = getFallbackMessages();
+  // Clear existing content
+  bannerMessages.innerHTML = ""
+
+  // Create banner text elements
+  bannerTexts.forEach((text, index) => {
+    const bannerText = document.createElement("div")
+    bannerText.className = "banner-text"
+
+    // Add icon based on content
+    if (text.toLowerCase().includes("discount") || text.toLowerCase().includes("sale")) {
+      bannerText.innerHTML = `<i class="fas fa-tag"></i> ${text}`
+    } else if (text.toLowerCase().includes("new") || text.toLowerCase().includes("arrival")) {
+      bannerText.innerHTML = `<i class="fas fa-star"></i> ${text}`
+    } else if (text.toLowerCase().includes("free") || text.toLowerCase().includes("shipping")) {
+      bannerText.innerHTML = `<i class="fas fa-truck"></i> ${text}`
     } else {
-        messages = response.data;
+      bannerText.innerHTML = `<i class="fas fa-book"></i> ${text}`
     }
 
-    renderBanners(messages);
-
-    function getFallbackMessages() {
-        return [
-            'Fallback Banner 1.',
-            'Fallback Banner 2.',
-        ];
+    if (index === 0) {
+      bannerText.classList.add("active")
     }
+    bannerMessages.appendChild(bannerText)
+  })
 
-    function renderBanners(messages) {
-        // Clear existing content
-        bannerContainer.innerHTML = '';
-        bannerElements = []; // Reset stored elements
+  // Set up navigation
+  const prevBtn = document.getElementById("prevBtn")
+  const nextBtn = document.getElementById("nextBtn")
 
-        // Create banner elements
-        messages.forEach((message, index) => {
-            const bannerElement = document.createElement('h2');
-            bannerElement.className = 'banner-text';
-            bannerElement.textContent = message;
-            if (index === 0) bannerElement.classList.add('active');
-            bannerContainer.appendChild(bannerElement);
-            bannerElements.push(bannerElement); // Store the DOM element
-        });
+  if (!prevBtn || !nextBtn) {
+    console.error("Banner navigation buttons not found!")
+    return
+  }
 
-        // Initialize UI controls
-        initializeControls();
-    }
+  let currentIndex = 0
+  const bannerElements = document.querySelectorAll(".banner-text")
 
-    function initializeControls() {
-        // Clear any existing interval
-        if (autoScroll) {
-            clearInterval(autoScroll);
-        }
+  function showBanner(index) {
+    bannerElements.forEach((el) => el.classList.remove("active"))
+    bannerElements[index].classList.add("active")
+  }
 
-        // Only proceed if we have banners
-        if (bannerElements.length === 0) return;
+  prevBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + bannerElements.length) % bannerElements.length
+    showBanner(currentIndex)
+  })
 
-        // Set up auto-scroll if multiple banners
-        if (bannerElements.length > 1) {
-            startAutoScroll();
-        }
+  nextBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % bannerElements.length
+    showBanner(currentIndex)
+  })
 
-        // Set up navigation buttons if they exist
-        setupNavigation();
-
-        // Show first banner
-        updateBanner(currentIndex);
-    }
-
-    function updateBanner(index) {
-        bannerElements.forEach((element, i) => {
-            element.classList.remove("active");
-            if (i === index) {
-                element.classList.add("active");
-            }
-        });
-    }
-
-    function nextMessage() {
-        currentIndex = (currentIndex + 1) % bannerElements.length;
-        updateBanner(currentIndex);
-    }
-
-    function prevMessage() {
-        currentIndex = (currentIndex - 1 + bannerElements.length) % bannerElements.length;
-        updateBanner(currentIndex);
-    }
-
-    function startAutoScroll() {
-        autoScroll = setInterval(nextMessage, 3000);
-    }
-
-    function resetAutoScroll() {
-        clearInterval(autoScroll);
-        startAutoScroll();
-    }
-
-    function setupNavigation() {
-        if (prevBtn) {
-            prevBtn.addEventListener("click", () => {
-                prevMessage();
-                resetAutoScroll();
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener("click", () => {
-                nextMessage();
-                resetAutoScroll();
-            });
-        }
-    }
+  // Auto-rotate banners
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % bannerElements.length
+    showBanner(currentIndex)
+  }, 5000)
 }

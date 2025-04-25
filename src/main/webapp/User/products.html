@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="CSS/Common/BookPopup.css"/>
 
     <link rel="stylesheet" href="CSS/products.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <script src="JavaScript/Common/context_path.js"></script>
 
@@ -39,13 +40,13 @@
 </header>
 
 <main>
-    <h1 class="center-title">Browse or Search Our Book Collection</h1>
+    <h1 class="center-title">Browse Our Book Collection</h1>
 
     <section class="books-controls">
         <div class="search-container">
             <label for="searchBar">Search for books</label>
-            <input type="text" id="searchBar" placeholder="Search for books..."/>
-            <input type="button" id="searchButton" value="Refresh"/>
+            <input type="text" id="searchBar" placeholder="Title, author, genre..."/>
+            <button type="button" id="searchButton">Search</button>
         </div>
         <div class="filters">
             <div class="filter-group">
@@ -57,7 +58,7 @@
             <div class="filter-group">
                 <label>
                     <input type="checkbox" id="unavailableToggle"/>
-                    Include Out-of-Stock & Unavailable Items
+                    Include Out-of-Stock Items
                 </label>
             </div>
         </div>
@@ -70,7 +71,7 @@
     <div class="pagination-container">
         <div class="pagination-controls">
             <button id="prevPage" class="pagination-button" disabled>&larr;</button>
-            <label for="pageInput"></label>
+            <label for="pageInput" class="sr-only">Page number</label>
             <input type="number" id="pageInput" min="1" value="1" class="page-input">
             <button id="nextPage" class="pagination-button">&rarr;</button>
         </div>

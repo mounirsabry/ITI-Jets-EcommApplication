@@ -1,10 +1,10 @@
 'use strict';
 
 const OrderStatus = Object.freeze({
-    CONFIRMED: 'CONFIRMED',
+    PENDING: 'PENDING',
     SHIPPED: 'SHIPPED',
     CANCELLED: 'CANCELLED',
-    UNSPECIFIED: 'UNSPECIFIED'
+    DELIVERED: 'DELIVERED'
 });
 
 export default OrderStatus;

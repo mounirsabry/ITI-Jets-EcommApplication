@@ -59,3 +59,19 @@
     margin-top: 10px;
   }
 }
+
+.order-status {
+    font-weight: bold;
+}
+.order-status.pending {
+    color: #ffa500; /* Orange for pending */
+}
+.order-status.shipped {
+    color: #1e90ff; /* Blue for shipped */
+}
+.order-status.cancelled {
+    color: #ff0000; /* Red for cancelled */
+}
+.order-status.delivered {
+    color: #008000; /* Green for delivered */
+}
