@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         booksLoadingOverlay.createAndDisplay('Loading Books...');
 
         const promisesList = [];
+        let subtotal = 0; // Initialize subtotal to 0
 
         order.orderItems.forEach(orderItem => {
             const loadOrderItemBook = async function(orderItem) {
@@ -162,6 +163,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
 
                 loadBookInfoElement(bookElement, orderItem, response.data);
+
+                // Accumulate subtotal for each order item
+                const itemTotal = orderItem.priceAtPurchase * orderItem.quantity;
+                subtotal += itemTotal;
+                updatePriceSummarySection(subtotal);
             }
 
             loadOrderItemBook(orderItem);
@@ -173,6 +179,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (shippingFeeComponent) {
             shippingFeeComponent.textContent = order.shippingFee.toFixed(2);
+            shippingFeeComponent.parentElement.innerHTML = `<strong>Shipping Fee:</strong> <span class="currency-group"><span>${order.shippingFee.toFixed(2)}</span> EGP</span>`;
         }
     }
 
@@ -236,58 +243,50 @@ document.addEventListener("DOMContentLoaded", async function () {
         const priceSection = document.createElement('div');
         priceSection.className = 'price-section';
 
-//        if (orderItem.quantity === 1) {
-//            const priceInfo = document.createElement('p');
-//            priceInfo.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-//            priceSection.appendChild(priceInfo);
-//        } else {
-            const pricePerPieceParagraph = document.createElement('p');
-            pricePerPieceParagraph.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(pricePerPieceParagraph);
+        const pricePerPieceParagraph = document.createElement('p');
+        pricePerPieceParagraph.innerHTML = `<strong>Price:</strong> <span class="currency-group">${orderItem.priceAtPurchase.toFixed(2)} EGP</span>`;
+        priceSection.appendChild(pricePerPieceParagraph);
 
-            const quantityParagraph = document.createElement('p');
-            quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${orderItem.quantity}`;
-            priceSection.appendChild(quantityParagraph);
+        const quantityParagraph = document.createElement('p');
+        quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${orderItem.quantity}`;
+        priceSection.appendChild(quantityParagraph);
 
-            const totalItemPriceParagraph = document.createElement('p');
-            totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> ${subtotalPrice.toFixed(2)}`;
-            priceSection.appendChild(totalItemPriceParagraph);
-//        }
+        const totalItemPriceParagraph = document.createElement('p');
+        totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> <span class="currency-group">${subtotalPrice.toFixed(2)} EGP</span>`;
+        priceSection.appendChild(totalItemPriceParagraph);
+
         bookElement.appendChild(priceSection);
 
         img.addEventListener('click', () => {
             displayProduct(parsedBook, (updatedBook) => {
                 // This is the callback that will be called when the book data is updated
-
-                // Update image if main image changed
                 const mainImage = updatedBook.images?.find(image => image.isMain);
                 if (mainImage) {
                     img.src = mainImage.url;
                 }
 
-                // Update the book data directly using existing references
                 title.textContent = updatedBook.title;
                 overview.textContent = updatedBook.overview;
                 author.innerHTML = `<strong>Author:</strong> ${updatedBook.author}`;
                 isbn.innerHTML = `<strong>ISBN:</strong> ${updatedBook.isbn}`;
 
-                // Store the updated book data for future reference
                 parsedBook = updatedBook;
             });
         });
-
-        const subtotalChange = orderItem.priceAtPurchase * orderItem.quantity;
-        updatePriceSummarySectionOnChange(subtotalChange);
     }
 
-    function updatePriceSummarySectionOnChange(subtotalChange) {
+    function updatePriceSummarySection(subtotal) {
         if (subtotalComponent) {
-            subtotalComponent.textContent = (parseFloat(subtotalComponent.textContent) + subtotalChange).toFixed(2);
+            subtotalComponent.textContent = subtotal.toFixed(2);
+            subtotalComponent.parentElement.innerHTML = `<strong>Subtotal:</strong> <span class="currency-group"><span>${subtotal.toFixed(2)}</span> EGP</span>`;
         }
-        const shippingFee = parseFloat(shippingFeeComponent.textContent);
+
+        const shippingFee = parseFloat(shippingFeeComponent.textContent) || 0;
+        const total = subtotal + shippingFee;
 
         if (totalAmountComponent) {
-            totalAmountComponent.textContent = (parseFloat(subtotalComponent.textContent) + shippingFee).toFixed(2);
+            totalAmountComponent.textContent = total.toFixed(2);
+            totalAmountComponent.parentElement.innerHTML = `<strong>Total Amount:</strong> <span class="currency-group"><span>${total.toFixed(2)}</span> EGP</span>`;
         }
     }
 });

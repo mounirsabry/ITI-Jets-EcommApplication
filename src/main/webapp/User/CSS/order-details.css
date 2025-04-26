@@ -10,9 +10,20 @@
 
 .order-header h1 {
   color: var(--primary-color);
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.order-header h1::before {
+  content: "\f46c"; /* Font Awesome icon for order */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--primary-color);
 }
 
 /* Back Button */
@@ -43,28 +54,70 @@
 
 /* Order Details Section */
 #orderDetails {
-  background-color: white;
-  padding: var(--spacing-md);
+  background-color: #f9fafb;
+  padding: var(--spacing-lg);
   border-radius: var(--main-border-radius);
   margin-bottom: var(--spacing-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--spacing-sm);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  border-left: 4px solid var(--primary-color);
 }
 
 #orderDetails p {
   margin: var(--spacing-xs) 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  background: white;
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform var(--transition-normal);
+}
+
+#orderDetails p:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 #orderDetails p strong {
   font-weight: 600;
   color: var(--text-primary);
+}
+
+#orderDetails p::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--primary-color);
+  font-size: 1rem;
+}
+
+#orderDetails p:nth-child(1)::before {
+  content: "\f073"; /* Calendar icon for Date */
+}
+
+#orderDetails p:nth-child(2)::before {
+  content: "\f017"; /* Clock icon for Time */
+}
+
+#orderDetails p:nth-child(3)::before {
+  content: "\f3c5"; /* Location icon for Address */
+}
+
+#orderDetails p:nth-child(4)::before {
+  content: "\f0c9"; /* List icon for Number of Items */
+}
+
+#orderDetails p:nth-child(5)::before {
+  content: "\f09d"; /* Credit card icon for Payment Method */
+}
+
+#orderDetails p:nth-child(6)::before {
+  content: "\f0ae"; /* Tasks icon for Order Status */
 }
 
 /* Order Items Section */
@@ -97,27 +150,28 @@
 
 /* Individual Order Item */
 .order-item {
-  background-color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
   border-radius: var(--main-border-radius);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: all var(--transition-normal);
-  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .order-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-light);
 }
 
 /* Book Image */
 .book-image {
-  width: 100px;
-  height: 140px;
+  width: 120px;
+  height: 160px;
   object-fit: cover;
   border-radius: var(--main-border-radius);
   transition: transform var(--transition-normal);
@@ -134,23 +188,23 @@
 .book-details {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .book-details h2 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--text-primary);
   margin: 0 0 var(--spacing-xs) 0;
   font-weight: 600;
 }
 
 .book-details .overview {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  margin: var(--spacing-xs) 0;
-  line-height: 1.4;
+  margin: var(--spacing-sm) 0;
+  line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-style: italic;
@@ -158,7 +212,7 @@
 
 .book-details p {
   margin: var(--spacing-xs) 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
 }
 
@@ -169,24 +223,25 @@
 
 /* Price Section */
 .price-section {
-  background-color: #f9fafb;
-  padding: var(--spacing-sm);
+  background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+  padding: var(--spacing-md);
   border-radius: var(--main-border-radius);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  min-width: 150px;
+  gap: var(--spacing-sm);
+  min-width: 180px;
   align-self: stretch;
   justify-content: center;
-  text-align: left; /* Align text to the left */
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .price-section p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
   display: flex;
-  justify-content: space-between; /* Space between label and value */
+  justify-content: space-between;
 }
 
 .price-section p strong {
@@ -197,10 +252,10 @@
 /* Order Summary */
 .order-summary {
   background-color: white;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   border-radius: var(--main-border-radius);
   margin-top: var(--spacing-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .order-summary h2 {
@@ -226,7 +281,7 @@
 .order-summary-details {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .order-summary-details p {
@@ -234,27 +289,33 @@
   justify-content: space-between;
   align-items: center;
   margin: 0;
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: 1px dashed #e5e7eb;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
 }
 
 .order-summary-details p:last-child {
   border-bottom: none;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--primary-color);
-  margin-top: var(--spacing-xs);
-  padding-top: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
   border-top: 2px solid #e5e7eb;
+  background: #e5e7eb;
+  border-radius: 8px;
 }
 
 .order-summary-details p strong {
   font-weight: 600;
 }
 
-.order-summary-details p span {
-  margin-right: var(--spacing-sm); /* Space between number and EGP */
+.order-summary-details p span.currency-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 /* Loading Data */
@@ -286,7 +347,7 @@
     grid-template-columns: 1fr;
     justify-items: center;
     text-align: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
 
   .book-details {
@@ -309,20 +370,24 @@
     align-items: flex-start;
   }
 
+  .order-header h1 {
+    font-size: 1.5rem;
+  }
+
   #backToOrdersButton {
     width: 100%;
   }
 
   .order-item {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
 
   .book-image {
-    width: 90px;
-    height: 130px;
+    width: 100px;
+    height: 140px;
   }
 
   .book-details h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
