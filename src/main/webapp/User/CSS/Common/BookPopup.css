@@ -1,19 +1,18 @@
 /* Book Popup Styles */
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
-    z-index: 10000; /* Ensured high z-index */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    visibility: visible;
-    opacity: 1;
-    animation: fadeIn 0.3s ease-out; /* Re-enabled animation */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 10000 !important; /* Ensured high z-index */
+    display: flex !important; /* Force display */
+    justify-content: center !important;
+    align-items: center !important;
+    visibility: visible !important; /* Force visibility */
+    opacity: 1 !important; /* Force opacity */
+    animation: fadeIn 0.3s ease-out !important;
 }
 
 @keyframes fadeIn {
