@@ -34,8 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderHeader() {
     const isAuthenticated = UserAuthTracker.isAuthenticated
 
-    // Ensure consistent header structure with icons always visible
-    // Following UX guidelines for navigation order
+    // Updated header structure with new order: Home | Books | Wishlist | Cart | About
     header.innerHTML = `
       <div class="header-left">
         <div class="logo-container">
@@ -44,31 +43,31 @@ document.addEventListener("DOMContentLoaded", () => {
         <h1 class="site-title" onclick="window.location.href='${URL_Mapper.WELCOME}'">Book Alley</h1>
       </div>
 
-      <nav class="navbar">
-        <a href="${URL_Mapper.WELCOME}"><i class="fas fa-home"></i> Home</a>
-        <a href="${URL_Mapper.PRODUCTS}"><i class="fas fa-book"></i> Books</a>
-        <a href="${URL_Mapper.ABOUT}"><i class="fas fa-info-circle"></i> About</a>
-      </nav>
+      <div class="header-right">
+        <nav class="navbar">
+          <a href="${URL_Mapper.WELCOME}"><i class="fas fa-home"></i> Home</a>
+          <a href="${URL_Mapper.PRODUCTS}"><i class="fas fa-book"></i> Books</a>
+          <a href="${URL_Mapper.WISH_LIST}" class="wishlist-link"><i class="fas fa-heart"></i> Wishlist</a>
+          <a href="${URL_Mapper.CART}" class="cart-link"><i class="fas fa-shopping-cart"></i> Cart</a>
+          <a href="${URL_Mapper.ABOUT}"><i class="fas fa-info-circle"></i> About</a>
+        </nav>
 
-      <div class="auth-container">
-        ${
-          isAuthenticated
-            ? `
-          <a href="${URL_Mapper.WISH_LIST}" class="wishlist-link"><i class="fas fa-heart"></i> Wishlist</a>
-          <a href="${URL_Mapper.CART}" class="cart-link"><i class="fas fa-shopping-cart"></i> Cart</a>
-          <a href="${URL_Mapper.PROFILE}" class="profile-link">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-          </a>
-          <button id="logoutButton" class="auth-button logout-button"><i class="fas fa-sign-out-alt"></i> Logout</button>
-        `
-            : `
-          <a href="${URL_Mapper.WISH_LIST}" class="wishlist-link"><i class="fas fa-heart"></i> Wishlist</a>
-          <a href="${URL_Mapper.CART}" class="cart-link"><i class="fas fa-shopping-cart"></i> Cart</a>
-          <button id="loginButton" class="auth-button login-button"><i class="fas fa-sign-in-alt"></i> Login</button>
-          <button id="registerButton" class="auth-button register-button"><i class="fas fa-user-plus"></i> Register</button>
-        `
-        }
+        <div class="auth-actions">
+          ${
+            isAuthenticated
+              ? `
+            <a href="${URL_Mapper.PROFILE}" class="profile-link">
+              <i class="fas fa-user"></i>
+              <span>Profile</span>
+            </a>
+            <button id="logoutButton" class="auth-button logout-button"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          `
+              : `
+            <button id="loginButton" class="auth-button login-button"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <button id="registerButton" class="auth-button register-button"><i class="fas fa-user-plus"></i> Register</button>
+          `
+          }
+        </div>
       </div>
     `
 

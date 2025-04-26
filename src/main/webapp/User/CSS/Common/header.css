@@ -3,8 +3,8 @@
   display: flex;
   align-items: center;
   background-color: white;
-  padding: var(--spacing-md) var(--spacing-xl);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -14,14 +14,14 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-right: var(--spacing-xl);
+  gap: var(--spacing-xs);
+  margin-right: var(--spacing-md);
 }
 
 #siteHeader .logo-container img {
-  height: 40px;
+  height: 36px;
   cursor: pointer;
-  border-radius: var(--main-border-radius);
+  border-radius: 8px;
   transition: transform var(--transition-normal);
 }
 
@@ -31,8 +31,8 @@
 
 #siteHeader .site-title {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--primary-color);
   transition: color var(--transition-normal);
   margin: 0;
@@ -43,101 +43,91 @@
   color: var(--primary-dark);
 }
 
-/* Main navigation - following UX guidelines */
-#siteHeader .navbar {
+/* Header right section */
+.header-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
   flex: 1;
 }
 
-#siteHeader .navbar a {
+/* Main navigation (now includes Wishlist and Cart) */
+#siteHeader .navbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs); /* Small gap between elements */
+}
+
+/* Remove the separate auth-container since Wishlist and Cart are now in navbar */
+#siteHeader .navbar a,
+#siteHeader .navbar .wishlist-link,
+#siteHeader .navbar .cart-link {
   text-decoration: none;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--main-border-radius);
+  border-radius: 8px;
   transition: all var(--transition-normal);
-  position: relative;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
 }
 
-#siteHeader .navbar a i {
-  font-size: 1.1rem;
+#siteHeader .navbar a i,
+#siteHeader .navbar .wishlist-link i,
+#siteHeader .navbar .cart-link i {
+  font-size: 1rem;
   display: inline-block !important;
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1rem;
+  height: 1rem;
   margin-right: 4px;
 }
 
-#siteHeader .navbar a::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: var(--primary-color);
-  transition: width var(--transition-normal);
-}
-
-#siteHeader .navbar a:hover {
+#siteHeader .navbar a:hover,
+#siteHeader .navbar .wishlist-link:hover,
+#siteHeader .navbar .cart-link:hover {
+  background-color: rgba(79, 70, 229, 0.1);
   color: var(--primary-color);
 }
 
-#siteHeader .navbar a:hover::after {
-  width: 80%;
-}
-
-/* Auth container with buttons - right aligned */
-#siteHeader .auth-container {
+/* Auth actions (Profile, Logout or Login, Register) */
+#siteHeader .auth-actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  justify-content: flex-end;
+  gap: var(--spacing-xs); /* Small gap between elements */
   margin-left: auto;
 }
 
-/* Wishlist and Cart link styling */
-#siteHeader .auth-container .wishlist-link,
-#siteHeader .auth-container .cart-link,
-#siteHeader .auth-container .profile-link {
+/* Profile link styling */
+#siteHeader .auth-actions .profile-link {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: var(--text-primary);
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--main-border-radius);
+  border-radius: 8px;
   transition: all var(--transition-normal);
   gap: var(--spacing-xs);
 }
 
-#siteHeader .auth-container .wishlist-link i,
-#siteHeader .auth-container .cart-link i,
-#siteHeader .auth-container .profile-link i {
-  font-size: 1.1rem;
+#siteHeader .auth-actions .profile-link i {
+  font-size: 1rem;
   display: inline-block !important;
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1rem;
+  height: 1rem;
 }
 
-#siteHeader .auth-container .wishlist-link:hover,
-#siteHeader .auth-container .cart-link:hover,
-#siteHeader .auth-container .profile-link:hover {
+#siteHeader .auth-actions .profile-link:hover {
   background-color: rgba(79, 70, 229, 0.1);
   color: var(--primary-color);
-  transform: translateY(-2px);
 }
 
+/* Auth buttons (Login, Register, Logout) */
 #siteHeader .auth-button {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--main-border-radius);
-  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-normal);
   display: flex;
@@ -148,38 +138,31 @@
 #siteHeader .login-button {
   background-color: transparent;
   color: var(--primary-color);
-  border: 1px solid var(--primary-color);
+  border: none;
 }
 
 #siteHeader .login-button:hover {
   background-color: rgba(79, 70, 229, 0.1);
-  transform: translateY(-2px);
 }
 
 #siteHeader .register-button {
   background-color: var(--primary-color);
   color: white;
-  border: 1px solid var(--primary-color);
+  border: none;
 }
 
 #siteHeader .register-button:hover {
   background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #siteHeader .logout-button {
   background-color: var(--error);
   color: white;
-  border: 1px solid var(--error);
+  border: none;
 }
 
 #siteHeader .logout-button:hover {
   background-color: #dc2626;
-  border-color: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Auth Modal Styles */
@@ -364,7 +347,7 @@
 /* Mobile responsiveness */
 @media (max-width: 820px) {
   #siteHeader {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     flex-wrap: wrap;
   }
 
@@ -373,23 +356,31 @@
   }
 
   #siteHeader .logo-container img {
-    height: 36px;
+    height: 32px;
   }
 
   #siteHeader .site-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
-  #siteHeader .navbar {
+  .header-right {
     order: 3;
     width: 100%;
-    justify-content: center;
-    margin: var(--spacing-sm) 0;
+    justify-content: space-between;
   }
 
-  #siteHeader .auth-container {
-    flex: 1;
-    justify-content: flex-end;
+  #siteHeader .navbar,
+  #siteHeader .auth-actions {
+    gap: var(--spacing-xs);
+  }
+
+  #siteHeader .navbar a,
+  #siteHeader .navbar .wishlist-link,
+  #siteHeader .navbar .cart-link,
+  #siteHeader .auth-actions .profile-link,
+  #siteHeader .auth-button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.9rem;
   }
 
   .auth-modal {
@@ -400,33 +391,24 @@
 
 @media (max-width: 520px) {
   #siteHeader {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
   }
 
   #siteHeader .logo-container img {
-    height: 32px;
+    height: 28px;
   }
 
   #siteHeader .site-title {
     font-size: 1.1rem;
   }
 
-  #siteHeader .navbar {
-    gap: var(--spacing-sm);
-  }
-
-  #siteHeader .navbar a {
-    font-size: 0.9rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-
-  #siteHeader .auth-container {
-    gap: var(--spacing-xs);
-  }
-
+  #siteHeader .navbar a,
+  #siteHeader .navbar .wishlist-link,
+  #siteHeader .navbar .cart-link,
+  #siteHeader .auth-actions .profile-link,
   #siteHeader .auth-button {
     padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .auth-modal-buttons {
