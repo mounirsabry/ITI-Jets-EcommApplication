@@ -80,6 +80,10 @@
   gap: var(--spacing-sm);
 }
 
+.order-items-section h2::after {
+  content: none; /* Remove the blue line */
+}
+
 .order-items-section h2 i {
   font-size: 1.2rem;
 }
@@ -174,13 +178,15 @@
   min-width: 150px;
   align-self: stretch;
   justify-content: center;
+  text-align: left; /* Align text to the left */
 }
 
 .price-section p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--text-secondary);
-  text-align: center;
+  display: flex;
+  justify-content: space-between; /* Space between label and value */
 }
 
 .price-section p strong {
@@ -209,6 +215,10 @@
   gap: var(--spacing-sm);
 }
 
+.order-summary h2::after {
+  content: none; /* Remove the blue line */
+}
+
 .order-summary h2 i {
   font-size: 1.2rem;
 }
@@ -222,6 +232,7 @@
 .order-summary-details p {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 0;
   padding: var(--spacing-xs) 0;
   border-bottom: 1px dashed #e5e7eb;
@@ -240,6 +251,10 @@
 
 .order-summary-details p strong {
   font-weight: 600;
+}
+
+.order-summary-details p span {
+  margin-right: var(--spacing-sm); /* Space between number and EGP */
 }
 
 /* Loading Data */

@@ -236,13 +236,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         const priceSection = document.createElement('div');
         priceSection.className = 'price-section';
 
-        if (orderItem.quantity === 1) {
-            const priceInfo = document.createElement('p');
-            priceInfo.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(priceInfo);
-        } else {
+//        if (orderItem.quantity === 1) {
+//            const priceInfo = document.createElement('p');
+//            priceInfo.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
+//            priceSection.appendChild(priceInfo);
+//        } else {
             const pricePerPieceParagraph = document.createElement('p');
-            pricePerPieceParagraph.innerHTML = `<strong>Price per Piece:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
+            pricePerPieceParagraph.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
             priceSection.appendChild(pricePerPieceParagraph);
 
             const quantityParagraph = document.createElement('p');
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const totalItemPriceParagraph = document.createElement('p');
             totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> ${subtotalPrice.toFixed(2)}`;
             priceSection.appendChild(totalItemPriceParagraph);
-        }
+//        }
         bookElement.appendChild(priceSection);
 
         img.addEventListener('click', () => {

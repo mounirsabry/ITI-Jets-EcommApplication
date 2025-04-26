@@ -1,43 +1,59 @@
-/* Orders List Styles */
-.orders-list {
+/* Order Details Page Styles */
+.order-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
   gap: var(--spacing-md);
 }
 
-/* Individual Order Card */
-.order-item {
-  width: 100%;
-  padding: var(--spacing-md);
-  background: white;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: var(--main-border-radius);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-normal);
-}
-
-.order-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Order Details */
-.order-details {
-  flex: 1;
-  padding-right: var(--spacing-md);
-}
-
-.order-details h2 {
-  font-size: 1.1rem;
+.order-header h1 {
   color: var(--primary-color);
-  margin-bottom: var(--spacing-xs);
+  font-size: 1.5rem;
+  margin: 0;
   font-weight: 600;
 }
 
-.order-details p {
+/* Back Button */
+#backToOrdersButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--main-border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+}
+
+#backToOrdersButton i {
+  font-size: 1.1rem;
+}
+
+#backToOrdersButton:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Order Details Section */
+#orderDetails {
+  background-color: white;
+  padding: var(--spacing-md);
+  border-radius: var(--main-border-radius);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+#orderDetails p {
   margin: var(--spacing-xs) 0;
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -46,124 +62,199 @@
   gap: var(--spacing-sm);
 }
 
-.order-details p strong {
+#orderDetails p strong {
   font-weight: 600;
   color: var(--text-primary);
 }
 
-/* View Order Button */
-.view-order-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--main-border-radius);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.9rem;
-}
-
-.view-order-button::before {
-  content: "\f06e";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-
-.view-order-button:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Back to Profile Button */
-.back-button {
-  align-self: flex-start;
+/* Order Items Section */
+.order-items-section h2 {
+  font-size: 1.3rem;
+  color: var(--primary-color);
   margin-bottom: var(--spacing-md);
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--main-border-radius);
+  position: relative;
+  padding-bottom: var(--spacing-xs);
   font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  font-size: 0.9rem;
 }
 
-.back-button::before {
-  content: "\f060";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+.order-items-section h2::after {
+  content: none; /* Remove the blue line */
 }
 
-.back-button:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.order-items-section h2 i {
+  font-size: 1.2rem;
 }
 
-/* Order Status Styles */
-.order-status {
-  font-weight: 600;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: 12px;
-  display: inline-block;
-  font-size: 0.8rem;
-  text-align: center;
-  min-width: 80px;
-  margin-left: auto;
-  margin-right: var(--spacing-md);
-}
-
-.order-status.pending {
-  color: #ff9800;
-  background-color: rgba(255, 152, 0, 0.1);
-}
-
-.order-status.shipped {
-  color: #2196f3;
-  background-color: rgba(33, 150, 243, 0.1);
-}
-
-.order-status.cancelled {
-  color: #f44336;
-  background-color: rgba(244, 67, 54, 0.1);
-}
-
-.order-status.delivered {
-  color: #4caf50;
-  background-color: rgba(76, 175, 80, 0.1);
-}
-
-/* No Orders Found */
-.no-data-found {
-  text-align: center;
-  padding: var(--spacing-lg);
-  background-color: #f9fafb;
-  border-radius: var(--main-border-radius);
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  font-style: italic;
+/* Order Items List */
+.order-items-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--spacing-md);
 }
 
-.no-data-found::before {
-  content: "\f07b";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-  font-size: 2.5rem;
+/* Individual Order Item */
+.order-item {
+  background-color: white;
+  border-radius: var(--main-border-radius);
+  padding: var(--spacing-md);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--spacing-md);
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.order-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Book Image */
+.book-image {
+  width: 100px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--main-border-radius);
+  transition: transform var(--transition-normal);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.book-image:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Book Details */
+.book-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.book-details h2 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  font-weight: 600;
+}
+
+.book-details .overview {
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  opacity: 0.5;
+  margin: var(--spacing-xs) 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-style: italic;
+}
+
+.book-details p {
+  margin: var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.book-details p strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Price Section */
+.price-section {
+  background-color: #f9fafb;
+  padding: var(--spacing-sm);
+  border-radius: var(--main-border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 150px;
+  align-self: stretch;
+  justify-content: center;
+  text-align: left; /* Align text to the left */
+}
+
+.price-section p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between; /* Space between label and value */
+}
+
+.price-section p strong {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Order Summary */
+.order-summary {
+  background-color: white;
+  padding: var(--spacing-md);
+  border-radius: var(--main-border-radius);
+  margin-top: var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary h2 {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  padding-bottom: var(--spacing-xs);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.order-summary h2::after {
+  content: none; /* Remove the blue line */
+}
+
+.order-summary h2 i {
+  font-size: 1.2rem;
+}
+
+.order-summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.order-summary-details p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px dashed #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.order-summary-details p:last-child {
+  border-bottom: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid #e5e7eb;
+}
+
+.order-summary-details p strong {
+  font-weight: 600;
+}
+
+.order-summary-details p span {
+  margin-right: var(--spacing-sm); /* Space between number and EGP */
 }
 
 /* Loading Data */
@@ -178,41 +269,60 @@
   color: var(--text-secondary);
 }
 
-/* Responsive adjustments */
+/* No Data Found */
+.no-data-found {
+  text-align: center;
+  padding: var(--spacing-lg);
+  background-color: #f9fafb;
+  border-radius: var(--main-border-radius);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive Styles */
 @media (max-width: 820px) {
   .order-item {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
     gap: var(--spacing-sm);
   }
 
-  .order-details {
-    padding-right: 0;
-    width: 100%;
+  .book-details {
+    align-items: center;
   }
 
-  .order-status {
-    margin: var(--spacing-xs) 0;
-    margin-left: 0;
+  .price-section {
+    width: 100%;
+    min-width: unset;
   }
 
-  .view-order-button {
-    width: 100%;
-    margin-top: var(--spacing-sm);
-    justify-content: center;
+  #orderDetails {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 520px) {
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #backToOrdersButton {
+    width: 100%;
+  }
+
   .order-item {
     padding: var(--spacing-sm);
   }
 
-  .order-details h2 {
-    font-size: 1rem;
+  .book-image {
+    width: 90px;
+    height: 130px;
   }
 
-  .order-details p {
-    font-size: 0.85rem;
+  .book-details h2 {
+    font-size: 1rem;
   }
 }

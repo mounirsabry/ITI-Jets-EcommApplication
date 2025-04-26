@@ -98,7 +98,7 @@ function updatePriceSection(priceSection, price, quantity) {
     const subtotalPrice = price * quantity;
 
     const pricePerPieceParagraph = document.createElement("p")
-    pricePerPieceParagraph.innerHTML = `<strong>Price per Piece:</strong> <span>${price.toFixed(2)} EGP</span>`
+    pricePerPieceParagraph.innerHTML = `<strong>Price:</strong> <span>${price.toFixed(2)} EGP</span>` // price for per piece
     priceSection.appendChild(pricePerPieceParagraph)
 
     const quantityParagraph = document.createElement("p")
