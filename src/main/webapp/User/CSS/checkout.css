@@ -11,6 +11,9 @@ main .checkout-header {
 main .checkout-header h1 {
   color: var(--primary-color);
   margin: 0;
+  font-size: 2.8rem; /* Increased for better emphasis */
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 /* Back to Cart Button */
@@ -45,6 +48,7 @@ main .checkout-container {
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: var(--spacing-xl);
+  padding: var(--spacing-md) 0; /* Added padding for better spacing */
 }
 
 /* Checkout Form */
@@ -53,7 +57,7 @@ main .checkout-form {
   padding: var(--spacing-lg);
   border-radius: var(--main-border-radius);
   box-shadow: var(--main-box-shadow);
-  border-left: 4px solid var(--primary-color);
+  background: linear-gradient(145deg, #ffffff, #f8fafc); /* Subtle gradient for depth */
 }
 
 main .checkout-form h2 {
@@ -62,6 +66,7 @@ main .checkout-form h2 {
   margin-bottom: var(--spacing-lg);
   position: relative;
   padding-bottom: var(--spacing-sm);
+  font-weight: 700; /* Bolder for emphasis */
 }
 
 main .checkout-form h2::after {
@@ -87,11 +92,13 @@ main .form-section h3 {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  font-weight: 600;
 }
 
 main .form-section h3::before {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
+  color: var(--primary-color); /* Match icon color to theme */
 }
 
 main .shipping-section h3::before {
@@ -164,6 +171,7 @@ main .payment-method {
   border-radius: var(--main-border-radius);
   cursor: pointer;
   transition: all var(--transition-normal);
+  background-color: var(--bg-primary);
 }
 
 main .payment-method:hover {
@@ -174,6 +182,8 @@ main .payment-method:hover {
 main .payment-method input[type="radio"] {
   width: 20px;
   height: 20px;
+  accent-color: var(--primary-color); /* Style the radio button */
+  cursor: pointer;
 }
 
 main .payment-method-label {
@@ -190,7 +200,7 @@ main .order-summary {
   position: sticky;
   top: 100px;
   align-self: start;
-  border-left: 4px solid var(--primary-color);
+  background: linear-gradient(145deg, #ffffff, #f8fafc); /* Subtle gradient for depth */
 }
 
 main .order-summary h2 {
@@ -199,6 +209,7 @@ main .order-summary h2 {
   margin-bottom: var(--spacing-lg);
   position: relative;
   padding-bottom: var(--spacing-sm);
+  font-weight: 700;
 }
 
 main .order-summary h2::after {
@@ -263,7 +274,6 @@ main #balanceNotice {
   padding: var(--spacing-md);
   border-radius: var(--main-border-radius);
   margin-top: var(--spacing-md);
-  border-left: 4px solid var(--primary-color);
 }
 
 main #balanceNotice p {
@@ -292,6 +302,8 @@ main #placeOrderButton {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  font-size: 1.1rem; /* Slightly larger for prominence */
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); /* Subtle shadow for depth */
 }
 
 main #placeOrderButton::before {
@@ -303,13 +315,14 @@ main #placeOrderButton::before {
 main #placeOrderButton:hover:not(:disabled) {
   background-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: var(--main-box-shadow);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
 }
 
 main #placeOrderButton:disabled {
   background-color: var(--bg-accent);
   color: var(--text-secondary);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Loading Data */

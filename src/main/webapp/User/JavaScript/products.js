@@ -48,17 +48,30 @@ document.addEventListener("DOMContentLoaded", async function() {
     await loadInitialBooks();
 
     function populateGenreFilter() {
-        const defaultOption = document.createElement('option');
-        defaultOption.value = 'all';
-        defaultOption.textContent = 'All Genres';
-        elements.genreFilter.appendChild(defaultOption);
+        // Clear existing options
+        elements.genreFilter.innerHTML = '';
 
+        // Add "All Genres" option with value 'all'
+        const allGenresOption = document.createElement('option');
+        allGenresOption.value = 'all';
+        allGenresOption.textContent = 'All Genres';
+        elements.genreFilter.appendChild(allGenresOption);
+
+        // Add other genres, excluding "Unspecified"
+        const addedGenres = new Set(['All Genres']); // Track added genres to avoid duplicates
         Object.values(Genres).forEach(genre => {
+            if (genre === "Unspecified" || genre === "All Genres") return; // Skip "Unspecified" and "All Genres"
+            if (addedGenres.has(genre)) return; // Skip duplicates
+            addedGenres.add(genre);
+
             const option = document.createElement('option');
             option.value = genre;
             option.textContent = genre;
             elements.genreFilter.appendChild(option);
         });
+
+        // Set "All Genres" as default
+        allGenresOption.selected = true;
     }
 
     function handleIncomingResponse(response) {
@@ -126,6 +139,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             const bookCard = createBookCard(book);
             elements.booksList.appendChild(bookCard);
         });
+
+        // Scroll to the top of the books list
+        elements.booksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function updatePagination() {

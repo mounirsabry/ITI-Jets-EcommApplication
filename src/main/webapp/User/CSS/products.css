@@ -215,94 +215,83 @@
 /* 🔎 Search & Filter Controls */
 .books-controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  color: white;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
   border-radius: var(--main-border-radius);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-bottom: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.books-controls::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 70%);
-  z-index: 0;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .search-container {
+  flex: 1;
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   align-items: center;
-  flex-wrap: wrap;
   position: relative;
-  z-index: 1;
 }
 
 .search-container label {
-  font-weight: 600;
-  min-width: 150px;
-  font-size: 1.1rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  display: none; /* Hidden since we’ll use a placeholder and icon */
 }
 
 #searchBar {
   flex: 1;
-  min-width: 200px;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 40px; /* Space for icon */
   border: none;
-  border-radius: var(--main-border-radius);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all var(--transition-normal);
   font-size: 1rem;
-  background-color: white;
+  color: var(--text-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%234f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+#searchBar::placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 #searchBar:focus {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   outline: none;
   transform: translateY(-1px);
 }
 
 #searchButton {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--main-border-radius);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: 50px;
   cursor: pointer;
   transition: all var(--transition-normal);
   font-weight: 600;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 #searchButton:hover {
-  background-color: var(--secondary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 #searchButton:active {
   transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   align-items: center;
-  margin-top: var(--spacing-md);
-  position: relative;
-  z-index: 1;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -314,61 +303,59 @@
 #genreFilter {
   padding: var(--spacing-sm) var(--spacing-md);
   border: none;
-  border-radius: var(--main-border-radius);
+  border-radius: 50px;
   background-color: white;
   color: var(--text-primary);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all var(--transition-normal);
   font-size: 0.95rem;
 }
 
 #genreFilter:focus {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   outline: none;
   transform: translateY(-1px);
 }
 
 .filters label {
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: var(--spacing-xs);
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Checkbox styling */
 .filters input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 4px;
   background-color: white;
-  border: 2px solid white;
+  border: 2px solid var(--primary-color);
   position: relative;
   cursor: pointer;
   transition: all var(--transition-normal);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .filters input[type="checkbox"]:checked {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
 }
 
 .filters input[type="checkbox"]:checked::after {
   content: "✓";
   position: absolute;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .filters input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
@@ -472,16 +459,14 @@
   }
 
   .books-controls {
+    flex-direction: column;
+    align-items: stretch;
     padding: var(--spacing-md);
   }
 
   .search-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .search-container label {
-    margin-bottom: var(--spacing-xs);
+    flex-direction: row;
+    gap: var(--spacing-sm);
   }
 
   #searchBar {
@@ -489,22 +474,21 @@
   }
 
   #searchButton {
-    margin-top: var(--spacing-xs);
-    width: 100%;
+    width: auto;
   }
 
   .filters {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
     gap: var(--spacing-sm);
+    justify-content: space-between;
   }
 
   .filter-group {
-    width: 100%;
+    flex: 1;
+    justify-content: center;
   }
 
   #genreFilter {
-    flex: 1;
     width: 100%;
   }
 
@@ -526,9 +510,22 @@
     padding: var(--spacing-sm);
   }
 
-  .filter-group {
+  .search-container {
     flex-direction: column;
-    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  #searchButton {
+    width: 100%;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    justify-content: flex-start;
   }
 
   .book-card {
