@@ -145,7 +145,7 @@ const displayProduct = (book, updateCallback = null) => {
       priceDisplay = `<span class="original-price">${book.price || 0} EGP</span> <span class="discounted-price">${discountedPrice.toFixed(2)} EGP</span>`;
     }
 
-    // Populate details
+    // Populate details (remove stock number from Availability)
     detailsElement.innerHTML = `
       <p><strong>Author:</strong> ${book.author || "Unknown"}</p>
       <p><strong>Genre:</strong> ${book.genre || "Unspecified"}</p>
@@ -153,9 +153,17 @@ const displayProduct = (book, updateCallback = null) => {
       <p><strong>ISBN:</strong> ${book.isbn || "N/A"}</p>
       <p><strong>Publication Date:</strong> ${book.publicationDate || "Unknown"}</p>
       <p><strong>Publisher:</strong> ${book.publisher || "Unknown"}</p>
-      <p><strong>Pages:</strong> ${book.pages || "Unknown"}</p>
+      <p><strong>Pages:</strong> ${book.numberOfPages || "Unknown"}</p>
       <p><strong>Language:</strong> ${book.language || "Unknown"}</p>
-      <p><strong>Availability:</strong> ${book.isAvailable ? `<span class="in-stock">In Stock (${book.stock || 0} available)</span>` : '<span class="out-stock">Out of Stock</span>'}</p>
+      <p><strong>Availability:</strong> ${book.isAvailable ? '<span class="in-stock">In Stock</span>' : '<span class="out-stock">Out of Stock</span>'}</p>
+    `;
+
+    // Add description section
+    const descriptionSection = document.createElement("div");
+    descriptionSection.className = "description";
+    descriptionSection.innerHTML = `
+      <h3>Description</h3>
+      <p>${book.description || "No detailed description available"}</p>
     `;
 
     // Assemble modal
@@ -164,6 +172,7 @@ const displayProduct = (book, updateCallback = null) => {
     modal.appendChild(titleElement);
     modal.appendChild(overviewElement);
     modal.appendChild(detailsElement);
+    modal.appendChild(descriptionSection);
 
     // Add modal to overlay
     overlay.appendChild(modal);

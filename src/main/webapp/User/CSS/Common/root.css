@@ -1,15 +1,12 @@
-
 body::before,
 body::after {
   display: none !important;
 }
 
 body
-  > *:not(header):not(main):not(footer):not(.auth-modal-overlay):not(.popup-message-container):not(.loading-overlay) {
+  > *:not(header):not(main):not(footer):not(.auth-modal-overlay):not(.popup-message-container):not(.loading-overlay):not(.popup-overlay) {
   display: none !important;
 }
-
-
 
 :root {
   /* Color Palette */
