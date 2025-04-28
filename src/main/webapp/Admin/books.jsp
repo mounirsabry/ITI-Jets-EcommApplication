@@ -1,6 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <% String adminUsername; HttpSession sessionObj=request.getSession(false); adminUsername=(String)
-        sessionObj.getAttribute("adminUsername") ; %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+    import="jakarta.servlet.http.HttpSession, jets.projects.admin_user.AdminURLMapper" %>
+    <% String adminUsername=null; HttpSession currentSession=request.getSession(false); if (currentSession==null) {
+        response.sendRedirect(request.getContextPath() + AdminURLMapper.LOGIN_PAGE); return; } String
+        isAdminLoggedIn=(String) currentSession.getAttribute("adminLoggedIn"); if (isAdminLoggedIn !=null &&
+        isAdminLoggedIn.equals("true")) { adminUsername=(String) currentSession.getAttribute("adminUsername"); } else {
+        response.sendRedirect(request.getContextPath() + AdminURLMapper.LOGIN_PAGE); return; } %>
         <!DOCTYPE html>
         <html lang="en">
 
@@ -12,7 +16,11 @@
             <link rel="stylesheet" href="CSS/books.css">
             <link rel="stylesheet"
                 href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+
+
+
         </head>
+
 
         <body onload="connect()">
             <div class="admin-container">
@@ -82,6 +90,21 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!--
+                        <div class="pagination">
+                            <button id="prevBookPage">Previous</button>
+                            <span id="bookPageIndicator"></span>
+                            <button id="nextBookPage">Next</button>
+                        </div>
+                    -->
+
+                        <div class="pagination">
+                            <button id="prevBookPage" class="btn">Previous</button>
+                            <span id="bookPageIndicator">Page 1 of 1</span>
+                            <button id="nextBookPage" class="btn">Next</button>
+                        </div>
+
+
                     </div>
                 </main>
             </div>

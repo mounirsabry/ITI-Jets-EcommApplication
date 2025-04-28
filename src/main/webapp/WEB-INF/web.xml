@@ -302,6 +302,13 @@
     <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>UserTruncateCart</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
+</servlet>
+
+
+
 <!-- wishlist -->
 <servlet>
     <servlet-name>UserGetAllWishList</servlet-name>
@@ -463,6 +470,14 @@
     <servlet-name>UserDirector</servlet-name>
     <url-pattern>/userTruncateCart</url-pattern>
 </servlet-mapping>
+
+<!--
+
+<servlet-mapping>
+    <servlet-name>UserDirector</servlet-name>
+    <url-pattern>/userTruncateCart</url-pattern>
+</servlet-mapping>
+-->
 
 <!--wishlist-->
 <servlet-mapping>

@@ -45,6 +45,7 @@ function loadUsers() {
 }
 
 // Display users in the table
+/*
 function displayUsers(users) {
     const usersTable = document.getElementById("usersTable");
     usersTable.innerHTML = "";
@@ -66,6 +67,42 @@ function displayUsers(users) {
         `;
     });
 }
+    */
+
+function displayUsers(users) {
+    const usersTable = document.getElementById("usersTable");
+    usersTable.innerHTML = "";
+
+    totalPages = Math.ceil(users.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedUsers = users.slice(startIndex, endIndex);
+
+    if (paginatedUsers.length === 0) {
+        usersTable.innerHTML = `<tr><td colspan="5" class="text-center">No users found.</td></tr>`;
+        return;
+    }
+
+    paginatedUsers.forEach((user) => {
+        usersTable.innerHTML += `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${user.orders}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="viewUser(${user.id})">View</button>
+                        <button class="btn btn-danger" onclick="confirmDelete(${user.id})">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    updateUserPagination();
+}
+
 
 // Search users
 function searchUsers(searchTerm) {
@@ -179,3 +216,31 @@ function deleteOnMessage(event) {
     usersString = event.data;
     loadUsers();
 }
+
+//--------------------------------------
+let currentPage = 1;
+let totalPages = 1;
+const itemsPerPage = 10;
+
+document.getElementById("prevUserPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        const users = JSON.parse(usersString) || [];
+        displayUsers(users);
+    }
+});
+
+document.getElementById("nextUserPage").addEventListener("click", () => {
+    if (currentPage < totalPages) {
+        currentPage++;
+        const users = JSON.parse(usersString) || [];
+        displayUsers(users);
+    }
+});
+
+function updateUserPagination() {
+    document.getElementById("userPageIndicator").textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById("prevUserPage").disabled = currentPage === 1;
+    document.getElementById("nextUserPage").disabled = currentPage === totalPages;
+}
+

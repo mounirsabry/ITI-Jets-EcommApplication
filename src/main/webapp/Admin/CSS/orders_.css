@@ -250,3 +250,12 @@
 .action-buttons .btn:hover {
   background-color: #0056b3;
 }
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}

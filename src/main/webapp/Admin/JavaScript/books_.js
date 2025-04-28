@@ -108,6 +108,8 @@ function loadBooks() {
 }
 
 // Display books in the table
+
+/*
 function displayBooks(books) {
   const booksTable = document.getElementById("booksTable")
   booksTable.innerHTML = ""
@@ -136,6 +138,43 @@ function displayBooks(books) {
     `
   })
 }
+*/
+function displayBooks(books) {
+  const booksTable = document.getElementById("booksTable")
+  booksTable.innerHTML = ""
+
+  totalPages = Math.ceil(books.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedBooks = books.slice(startIndex, endIndex);
+
+  paginatedBooks.forEach((book) => {
+    const statusClass = book.status === "Available" ? "status-available" : "status-unavailable"
+    const discountDisplay = book.discount > 0 ? `${book.discount}%` : "-"
+
+    booksTable.innerHTML += `
+      <tr>
+        <td><img src="${book.mainImage}" alt="${book.title}" class="book-cover"></td>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.genre}</td>
+        <td>${formatCurrency(book.price)}</td>
+        <td>${discountDisplay}</td>
+        <td>${book.quantity}</td>
+        <td><span class="status-badge ${statusClass}">${book.status}</span></td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn" onclick="editBook(${book.id})">Edit</button>
+            <button class="btn btn-danger" onclick="confirmDelete(${book.id})">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `
+  });
+
+  updateBookPagination();
+}
+
 
 // Search books
 function searchBooks(searchTerm) {
@@ -503,3 +542,31 @@ function editOnMessage(event) {
   loadBooks();
 
 }
+
+//--------------------------------------
+let currentPage = 1;
+let totalPages = 1;
+const itemsPerPage = 10;
+
+document.getElementById("prevBookPage").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    const books = JSON.parse(booksString) || [];
+    displayBooks(books);
+  }
+});
+
+document.getElementById("nextBookPage").addEventListener("click", () => {
+  if (currentPage < totalPages) {
+    currentPage++;
+    const books = JSON.parse(booksString) || [];
+    displayBooks(books);
+  }
+});
+
+function updateBookPagination() {
+  document.getElementById("bookPageIndicator").textContent = `Page ${currentPage} of ${totalPages}`;
+  document.getElementById("prevBookPage").disabled = currentPage === 1;
+  document.getElementById("nextBookPage").disabled = currentPage === totalPages;
+}
+
