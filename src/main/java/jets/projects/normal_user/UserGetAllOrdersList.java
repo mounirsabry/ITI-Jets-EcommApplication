@@ -16,6 +16,8 @@ public class UserGetAllOrdersList extends HttpServlet {
     public void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
+        System.out.println("get order list servlet");
+
         Long registeredID = GetUserID.getUserId(request);
 
         OrderService orderService = new OrderService();
@@ -33,6 +35,8 @@ public class UserGetAllOrdersList extends HttpServlet {
         }
 
         String returnJson = JsonResponseConverter.toJsonResponse(result, returnState);
+
+        System.out.println(returnJson);
 
         response.getWriter().write(returnJson);
 

@@ -7,7 +7,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>BookStore Admin - Books Management</title>
+            <title>Book Alley Admin - Books Management</title>
             <link rel="stylesheet" href="CSS/styles.css">
             <link rel="stylesheet" href="CSS/books.css">
             <link rel="stylesheet"
@@ -19,7 +19,7 @@
                 <!-- Sidebar Navigation -->
                 <aside class="sidebar">
                     <div class="sidebar-header">
-                        <h2>BookStore</h2>
+                        <h2>Book Alley</h2>
                         <button id="sidebarToggle" class="sidebar-toggle">
                             <span></span>
                             <span></span>

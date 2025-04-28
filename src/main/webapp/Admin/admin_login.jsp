@@ -6,7 +6,7 @@
 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BookStore Admin - Login</title>
+        <title>Book Alley Admin - Login</title>
         <link rel="stylesheet" href="CSS/styles.css">
         <link rel="stylesheet" href="CSS/login.css">
         <link rel="stylesheet"
@@ -552,7 +552,7 @@
         <div class="login-container">
             <div class="login-card">
                 <div class="login-header">
-                    <h1>BookStore Admin</h1>
+                    <h1>Book Alley Admin</h1>
                     <p>Enter your credentials to access the admin panel</p>
                 </div>
                 <form id="loginForm" class="login-form" action="../Admin/Login" method="POST">

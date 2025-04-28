@@ -7,6 +7,9 @@ public class UserURLMapper {
     public static final String USER_LOGIN = "/userLogin";
     public static final String USER_LOGIN_SERVLET = "UserLogin";
 
+    public static final String USER_LOGOUT = "/userLogout";
+    public static final String USER_LOGOUT_SERVLET = "UserLogout";
+
     public static final String REGISTER = "/Register";
     public static final String REGISTER_SERVLET = "UserRegister";
 
@@ -80,6 +83,9 @@ public class UserURLMapper {
     public static final String USER_TRUNCATE_CART = "/userTruncateCart";
     public static final String USER_TRUNCATE_CART_SERVLET = "UserTruncateCart";
 
+    public static final String USER_GET_CART_SUBTOTAL = "/userGetCartSubtotal";
+    public static final String USER_GET_CART_SUBTOATL_SERVLET = "UserGetCartSubtotal";
+
     public static final String USER_GET_ALL_WISH_LIST = "/userGetAllWishList";
     public static final String USER_GET_ALL_WISH_LIST_SERVLET = "UserGetAllWishList";
 
@@ -113,6 +119,7 @@ public class UserURLMapper {
     public static final String WELCOME_PAGE = "/User/welcome.html";
 
 //    public static final String WELCOME_PAGE = "/User/welcome.html";
+
 ////    public static final String REGISTER_PAGE = "/User/user_register.jspx";
 //    public static final String HOME_PAGE = "/User/user_home.jspx";
 

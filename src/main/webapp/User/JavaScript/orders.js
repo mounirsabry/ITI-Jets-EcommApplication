@@ -53,12 +53,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderOrders(response.data)
 
   function renderOrders(orders) {
+    console.log(orders);
     const parsedOrders = orders
+
       .map((order) => {
         try {
           return Order.fromJSON(order)
-        } catch (_) {
+        } catch (e) {
           console.error("Could not parse an order from the orders list!")
+          console.error("Could not parse an order:", order);
+          console.error("Error reason:", e);
           return null
         }
       })

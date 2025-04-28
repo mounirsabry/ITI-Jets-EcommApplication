@@ -14,7 +14,20 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userLogin,
-                { email, password });
+                    { email, password });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Login failed:', error);
+            MessagePopup.show('Login failed', true);
+            return null;
+        }
+    },
+
+    async logout(userID) {
+        try {
+            const rawResponse
+                = await ajaxClient.post(ServerURLMapper.userLogout,
+                    { userID });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Login failed:', error);
@@ -27,7 +40,7 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userRegister,
-                { userData });
+                    { userData });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Registration failed:', error);
@@ -52,7 +65,7 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userUpdateEmail,
-                { userID, newEmail });
+                    { userID, newEmail });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Email update failed:', error);
@@ -65,7 +78,7 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userUpdatePassword,
-                { userID, currentPassword, newPassword });
+                    { userID, currentPassword, newPassword });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Password update failed:', error);
@@ -78,7 +91,7 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userUpdatePersonalDetails,
-                { userID, updatedDetails });
+                    { userID, updatedDetails });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Details update failed:', error);
@@ -91,7 +104,7 @@ const ProfileManager = {
         try {
             const rawResponse
                 = await ajaxClient.post(ServerURLMapper.userRechargeAccountBalanceUsingCreditCard,
-                { userID, creditCardDetails, amount });
+                    { userID, creditCardDetails, amount });
             return handleResponse(rawResponse);
         } catch (error) {
             console.error('Balance recharge failed:', error);

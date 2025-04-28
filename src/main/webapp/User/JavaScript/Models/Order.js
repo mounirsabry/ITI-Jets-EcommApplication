@@ -114,7 +114,60 @@ export default class Order {
             status: this.#status
         };
     }
-
+    /*
+        static fromJSON(json) {
+            const {
+                orderID,
+                userID,
+                date,
+                address,
+                paymentMethod,
+                shippingFee,
+                orderItems,
+                status
+            } = json;
+    
+            if (!DataValidator.isIDValid(orderID)) {
+                throw new Error('Invalid order ID in JSON!');
+            }
+    
+            if (!DataValidator.isIDValid(userID)) {
+                throw new Error('Invalid user ID in JSON!');
+            }
+    
+            const parsedDate = new Date(date);
+            if (!DataValidator.isDateValid(parsedDate)) {
+                throw new Error('Invalid date in JSON!');
+            }
+    
+            if (!Object.values(PaymentMethods).includes(paymentMethod)) {
+                throw new Error('Invalid payment method in JSON!');
+            }
+    
+            if (!DataValidator.isNonNegativeFloat(shippingFee)) {
+                throw new Error('Invalid shipping fee in JSON!');
+            }
+    
+            if (!Array.isArray(orderItems)) {
+                throw new Error('Order items must be an array in JSON!');
+            }
+    
+            if (!Object.values(OrderStatus).includes(status)) {
+                throw new Error('Invalid status in JSON!');
+            }
+    
+            const newOrder = new Order();
+            newOrder.orderID = parseInt(orderID);
+            newOrder.userID = parseInt(userID);
+            newOrder.date = parsedDate;
+            newOrder.address = address;
+            newOrder.paymentMethod = paymentMethod;
+            newOrder.shippingFee = parseFloat(shippingFee);
+            newOrder.orderItems = orderItems;
+            newOrder.status = status;
+            return newOrder;
+        }
+            */
     static fromJSON(json) {
         const {
             orderID,
@@ -135,12 +188,20 @@ export default class Order {
             throw new Error('Invalid user ID in JSON!');
         }
 
-        const parsedDate = new Date(date);
-        if (!DataValidator.isDateValid(parsedDate)) {
+        // Fix date parsing
+        let parsedDateString = date;
+        if (typeof parsedDateString === 'string' && parsedDateString.includes('.')) {
+            parsedDateString = parsedDateString.split('.')[0] + "Z";
+        }
+        const parsedDate = new Date(parsedDateString);
+
+        if (isNaN(parsedDate.getTime())) {
             throw new Error('Invalid date in JSON!');
         }
 
-        if (!Object.values(PaymentMethods).includes(paymentMethod)) {
+        // Fix paymentMethod parsing
+        let normalizedPaymentMethod = paymentMethod.toLowerCase();
+        if (!Object.values(PaymentMethods).includes(normalizedPaymentMethod)) {
             throw new Error('Invalid payment method in JSON!');
         }
 
@@ -161,10 +222,12 @@ export default class Order {
         newOrder.userID = parseInt(userID);
         newOrder.date = parsedDate;
         newOrder.address = address;
-        newOrder.paymentMethod = paymentMethod;
+        newOrder.paymentMethod = normalizedPaymentMethod;
         newOrder.shippingFee = parseFloat(shippingFee);
         newOrder.orderItems = orderItems;
         newOrder.status = status;
         return newOrder;
     }
+
+
 }
