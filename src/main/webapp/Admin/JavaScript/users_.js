@@ -220,7 +220,7 @@ function deleteOnMessage(event) {
 //--------------------------------------
 let currentPage = 1;
 let totalPages = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 7;
 
 document.getElementById("prevUserPage").addEventListener("click", () => {
     if (currentPage > 1) {

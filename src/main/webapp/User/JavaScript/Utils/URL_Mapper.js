@@ -25,7 +25,8 @@ const URL_Mapper = Object.freeze({
         SEARCH: `${contextPath}/Assets/Icons/search-icon.svg`,
         USER: `${contextPath}/Assets/Icons/user-icon.svg`,
         TRASH_CAN_COVERED: `${contextPath}/Assets/Icons/trash-can-icon-covered.svg`,
-        TRASH_CAN_UNCOVERED: `${contextPath}/Assets/Icons/trash-can-icon-uncovered.svg`
+        TRASH_CAN_UNCOVERED: `${contextPath}/Assets/Icons/trash-can-icon-uncovered.svg`,
+        WISH_LIST: `${contextPath}/Assets/Icons/heart-flat-icon.svg`
     })
 });
 

@@ -7,7 +7,7 @@ export default class HistoryItem {
     #userID = -1;
     #date = null;
     #totalPaid = 0.0;
-    #receiptFileURL = null;
+    #receiptFileUrl = null;
 
     constructor() {
     }
@@ -55,27 +55,27 @@ export default class HistoryItem {
         }
         this.#totalPaid = totalPaid;
     }
-    
-    get receiptFileURL() {
-        return this.#receiptFileURL;
+
+    get receiptFileUrl() {
+        return this.#receiptFileUrl;
     }
-    
-    set receiptFileURL(receiptFileURL) {
-        this.#receiptFileURL = receiptFileURL;
+
+    set receiptFileUrl(receiptFileUrl) {
+        this.#receiptFileUrl = receiptFileUrl;
     }
-    
+
     toJSON() {
         return {
             itemID: this.#itemID,
             userID: this.#userID,
-            date: this.#date,
+            date: this.#date.toISOString(),
             totalPaid: this.#totalPaid,
-            receiptFileURL: encodeURI(this.#receiptFileURL)
+            receiptFileUrl: this.#receiptFileUrl ? encodeURI(this.#receiptFileUrl) : null
         };
     }
-    
+
     static fromJSON(json) {
-        const {itemID, userID, date, totalPaid, receiptFileURL} = json;
+        const { itemID, userID, date, totalPaid, receiptFileUrl } = json;
 
         if (!DataValidator.isIDValid(itemID)) {
             throw new Error('Invalid item ID in JSON!');
@@ -87,29 +87,26 @@ export default class HistoryItem {
         }
         const parsedUserID = parseInt(userID);
 
-        if (!DataValidator.isDateValid(date)) {
+        const parsedDate = new Date(date);
+        if (!DataValidator.isDateValid(parsedDate)) {
             throw new Error('Invalid date in JSON!');
         }
-        const parsedDate = new Date(date).toISOString();
 
         if (!DataValidator.isNonNegativeFloat(totalPaid)) {
             throw new Error('Invalid total paid in JSON!');
         }
         const parsedTotalPaid = parseFloat(totalPaid);
 
-        if (receiptFileURL === null || typeof receiptFileURL !== 'string') {
+        if (receiptFileUrl !== null && (typeof receiptFileUrl !== 'string' || receiptFileUrl.trim().length === 0)) {
             throw new Error('Invalid receipt file URL in JSON!');
         }
-        if (receiptFileURL.trim().length === 0) {
-            throw new Error('Receipt file URL cannot be empty!');
-        }
-        
+
         const item = new HistoryItem();
         item.itemID = parsedItemID;
         item.userID = parsedUserID;
         item.date = parsedDate;
         item.totalPaid = parsedTotalPaid;
-        item.receiptFileURL = decodeURI(receiptFileURL);
+        item.receiptFileUrl = receiptFileUrl ? decodeURI(receiptFileUrl) : null;
         return item;
     }
 }

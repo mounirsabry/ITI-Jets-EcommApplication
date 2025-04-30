@@ -1,5 +1,5 @@
-import serverContextPath from "./serverContextPath.js";
-import { AjaxRequestError, AjaxRequestErrorType } from "./AjaxError.js";
+import serverContextPath from "./ServerContextPath.js";
+import { AjaxRequestError, AjaxRequestErrorType } from './AJAXError.js'
 
 class VanillaAJAX {
     #baseURL = serverContextPath;
@@ -38,25 +38,8 @@ class VanillaAJAX {
 
             ajaxRequest.onload = () => {
                 if (ajaxRequest.status >= 200 && ajaxRequest.status < 300) {
-                    const responseText = ajaxRequest.responseText;
-                    console.log('Raw response:', responseText); // Log raw response
-
-                    try {
-                        // Check if response is already an object or needs parsing
-                        const response = responseText
-                            ? (typeof responseText === 'string'
-                                ? JSON.parse(responseText)
-                                : responseText)
-                            : null;
-                        resolve(response);
-                    } catch (parseError) {
-                        console.error('Response parsing failed:', parseError);
-                        console.error('Problematic response:', responseText);
-                        reject(new AjaxRequestError(
-                            AjaxRequestErrorType.PARSING_ERROR,
-                            `Failed to parse response: ${parseError.message}`
-                        ));
-                    }
+                    // Return the raw response text without parsing
+                    resolve(ajaxRequest.responseText);
                 } else {
                     reject(new AjaxRequestError(
                         AjaxRequestErrorType.HTTP_ERROR,

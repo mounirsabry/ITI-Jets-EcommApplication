@@ -188,6 +188,16 @@ public class UserDirector extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
+        if (servletPath.equals(UserURLMapper.USER_GET_CART_SUBTOTAL)) {
+            System.out.println("hello in userMapper get cart");
+            if (!isLoggedIn(request, response)) {
+                return;
+            }
+            var dispatcher = getServletContext().getNamedDispatcher(
+                    UserURLMapper.USER_GET_CART_SUBTOATL_SERVLET);
+            dispatcher.forward(request, response);
+            return;
+        }
 
         if (servletPath.equals(UserURLMapper.USER_GET_ALL_WISH_LIST)) {
 

@@ -7,7 +7,7 @@ public class UserDto {
     private Long userID;
     private String email;
     private String hashPassword;
-    private String username;
+    private String userName;
     private String phoneNumber;
     private String address;
     private LocalDate birthDate;
@@ -20,8 +20,8 @@ public class UserDto {
     public void setEmail(String email) { this.email = email; }
     public String getHashPassword() { return hashPassword; }
     public void setHashPassword(String hashPassword) { this.hashPassword = hashPassword; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() { return userName; }
+    public void setUsername(String username) { this.userName = username; }
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getAddress() { return address; }

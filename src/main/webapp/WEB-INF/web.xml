@@ -302,12 +302,12 @@
     <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
 </servlet>
 
+<!-- get Cart subtotoal-->
+
 <servlet>
-    <servlet-name>UserTruncateCart</servlet-name>
-    <servlet-class>jets.projects.normal_user.UserTruncateCart</servlet-class>
+    <servlet-name>UserGetCartSubtotal</servlet-name>
+    <servlet-class>jets.projects.normal_user.UserGetCartSubtotal</servlet-class>
 </servlet>
-
-
 
 <!-- wishlist -->
 <servlet>
@@ -396,7 +396,7 @@
 
   <servlet-mapping>
     <servlet-name>UserDirector</servlet-name>
-    <url-pattern>/Logout</url-pattern>
+    <url-pattern>/userLogout</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -471,13 +471,10 @@
     <url-pattern>/userTruncateCart</url-pattern>
 </servlet-mapping>
 
-<!--
-
 <servlet-mapping>
     <servlet-name>UserDirector</servlet-name>
-    <url-pattern>/userTruncateCart</url-pattern>
+    <url-pattern>/userGetCartSubtotal</url-pattern>
 </servlet-mapping>
--->
 
 <!--wishlist-->
 <servlet-mapping>

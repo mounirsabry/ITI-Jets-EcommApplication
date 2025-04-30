@@ -18,7 +18,7 @@ export default class Book {
     #language = '';
     #isAvailable = true;
     #stock = 0;
-    #price = 0.0;
+    #price = 0;
     #discountedPercentage = 0;
     #images = []; // Array of BookImage objects
     #copiesSold = 0;
@@ -173,7 +173,7 @@ export default class Book {
 
     set discountedPercentage(value) {
         if (!DataValidator.isNonNegativeFloat(value)) {
-            throw new Error('Discount percentage must be a non-negative integer!');
+            throw new Error('Discount percentage must be a non-negative number!');
         }
         this.#discountedPercentage = value;
     }

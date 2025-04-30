@@ -23,7 +23,7 @@
                 <!-- Sidebar Navigation -->
                 <aside class="sidebar" style="position: sticky; top: 0;">
                     <div class="sidebar-header">
-                        <h2>BookStore</h2>
+                        <h2>Book Alley</h2>
                         <button id="sidebarToggle" class="sidebar-toggle">
                             <span></span>
                             <span></span>
@@ -36,7 +36,6 @@
                             <li><a href="books.jsp"><span class="icon">📚</span> Books</a></li>
                             <li class="active"><a href="orders.jsp"><span class="icon">📦</span> Orders</a></li>
                             <li><a href="users.jsp"><span class="icon">👥</span> Users</a></li>
-                            <li><a href="discounts.jsp"><span class="icon">🏷️</span> Discounts</a></li>
                             <li><a href="purchase-history.jsp"><span class="icon">📝</span> Purchase History</a></li>
                             <li class="logout"><a href="#" id="logoutBtn"><span class="icon">🚪</span> Logout</a></li>
                         </ul>

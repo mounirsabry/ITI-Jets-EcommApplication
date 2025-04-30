@@ -75,7 +75,8 @@ class UserAuthTracker {
     }
 
     handleUserInvalidState() {
-        //window.location.href = URL_Mapper.WELCOME + `?errorMessage=Not logged in!`;
+        this.userObject = null;
+        window.location.href = URL_Mapper.WELCOME + `?errorMessage=Not logged in!`;
     }
 }
 

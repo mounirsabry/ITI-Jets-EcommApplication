@@ -7,23 +7,41 @@ import OrdersManager from "./Managers/OrdersManager.js";
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 import MessagePopup from "./Common/MessagePopup.js";
 import DataValidator from "./Utils/DataValidator.js";
+import { populateYearSelect } from "./Utils/UICommonFunctions.js";
+import LoadingOverlay from "./Common/LoadingOverlay.js";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
     checkForErrorMessageParameter();
 
     // Initialize DOM elements
+    // Navigation buttons
     const backToCartButton = document.getElementById('backToCart');
     const placeOrderButton = document.getElementById('placeOrderButton');
+
+    // Order summary elements
     const subtotalComponent = document.getElementById('subtotal');
     const shippingFeeComponent = document.getElementById('shippingFee');
     const totalAmountComponent = document.getElementById('totalAmount');
+
+    // Shipping information elements
     const addressComponent = document.getElementById('address');
-    const accountBalanceElement = document.getElementById('accountBalance');
-    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
-    const deductionAmountDisplay = document.getElementById('deductionAmount');
+
+    // Payment method elements
+    const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
     const creditCardForm = document.getElementById('creditCardForm');
     const balanceNotice = document.getElementById('balanceNotice');
+    const accountBalanceElement = document.getElementById('accountBalance');
+
+    // Credit card form elements
+    const nameOnCardInput = document.getElementById('nameOnCard');
+    const cardNumberInput = document.getElementById('cardNumber');
+    const expiryMonthSelect = document.getElementById('expiryMonth');
     const expiryYearSelect = document.getElementById('expiryYear');
+    const cvcInput = document.getElementById('cvc');
+
+    // Balance notice elements
+    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
+    const deductionAmountDisplay = document.getElementById('deductionAmount');
 
     // Initialize variables
     let subtotalAmount = 0;
@@ -48,26 +66,21 @@ document.addEventListener("DOMContentLoaded", function() {
         placeOrderButton.addEventListener('click', handlePlaceOrder);
     }
 
-    // Populate expiry years (current year + next 10 years)
-    if (expiryYearSelect) {
-        const currentYear = new Date().getFullYear() - 2000;
-        for (let i = 0; i <= 10; i++) {
-            const option = document.createElement('option');
-            option.value = (currentYear + i).toString().padStart(2, '0');
-            option.textContent = option.value;
-            expiryYearSelect.appendChild(option);
-        }
+    if (paymentMethodRadios) {
+        paymentMethodRadios.forEach(radio => {
+            radio.addEventListener('change', updatePaymentUI);
+        });
     }
 
-    // Payment method toggle
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.addEventListener('change', updatePaymentUI);
-    });
+    // Populate expiry years (current year + next 10 years)
+    if (expiryYearSelect) {
+        populateYearSelect(expiryYearSelect);
+    }
 
     // Initialize UI
     updatePaymentUI();
     loadUserData();
-    loadOrderSummary();
+    await loadOrderSummary();
 
     function updatePaymentUI() {
         const method = document.querySelector('input[name="paymentMethod"]:checked').value;
@@ -95,27 +108,43 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function loadOrderSummary() {
-        // Load subtotal.
-        CartManager.getSubtotal(userObject.userID, (data) => {
-            console.log(data);
-            const subtotal = data || 0;
+    async function loadOrderSummary() {
+        const summaryLoadingOverlay = new LoadingOverlay();
+        summaryLoadingOverlay.createAndDisplay('Loading Order Summary...');
+
+        const subtotalPromise = CartManager.getSubtotal(userObject.userID);
+        const shippingFeePromise = CartManager.getShippingFee(userObject.userID);
+
+        const subtotalResponse = await subtotalPromise;
+        if (!subtotalResponse) {
+            MessagePopup.show('Unknown error, could not load subtotal!', true);
+        } else if (!subtotalResponse.success) {
+            window.location.href = URL_Mapper.CART + '?errorMessage='
+                + encodeURIComponent(subtotalResponse.data);
+        } else {
+            const subtotal = subtotalResponse.data;
             if (subtotalComponent) {
                 subtotalComponent.textContent = subtotal.toFixed(2);
             }
             subtotalAmount = subtotal;
-            updateTotalAmount();
-        }, null);
+        }
 
-        // Load shipping fee
-        CartManager.getShippingFee(userObject.userID, (data) => {
-            const shippingFee = data || 0;
+        const shippingResponse = await shippingFeePromise;
+        if (!shippingResponse) {
+            MessagePopup.show('Unknown error, could not load shipping fee!', true);
+        } else if (!shippingResponse.success) {
+            window.location.href = URL_Mapper.CART + '?errorMessage='
+                + encodeURIComponent(shippingResponse.data);
+        } else {
+            const shippingFee = shippingResponse.data;
             if (shippingFeeComponent) {
                 shippingFeeComponent.textContent = shippingFee.toFixed(2);
             }
             shippingFeeAmount = shippingFee;
-            updateTotalAmount();
-        }, null);
+        }
+
+        summaryLoadingOverlay.remove();
+        updateTotalAmount();
     }
 
     function updateTotalAmount() {
@@ -128,33 +157,32 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function handlePlaceOrder(event) {
+    async function handlePlaceOrder(event) {
         event.preventDefault();
         const method = document.querySelector('input[name="paymentMethod"]:checked').value;
         const total = subtotalAmount + shippingFeeAmount;
 
         if (method === 'accountBalance') {
-            handleBalancePayment(total);
+            await handleBalancePayment(total);
         } else {
-            handleCreditCardPayment();
+            await handleCreditCardPayment();
         }
     }
 
-    function handleBalancePayment(total) {
+    async function handleBalancePayment(total) {
         if (userObject.accountBalance < total) {
             MessagePopup.show(`Insufficient balance. Your balance is ${userObject.accountBalance.toFixed(2)} EGP`, true);
             return;
         }
-        placeOrderWithBalance(userObject.userID, userObject.address, total);
+        await placeOrderWithBalance(userObject.userID, userObject.address);
     }
 
-    function handleCreditCardPayment() {
-        const formData = new FormData(document.getElementById('paymentForm'));
-        const nameOnCard = formData.get('nameOnCard');
-        const cardNumber = formData.get('cardNumber');
-        const expiryMonth = formData.get('expiryMonth');
-        const expiryYear = formData.get('expiryYear');
-        const cvc = formData.get('cvc');
+    async function handleCreditCardPayment() {
+        const nameOnCard = nameOnCardInput.value;
+        const cardNumber = cardNumberInput.value;
+        const expiryMonth = expiryMonthSelect.value;
+        const expiryYear = expiryYearSelect.value;
+        const cvc = cvcInput.value;
 
         // Validate required fields
         if (!nameOnCard || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
@@ -167,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function() {
             nameOnCard,
             cardNumber,
             expiryMonth,
-            expiryYear: expiryYear + 2000,
+            expiryYear: parseInt(expiryYear) + 2000,
             cvc
         };
 
@@ -177,23 +205,56 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        placeOrderWithCreditCard(userObject.userID, userObject.address, creditCardDetails);
+        await placeOrderWithCreditCard(userObject.userID, userObject.address, creditCardDetails);
     }
 
     function handleSuccessfulOrder(message) {
-        MessagePopup.show(message);
+        placeOrderButton.disabled = true;
+        MessagePopup.show(`
+            ${message}
+            You will be redirected to orders page in 5 seconds.
+        `);
         setTimeout(() => {
             window.location.href = URL_Mapper.ORDERS;
-        }, 5000); // 5 seconds delay
+        }, 5000); // 5 seconds delay.
     }
 
-    function placeOrderWithCreditCard(userID, address, creditCardDetails) {
-        OrdersManager.checkoutUsingCreditCard(userID, address, creditCardDetails,
-            handleSuccessfulOrder, null);
+    function getCheckingOutLoadingOverlay() {
+        const checkingOutLoadingOverlay = new LoadingOverlay();
+        checkingOutLoadingOverlay.createAndDisplay('Checking out...');
+        return checkingOutLoadingOverlay;
     }
 
-    function placeOrderWithBalance(userID, address) {
-        OrdersManager.checkoutUsingAccountBalance(userID, address,
-            handleSuccessfulOrder, null);
+    async function placeOrderWithCreditCard(userID, address, creditCardDetails) {
+        const loadingOverlay = getCheckingOutLoadingOverlay();
+
+        const response = await OrdersManager.checkoutUsingCreditCard(userID, address, creditCardDetails);
+        loadingOverlay.remove();
+
+        if (response && response.success) {
+            handleSuccessfulOrder(response.data);
+        } else {
+            MessagePopup.show(response?.data || 'Unknown error, cannot place order!', true);
+        }
+    }
+
+    async function placeOrderWithBalance(userID, address) {
+        const loadingOverlay = getCheckingOutLoadingOverlay();
+
+        const response = await OrdersManager.checkoutUsingAccountBalance(userID, address);
+        loadingOverlay.remove();
+
+        if (response && response.success) {
+            handleSuccessfulOrder(response.data);
+        } else {
+            MessagePopup.show(response?.data || 'Unknown error, cannot place order!', true);
+        }
+    }
+
+    function updateBalanceDisplay() {
+        if (currentBalanceDisplay && deductionAmountDisplay) {
+            currentBalanceDisplay.textContent = userObject.accountBalance?.toFixed(2) || '0.00';
+            deductionAmountDisplay.textContent = totalAmount.toFixed(2);
+        }
     }
 });

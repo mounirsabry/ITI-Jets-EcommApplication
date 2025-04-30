@@ -11,7 +11,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>BookStore Admin - Dashboard</title>
+            <title>Book Alley Admin - Dashboard</title>
             <link rel="stylesheet" href="CSS/styles.css">
             <link rel="stylesheet" href="CSS/dashboard.css">
             <link rel="stylesheet"
@@ -24,7 +24,7 @@
                 <!-- Sidebar Navigation -->
                 <aside class="sidebar">
                     <div class="sidebar-header">
-                        <h2>BookStore</h2>
+                        <h2>Book Alley</h2>
                         <button id="sidebarToggle" class="sidebar-toggle">
                             <span></span>
                             <span></span>
@@ -37,7 +37,6 @@
                             <li><a href="books.jsp"><span class="icon">📚</span> Books</a></li>
                             <li><a href="orders.jsp"><span class="icon">📦</span> Orders</a></li>
                             <li><a href="users.jsp"><span class="icon">👥</span> Users</a></li>
-                            <li><a href="discounts.jsp"><span class="icon">🏷️</span> Discounts</a></li>
                             <li><a href="purchase-history.jsp"><span class="icon">📝</span> Purchase History</a></li>
                             <li class="logout"><a href="#" id="logoutBtn"><span class="icon">🚪</span> Logout</a></li>
                         </ul>

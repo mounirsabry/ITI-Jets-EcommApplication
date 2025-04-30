@@ -8,10 +8,16 @@ import OrdersManager from "./Managers/OrdersManager.js";
 import UserAuthTracker from "./Common/UserAuthTracker.js";
 
 import Order from "./Models/Order.js";
-import { BooksManager } from "./Managers/BooksManager.js";
+import BooksManager from "./Managers/BooksManager.js";
 import Book from "./Models/Book.js";
+import MessagePopup from "./Common/MessagePopup.js";
+import LoadingOverlay from "./Common/LoadingOverlay.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+const navigateWithError = function(url, error) {
+    window.location.href = url + `?errorMessage=${encodeURIComponent(error)}`;
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
     checkForErrorMessageParameter();
 
     const userObject = UserAuthTracker.userObject;
@@ -23,14 +29,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
     let orderID = urlParams.get("orderID");
     if (!orderID) {
-        window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('No order ID specified!')}`;
+        navigateWithError(URL_Mapper.ORDERS, 'No order ID specified!');
         return;
     }
 
     try {
         orderID = JSON.parse(orderID);
     } catch (error) {
-        window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('Could not parse the order ID!')}`;
+        navigateWithError(URL_Mapper.ORDERS, 'Could not read the order ID!');
         return;
     }
 
@@ -74,14 +80,30 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error('Could not locate total amount component.');
     }
 
-    OrdersManager.getOrderDetails(userObject.userID, orderID, callbackOnOrderDetailsSuccessful, null);
+    const orderLoadingOverlay = new LoadingOverlay();
+    orderLoadingOverlay.createAndDisplay('Loading Order Details...');
 
-    function callbackOnOrderDetailsSuccessful(order) {
+    const response = await OrdersManager.getOrderDetails(userObject.userID, orderID);
+    orderLoadingOverlay.remove();
+
+    if (!response) {
+        navigateWithError(URL_Mapper.ORDERS, 'Unknown error, could not load the order details!');
+        return;
+    }
+
+    if (!response.success) {
+        navigateWithError(URL_Mapper.ORDERS, response.data);
+        return;
+    }
+
+    renderOrder(response.data);
+
+    function renderOrder(order) {
         let parsedOrder;
         try {
             parsedOrder = Order.fromJSON(order);
         } catch (_) {
-            window.location.href = URL_Mapper.ORDERS + `?errorMessage=${encodeURIComponent('Could not find an order with this order ID!')}`;
+            navigateWithError(URL_Mapper.ORDERS, 'Could not find an order with this order ID!')
             return;
         }
 
@@ -102,31 +124,66 @@ document.addEventListener("DOMContentLoaded", function () {
         const numberOfItemsParagraph = document.createElement('p');
         numberOfItemsParagraph.innerHTML = `<strong>Number of Items:</strong> ${order.orderItems.length}`;
         orderDetails.appendChild(numberOfItemsParagraph);
+
+        const paymentMethod = document.createElement('p');
+        paymentMethod.innerHTML = `<strong>Payment Method:</strong> ${order.paymentMethod}`;
+        orderDetails.appendChild(paymentMethod);
+
+        const orderStatus = document.createElement('p');
+        orderStatus.innerHTML = `<strong>Order Status:</strong> ${order.status}`;
+        orderDetails.appendChild(orderStatus);
     }
 
     function renderOrderItems(order) {
         orderItemsContainer.innerHTML = '';
 
+        const booksLoadingOverlay = new LoadingOverlay();
+        booksLoadingOverlay.createAndDisplay('Loading Books...');
+
+        const promisesList = [];
+        let subtotal = 0; // Initialize subtotal to 0
+
         order.orderItems.forEach(orderItem => {
-            const bookElement = document.createElement('div');
-            bookElement.classList.add('order-item');
-            orderItemsContainer.appendChild(bookElement);
+            const loadOrderItemBook = async function(orderItem) {
+                const bookElement = document.createElement('div');
+                bookElement.classList.add('order-item');
+                orderItemsContainer.appendChild(bookElement);
 
-            BooksManager.getBookDetails(orderItem.bookID, (book) => {
-                loadBookInfoElementOnSuccess(bookElement, orderItem, book, () => {
-                    const subtotalChange = orderItem.priceAtPurchase * orderItem.quantity;
-                    updatePriceSummarySectionOnChange(subtotalChange);
-                });
-            });
+                const responsePromise = BooksManager.getBookDetails(orderItem.bookID);
+                promisesList.push(responsePromise);
+
+                const response = await responsePromise;
+                if (!response) {
+                    console.error('Unknown error, could not load the book with #ID: ' + orderItem.bookID);
+                    return;
+                }
+
+                if (!response.success) {
+                    MessagePopup.show(response.data, true);
+                }
+
+                loadBookInfoElement(bookElement, orderItem, response.data);
+
+                // Accumulate subtotal for each order item
+                const itemTotal = orderItem.priceAtPurchase * orderItem.quantity;
+                subtotal += itemTotal;
+                updatePriceSummarySection(subtotal);
+            }
+
+            loadOrderItemBook(orderItem);
+
+            Promise.all(promisesList)
+                .then(_ => booksLoadingOverlay.remove())
+                .catch(_ => booksLoadingOverlay.remove());
         });
-
 
         if (shippingFeeComponent) {
             shippingFeeComponent.textContent = order.shippingFee.toFixed(2);
+            shippingFeeComponent.parentElement.innerHTML = `<strong>Shipping Fee:</strong> <span class="currency-group"><span>${order.shippingFee.toFixed(2)}</span> EGP</span>`;
         }
     }
 
-    function loadBookInfoElementOnSuccess(bookElement, orderItem, book, callbackAfterLoad) {
+    function loadBookInfoElement(bookElement, orderItem, book) {
         let parsedBook;
         try {
             parsedBook = Book.fromJSON(book);
@@ -186,40 +243,50 @@ document.addEventListener("DOMContentLoaded", function () {
         const priceSection = document.createElement('div');
         priceSection.className = 'price-section';
 
-        if (orderItem.quantity === 1) {
-            const priceInfo = document.createElement('p');
-            priceInfo.innerHTML = `<strong>Price:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(priceInfo);
-        } else {
-            const pricePerPieceParagraph = document.createElement('p');
-            pricePerPieceParagraph.innerHTML = `<strong>Price per Piece:</strong> ${orderItem.priceAtPurchase.toFixed(2)}`;
-            priceSection.appendChild(pricePerPieceParagraph);
+        const pricePerPieceParagraph = document.createElement('p');
+        pricePerPieceParagraph.innerHTML = `<strong>Price:</strong> <span class="currency-group">${orderItem.priceAtPurchase.toFixed(2)} EGP</span>`;
+        priceSection.appendChild(pricePerPieceParagraph);
 
-            const quantityParagraph = document.createElement('p');
-            quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${orderItem.quantity}`;
-            priceSection.appendChild(quantityParagraph);
+        const quantityParagraph = document.createElement('p');
+        quantityParagraph.innerHTML = `<strong>Quantity:</strong> ${orderItem.quantity}`;
+        priceSection.appendChild(quantityParagraph);
 
-            const totalItemPriceParagraph = document.createElement('p');
-            totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> ${subtotalPrice.toFixed(2)}`;
-            priceSection.appendChild(totalItemPriceParagraph);
-        }
+        const totalItemPriceParagraph = document.createElement('p');
+        totalItemPriceParagraph.innerHTML = `<strong>Total Price:</strong> <span class="currency-group">${subtotalPrice.toFixed(2)} EGP</span>`;
+        priceSection.appendChild(totalItemPriceParagraph);
+
         bookElement.appendChild(priceSection);
 
         img.addEventListener('click', () => {
-            displayProduct(parsedBook);
-        });
+            displayProduct(parsedBook, (updatedBook) => {
+                // This is the callback that will be called when the book data is updated
+                const mainImage = updatedBook.images?.find(image => image.isMain);
+                if (mainImage) {
+                    img.src = mainImage.url;
+                }
 
-        callbackAfterLoad();
+                title.textContent = updatedBook.title;
+                overview.textContent = updatedBook.overview;
+                author.innerHTML = `<strong>Author:</strong> ${updatedBook.author}`;
+                isbn.innerHTML = `<strong>ISBN:</strong> ${updatedBook.isbn}`;
+
+                parsedBook = updatedBook;
+            });
+        });
     }
 
-    function updatePriceSummarySectionOnChange(subtotalChange) {
+    function updatePriceSummarySection(subtotal) {
         if (subtotalComponent) {
-            subtotalComponent.textContent = (parseFloat(subtotalComponent.textContent) + subtotalChange).toFixed(2);
+            subtotalComponent.textContent = subtotal.toFixed(2);
+            subtotalComponent.parentElement.innerHTML = `<strong>Subtotal:</strong> <span class="currency-group"><span>${subtotal.toFixed(2)}</span> EGP</span>`;
         }
-        const shippingFee = parseFloat(shippingFeeComponent.textContent);
+
+        const shippingFee = parseFloat(shippingFeeComponent.textContent) || 0;
+        const total = subtotal + shippingFee;
 
         if (totalAmountComponent) {
-            totalAmountComponent.textContent = (parseFloat(subtotalComponent.textContent) + shippingFee).toFixed(2) + ' EGP';
+            totalAmountComponent.textContent = total.toFixed(2);
+            totalAmountComponent.parentElement.innerHTML = `<strong>Total Amount:</strong> <span class="currency-group"><span>${total.toFixed(2)}</span> EGP</span>`;
         }
     }
 });

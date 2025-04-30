@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Welcome to Book Alley</title>
 
-    <link rel="stylesheet" href="CSS/Common/reset.css" />
-    <link rel="stylesheet" href="CSS/Common/root.css" />
-    <link rel="stylesheet" href="CSS/Common/header.css" />
-    <link rel="stylesheet" href="CSS/Common/footer.css" />
-    <link rel="stylesheet" href="CSS/Common/main.css" />
-    <link rel="stylesheet" href="CSS/Common/MessagePopup.css" />
-    <link rel="stylesheet" href="CSS/Common/BookPopup.css" />
+    <script type="module">
+        import LoadingOverlay from "./JavaScript/Common/LoadingOverlay.js";
 
-    <link rel="stylesheet" href="CSS/welcome.css" />
+        const loadingOverlay = new LoadingOverlay();
+        loadingOverlay.createAndDisplay();
+
+        window.addEventListener('load', () => {
+            loadingOverlay.remove();
+        });
+    </script>
+
+    <link rel="stylesheet" href="CSS/Common/reset.css"/>
+    <link rel="stylesheet" href="CSS/Common/root.css"/>
+    <link rel="stylesheet" href="CSS/Common/header.css"/>
+    <link rel="stylesheet" href="CSS/Common/footer.css"/>
+    <link rel="stylesheet" href="CSS/Common/main.css"/>
+    <link rel="stylesheet" href="CSS/Common/MessagePopup.css"/>
+    <link rel="stylesheet" href="CSS/Common/BookPopup.css"/>
+
+    <link rel="stylesheet" href="CSS/welcome.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <script src="JavaScript/Common/context_path.js"></script>
 
@@ -21,53 +33,42 @@
     <script defer type="module" src="JavaScript/Common/footer.js"></script>
 
     <script type="module" src="JavaScript/welcome.js"></script>
-  </head>
-  <body>
-    <header id="siteHeader">
-      <!-- Header will be injected here by JS -->
-    </header>
+</head>
+<body>
+<header id="siteHeader">
+    <!-- Header will be injected here by JS -->
+</header>
 
-    <main>
-      <section class="welcome-banner">
+<main>
+    <section class="welcome-banner">
         <h1>Welcome to Book Alley</h1>
         <p>Where Every Book Finds Its Home</p>
         <button type="button" id="browseButton" class="browse-button">
-          Explore Books
+            <i class="fas fa-book-open"></i> Explore Books
         </button>
-      </section>
+    </section>
 
-      <section id="eventBanner">
-        <button id="prevBtn">&#10094;</button>
+    <section id="eventBanner">
+        <button id="prevBtn" aria-label="Previous announcement"><i class="fas fa-chevron-left"></i></button>
         <div id="bannerMessages">
-          <h2 class="banner-text active">
-            Limited Time Offer! Get up to 50% off on selected books.
-          </h2>
-          <h2 class="banner-text">
-            New Arrivals! Explore the latest collection of bestsellers.
-          </h2>
-          <h2 class="banner-text">
-            Buy 2, Get 1 Free on selected items. Don’t miss out!
-          </h2>
-          <h2 class="banner-text">
-            Subscribe now and get exclusive discounts!
-          </h2>
+            <!-- Will be injected by JS. -->
         </div>
-        <button id="nextBtn">&#10095;</button>
-      </section>
+        <button id="nextBtn" aria-label="Next announcement"><i class="fas fa-chevron-right"></i></button>
+    </section>
 
-      <section id="topSellingSection">
+    <section id="topSellingSection">
         <h2>Top Selling Books</h2>
         <div id="topSelling" class="top-books"></div>
-      </section>
+    </section>
 
-      <section id="topSellingGenreSection">
+    <section id="topSellingGenreSection">
         <h2>Top Selling in Genre</h2>
         <div id="topSellingGenreBook" class="top-genre-books"></div>
-      </section>
-    </main>
+    </section>
+</main>
 
-    <footer id="siteFooter">
-      <!-- Footer will be injected here by JS -->
-    </footer>
-  </body>
+<footer id="siteFooter">
+    <!-- Footer will be injected here by JS -->
+</footer>
+</body>
 </html>

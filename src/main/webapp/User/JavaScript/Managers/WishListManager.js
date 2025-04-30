@@ -1,50 +1,64 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import createResponseHandler from "./responseHandler.js";
-import handleManagerError from "./handleManagerError.js";
+import MessagePopup from "../Common/MessagePopup.js";
+import handleResponse from "./ManagersUtils/responseHandler.js";
 
+import VanillaAJAX from "./AJAX/VanillaAJAX.js";
+import ServerURLMapper from "./AJAX/ServerURLMapper.js";
+
+// Create an instance of VanillaAJAX to use for all requests.
 const ajaxClient = new VanillaAJAX();
 
-export default {
-    getAllWishList(userID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetAllWishList, { userID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+const WishListManager = {
+    async getAllWishList(userID) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetAllWishList, { userID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to get wishlist:', error);
+            MessagePopup.show('Failed to load wishlist', true);
+            return null;
+        }
     },
 
-    getAllWishListBooks(userID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetAllWishListBooks, { userID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async getAllWishListBooks(userID) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetAllWishListBooks, { userID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to get wishlist books:', error);
+            MessagePopup.show('Failed to load wishlist books', true);
+            return null;
+        }
     },
 
-    addWishListItem(userID, bookID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.post(ServerURLMapper.userAddWishListItem, { userID, bookID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async addWishListItem(userID, bookID) {
+        try {
+            const rawResponse
+                = await ajaxClient.post(ServerURLMapper.userAddWishListItem,
+                { userID, bookID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to add to wishlist:', error);
+            MessagePopup.show('Failed to add to wishlist', true);
+            return null;
+        }
     },
 
-    removeFromWishList(userID, bookID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.post(ServerURLMapper.userRemoveFromWishList, { userID, bookID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async removeFromWishList(userID, bookID) {
+        try {
+            const rawResponse
+                = await ajaxClient.post(ServerURLMapper.userRemoveFromWishList,
+                { userID, bookID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to remove from wishlist:', error);
+            MessagePopup.show('Failed to remove from wishlist', true);
+            return null;
+        }
     }
 };
+
+export default WishListManager;

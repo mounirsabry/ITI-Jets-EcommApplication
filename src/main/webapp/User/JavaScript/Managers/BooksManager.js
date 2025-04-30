@@ -1,60 +1,74 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import createResponseHandler from "./responseHandler.js";
-import handleManagerError from "./handleManagerError.js";
+import MessagePopup from "../Common/MessagePopup.js";
+import handleResponse from "./ManagersUtils/responseHandler.js";
 
+import VanillaAJAX from "./AJAX/VanillaAJAX.js";
+import ServerURLMapper from "./AJAX/ServerURLMapper.js";
+
+// Create an instance of VanillaAJAX to use for all requests.
 const ajaxClient = new VanillaAJAX();
 
-export default {
-    getTopSelling(callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetTopSellingBooksList, {})
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+const BooksManager = {
+    async getTopSelling() {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetTopSellingBooksList, '{}');
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Top selling books request failed:', error);
+            MessagePopup.show('Unknown error', true);
+            return null;
+        }
     },
 
-    getTopSellingInGenres(callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetTopSellingBookFromEachGenreList, {})
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async getTopSellingInGenres() {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetTopSellingBookFromEachGenreList, '{}');
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Genre books request failed:', error);
+            MessagePopup.show('Unknown error', true);
+            return null;
+        }
     },
 
-    getAllBooks(callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetAllBooksList, {})
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async getAllBooks() {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetAllBooksList, '{}');
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('All books request failed:', error);
+            MessagePopup.show('Unknown error', true);
+            return null;
+        }
     },
 
-    search(keywords, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userSearchBooks, { keywords })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async search(keywords) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userSearchBooks, { keywords });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Search request failed:', error);
+            MessagePopup.show('Unknown error', true);
+            return null;
+        }
     },
 
-    getBookDetails(bookID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetBookDetails, { bookID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async getBookDetails(bookID) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetBookDetails, { bookID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Book details request failed:', error);
+            MessagePopup.show('Unknown error', true);
+            return null;
+        }
     }
 };
+
+export default BooksManager;

@@ -1,24 +1,24 @@
-'use strict';
+document.addEventListener("DOMContentLoaded", () => {
+  const footer = document.getElementById("siteFooter")
+  if (!footer) return
 
-import URL_Mapper from '../Utils/URL_Mapper.js';
+  const currentYear = new Date().getFullYear()
 
-document.addEventListener("DOMContentLoaded", function() {
-    const footerContainer = document.getElementById("siteFooter");
-    if (!footerContainer) {
-        console.log('Could not load the footer component.');
-        return;
-    }
-
-    footerContainer.innerHTML = `
-        <p>
-            <span>&copy; 2025 Book Alley</span>
-            <span class="pipe">|</span>
-            <span>Contact: support@bookalley.com</span>
-            <span class="pipe">|</span>
-            <span>Phone: +20 123 456 789</span>
-        </p>
-        <a target="_blank" id="aboutUSLink">About US</a>
-    `;
-
-    document.getElementById('aboutUSLink').href = URL_Mapper.ABOUT;
-});
+  footer.innerHTML = `
+    <p>
+      <span>© ${currentYear} Book Alley. All Rights Reserved.</span>
+      <span class="pipe">|</span>
+      <span><a href="About/about.html" id="aboutUSLink">About Us</a></span>
+      <span class="pipe">|</span>
+      <span>Privacy Policy</span>
+      <span class="pipe">|</span>
+      <span>Terms of Service</span>
+    </p>
+    <div class="social-links">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+    </div>
+  `
+})

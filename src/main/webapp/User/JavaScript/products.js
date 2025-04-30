@@ -1,27 +1,41 @@
 'use strict';
 
 import checkForErrorMessageParameter from "./Common/checkForError.js";
-import { createBookCard } from './Utils/bookUIFunctions.js';
 import BooksManager from './Managers/BooksManager.js';
-import Book from './Models/Book.js';
 import Genres from './Models/Genres.js';
+import MessagePopup from "./Common/MessagePopup.js";
+import { createBookCard } from './Utils/bookUIFunctions.js';
+import { parseBooksFromData } from "./Utils/UICommonFunctions.js";
+import LoadingOverlay from "./Common/LoadingOverlay.js";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
     checkForErrorMessageParameter();
 
     // Constants
-    const BOOKS_PER_PAGE = 12; // Can be easily changed here
+    const BOOKS_PER_PAGE = 12;
 
     // DOM Elements
-    const booksList = document.getElementById('booksList');
-    const searchBar = document.getElementById('searchBar');
-    const searchButton = document.getElementById('searchButton');
-    const unavailableToggle = document.getElementById('unavailableToggle');
-    const genreFilter = document.getElementById('genreFilter');
-    const prevPageButton = document.getElementById('prevPage');
-    const nextPageButton = document.getElementById('nextPage');
-    const pageInput = document.getElementById('pageInput');
-    const pageIndicator = document.getElementById('pageIndicator');
+    const elements = {
+        booksList: document.getElementById('booksList'),
+        searchBar: document.getElementById('searchBar'),
+        searchButton: document.getElementById('searchButton'),
+        unavailableToggle: document.getElementById('unavailableToggle'),
+        genreFilter: document.getElementById('genreFilter'),
+        prevPageButton: document.getElementById('prevPage'),
+        nextPageButton: document.getElementById('nextPage'),
+        pageInput: document.getElementById('pageInput'),
+        pageIndicator: document.getElementById('pageIndicator')
+    };
+
+    // Validate DOM elements
+    const missingElements = Object.entries(elements)
+        .filter(([key, value]) => !value)
+        .map(([key]) => key);
+    if (missingElements.length > 0) {
+        console.error(`Missing DOM elements: ${missingElements.join(", ")}`);
+        MessagePopup.show("Error: Page layout is broken. Some components are missing.", true);
+        return;
+    }
 
     // State variables
     let allBooksPossiblySearched = null;
@@ -31,44 +45,82 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Initialize
     populateGenreFilter();
-    BooksManager.getAllBooks(loadAllBooks, null);
+    await loadInitialBooks();
 
     function populateGenreFilter() {
+        // Clear existing options
+        elements.genreFilter.innerHTML = '';
+
+        // Add "All Genres" option with value 'all'
+        const allGenresOption = document.createElement('option');
+        allGenresOption.value = 'all';
+        allGenresOption.textContent = 'All Genres';
+        elements.genreFilter.appendChild(allGenresOption);
+
+        // Add other genres, excluding "Unspecified"
+        const addedGenres = new Set(['All Genres']); // Track added genres to avoid duplicates
         Object.values(Genres).forEach(genre => {
+            if (genre === "Unspecified" || genre === "All Genres") return; // Skip "Unspecified" and "All Genres"
+            if (addedGenres.has(genre)) return; // Skip duplicates
+            addedGenres.add(genre);
+
             const option = document.createElement('option');
             option.value = genre;
             option.textContent = genre;
-            genreFilter.appendChild(option);
+            elements.genreFilter.appendChild(option);
         });
+
+        // Set "All Genres" as default
+        allGenresOption.selected = true;
+    }
+
+    function handleIncomingResponse(response) {
+        if (!response) {
+            MessagePopup.show("Unknown error: Could not load books.", true);
+            return;
+        }
+        if (!response.success) {
+            MessagePopup.show(response.data || "Failed to load books.", true);
+            return;
+        }
+
+        allBooksPossiblySearched = parseBooksFromData(response.data);
+        filterBooks();
+        renderBooks();
+    }
+
+    async function loadInitialBooks() {
+        const loadingOverlay = new LoadingOverlay();
+        loadingOverlay.createAndDisplay('Loading Books List...');
+
+        const response = await BooksManager.getAllBooks();
+        loadingOverlay.remove();
+        handleIncomingResponse(response);
     }
 
     function filterBooks() {
         currentDisplayedMap.clear();
+        const { genreFilter, unavailableToggle } = elements;
         const selectedGenre = genreFilter.value;
 
-        allBooksPossiblySearched.forEach(book => {
-            if (selectedGenre !== 'all' && book.genre !== selectedGenre) {
-                return;
-            }
-            if (unavailableToggle && !unavailableToggle.checked && (book.stock === 0 || !book.isAvailable)) {
-                return;
-            }
+        allBooksPossiblySearched?.forEach(book => {
+            if (selectedGenre !== 'all' && book.genre !== selectedGenre) return;
+            if (unavailableToggle && !unavailableToggle.checked && (book.stock === 0 || !book.isAvailable)) return;
             currentDisplayedMap.set(book.bookID, book);
         });
 
-        // Reset to page 1 when filtering changes.
         currentPage = 1;
         updatePagination();
     }
 
     function renderBooks() {
-        booksList.innerHTML = '';
+        elements.booksList.innerHTML = '';
 
         if (currentDisplayedMap.size === 0) {
             const emptyElement = document.createElement('div');
             emptyElement.textContent = 'No books found matching your criteria!';
             emptyElement.classList.add('no-data-found');
-            booksList.appendChild(emptyElement);
+            elements.booksList.appendChild(emptyElement);
 
             currentPage = 0;
             totalPages = 0;
@@ -77,116 +129,98 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const booksArray = Array.from(currentDisplayedMap.values());
-
-        // Calculate pagination.
         totalPages = Math.ceil(booksArray.length / BOOKS_PER_PAGE);
         updatePagination();
 
-        // Get books for current page.
         const startIndex = (currentPage - 1) * BOOKS_PER_PAGE;
-        const endIndex = Math.min(startIndex + BOOKS_PER_PAGE, booksArray.length);
-        const booksToDisplay = booksArray.slice(startIndex, endIndex);
+        const booksToDisplay = booksArray.slice(startIndex, startIndex + BOOKS_PER_PAGE);
 
-        // Render books.
         booksToDisplay.forEach(book => {
-            const bookElement = createBookCard(book);
-            booksList.appendChild(bookElement);
+            const bookCard = createBookCard(book);
+            elements.booksList.appendChild(bookCard);
         });
+
+        // Scroll to the top of the books list
+        elements.booksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function updatePagination() {
-        // Update page indicator
+        const { pageIndicator, pageInput, prevPageButton, nextPageButton } = elements;
         pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
-
-        // Update input value.
         pageInput.value = currentPage;
-
-        // Update button states.
         prevPageButton.disabled = currentPage <= 1;
         nextPageButton.disabled = currentPage >= totalPages;
     }
 
     function goToPage(page) {
         const pageNum = parseInt(page);
-        if (isNaN(pageNum)) {
-            return;
-        }
+        if (isNaN(pageNum)) return;
 
         currentPage = Math.max(1, Math.min(pageNum, totalPages));
         renderBooks();
     }
 
-    // Event Listeners.
-    searchButton.addEventListener('click', () => {
-        const searchBarValue = searchBar.value;
-        if (!searchBarValue) {
-            BooksManager.getAllBooks(loadAllBooks, null);
+    // Event Listeners
+    elements.searchBar.addEventListener('input', () => {
+        const searchBarValue = elements.searchBar.value.trim().toLowerCase();
+        if (searchBarValue === '') {
+            elements.searchButton.value = 'Refresh';
+        } else {
+            elements.searchButton.value = 'Search';
+        }
+    });
+
+    elements.searchButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const searchingLoadingOverlay = new LoadingOverlay();
+        searchingLoadingOverlay.createAndDisplay('Searching...');
+
+        const searchTerm = elements.searchBar.value.trim().toLowerCase();
+        if (!searchTerm) {
+            searchingLoadingOverlay.updateMessage('Loading Books List...');
+            await loadInitialBooks();
+            searchingLoadingOverlay.remove();
             return;
         }
 
-        const searchTerm = searchBarValue.toLowerCase();
-        BooksManager.search(searchTerm, (searchResult) => {
-            allBooksPossiblySearched = searchResult.reduce((validBooks, book) => {
-                try {
-                    const parsedBook = Book.fromJSON(book);
-                    validBooks.push(parsedBook);
-                } catch (e) {
-                    console.log('Could not parse a book in search book function!', e);
-                }
-                return validBooks;
-            }, []);
+        const response = await BooksManager.search(searchTerm);
+        searchingLoadingOverlay.remove();
 
-            filterBooks();
-            renderBooks();
-        });
+        handleIncomingResponse(response);
     });
 
-    unavailableToggle.addEventListener("change", () => {
+    elements.unavailableToggle.addEventListener("change", () => {
         filterBooks();
         renderBooks();
     });
 
-    genreFilter.addEventListener("change", () => {
+    elements.genreFilter.addEventListener("change", () => {
         filterBooks();
         renderBooks();
     });
 
-    prevPageButton.addEventListener('click', () => {
+    elements.prevPageButton.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
             renderBooks();
         }
     });
 
-    nextPageButton.addEventListener('click', () => {
+    elements.nextPageButton.addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
             renderBooks();
         }
     });
 
-    pageInput.addEventListener('change', (e) => {
-        goToPage(e.target.value);
+    elements.pageInput.addEventListener('change', (e) => goToPage(e.target.value));
+    elements.pageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') goToPage(e.target.value);
     });
 
-    pageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            goToPage(e.target.value);
-        }
-    });
-
-    function loadAllBooks(allBooks) {
-        allBooksPossiblySearched = allBooks.reduce((validBooks, book) => {
-            try {
-                const parsedBook = Book.fromJSON(book);
-                validBooks.push(parsedBook);
-            } catch (e) {
-                console.log('Could not parse a book in search book function!', e);
-            }
-            return validBooks;
-        }, []);
-
-        filterBooks();
-        renderBooks();
-    }
+    // Prevent any global click handlers from interfering with book cards
+    document.addEventListener('click', (e) => {
+        // Only log for debugging purposes; no action needed
+        console.log("Global click event captured on:", e.target);
+    }, { capture: true });
 });

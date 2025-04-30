@@ -1,54 +1,64 @@
 'use strict';
 
-import VanillaAJAX from "../Ajax/VanillaAJAX.js";
-import ServerURLMapper from "./ServerURLMapper.js";
-import createResponseHandler from "./responseHandler.js";
-import handleManagerError from "./handleManagerError.js";
+import MessagePopup from "../Common/MessagePopup.js";
+import handleResponse from "./ManagersUtils/responseHandler.js";
 
+import VanillaAJAX from "./AJAX/VanillaAJAX.js";
+import ServerURLMapper from "./AJAX/ServerURLMapper.js";
+
+// Create an instance of VanillaAJAX to use for all requests.
 const ajaxClient = new VanillaAJAX();
 
-export default {
-    getOrdersList(userID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetAllOrdersList, { userID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+const OrdersManager = {
+    async getOrdersList(userID) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetAllOrdersList, { userID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to get orders:', error);
+            MessagePopup.show('Failed to load orders', true);
+            return null;
+        }
     },
 
-    getOrderDetails(userID, orderID, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.get(ServerURLMapper.userGetOrderDetails, { userID, orderID })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async getOrderDetails(userID, orderID) {
+        try {
+            const rawResponse
+                = await ajaxClient.get(ServerURLMapper.userGetOrderDetails, { userID, orderID });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Failed to get order details:', error);
+            MessagePopup.show('Failed to load order details', true);
+            return null;
+        }
     },
 
-    checkoutUsingAccountBalance(userID, address, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.post(ServerURLMapper.userCheckoutUsingAccountBalance, { userID, address })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
+    async checkoutUsingAccountBalance(userID, address) {
+        try {
+            const rawResponse
+                = await ajaxClient.post(ServerURLMapper.userCheckoutUsingAccountBalance,
+                { userID, address });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Checkout failed:', error);
+            MessagePopup.show('Checkout failed', true);
+            return null;
+        }
     },
 
-    checkoutUsingCreditCard(userID, address, creditCardDetails, callbackOnSuccess, callbackOnFailure) {
-        const responseHandler = createResponseHandler(callbackOnSuccess, callbackOnFailure);
-
-        ajaxClient.post(ServerURLMapper.userCheckoutUsingCreditCard, {
-            userID,
-            address,
-            creditCardDetails
-        })
-            .then(response => {
-                responseHandler(response);
-            })
-            .catch(error => handleManagerError(error, callbackOnFailure));
-    },
+    async checkoutUsingCreditCard(userID, address, creditCardDetails) {
+        try {
+            const rawResponse
+                = await ajaxClient.post(ServerURLMapper.userCheckoutUsingCreditCard,
+                { userID, address, creditCardDetails });
+            return handleResponse(rawResponse);
+        } catch (error) {
+            console.error('Credit card checkout failed:', error);
+            MessagePopup.show('Payment processing failed', true);
+            return null;
+        }
+    }
 };
+
+export default OrdersManager;

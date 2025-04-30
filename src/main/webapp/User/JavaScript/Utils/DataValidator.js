@@ -2,8 +2,13 @@
 
 export default class DataValidator {
     static emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    static phonePattern = /^(?:\+20|0)(10|11|12|15)\d{8}$/;
     static passwordPattern = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+    // Allows letters, numbers, spaces, and basic punctuation
+    // 4-30 characters, must start with a letter
+    static userNamePattern = /^[a-zA-Z][a-zA-Z0-9 _-]{3,29}$/;
+
+    static phonePattern = /^(?:\+20|0)(10|11|12|15)\d{8}$/;
 
     // Check for ISO 8601 format.
     static isoDatePattern = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?/;
@@ -34,11 +39,11 @@ export default class DataValidator {
     }
 
     static isPasswordValid(password) {
-        return DataValidator.passwordPattern.test(password) || password === 'Hidden';
+        return DataValidator.passwordPattern.test(password);
     }
 
-    static isUserNameValid(username) {
-        return username && typeof username === 'string' && username.length >= 4;
+    static isUserNameValid(userName) {
+        return userName && typeof userName === 'string' && DataValidator.userNamePattern.test(userName);
     }
 
     static isPhoneValid(phone) {
@@ -46,7 +51,19 @@ export default class DataValidator {
     }
 
     static isAddressValid(address) {
-        return address && typeof address === 'string' && address.length >= 4;
+        if (typeof address !== 'string' || address.length < 4) {
+            return false;
+        }
+
+        // Cleanse and verify the address contains at least some valid characters
+        const CLEANSED_ADDRESS = address
+            .replace(/[<>"']/g, '') // Remove dangerous HTML/script tags
+            .replace(/\s{2,}/g, ' ') // Collapse multiple spaces
+            .trim();
+
+        // Check if cleansed address still meets requirements
+        return CLEANSED_ADDRESS.length >= 4 &&
+            /[a-zA-Z0-9]/.test(CLEANSED_ADDRESS); // Contains at least one alphanumeric
     }
 
     static isDateValid(date) {

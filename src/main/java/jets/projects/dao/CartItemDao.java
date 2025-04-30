@@ -1,16 +1,17 @@
 package jets.projects.dao;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import jets.projects.entity.CartItem;
 import jets.projects.utils.JpaUtil;
 
-import java.util.List;
-import java.util.Optional;
+public class CartItemDao {
 
-public class CartItemDao
-{
     private final EntityManagerFactory emf;
 
     public CartItemDao() {
@@ -114,6 +115,24 @@ public class CartItemDao
                 em.getTransaction().rollback();
             }
             return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    public BigDecimal calculateCartSubtotal(Long userId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<BigDecimal> query = em.createQuery(
+                    "SELECT SUM(c.quantity * (b.price - (b.price * b.discountPercentage / 100))) "
+                    + "FROM CartItem c "
+                    + "JOIN c.book b "
+                    + "WHERE c.user.userId = :userId",
+                    BigDecimal.class
+            );
+            query.setParameter("userId", userId);
+            BigDecimal subtotal = query.getSingleResult();
+            return subtotal != null ? subtotal : BigDecimal.ZERO;
         } finally {
             em.close();
         }

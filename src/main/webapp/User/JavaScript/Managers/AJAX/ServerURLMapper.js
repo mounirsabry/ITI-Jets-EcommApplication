@@ -6,9 +6,13 @@ class ServerURLMapper {
     static userSearchBooks = '/userSearchBooks';
     static userGetBookDetails = '/userGetBookDetails';
 
+    // Promotions Section.
+    static userGetEventBannersList = '/userGetEventBannersList';
+
     // Cart Section.
     static userGetCart = '/userGetCart';
     static userValidateCart = '/userValidateCart';
+    static userGetCartSubtotal = '/userGetCartSubtotal';
     static userGetCartShippingFee = '/userGetCartShippingFee';
     static userAddItemToCart = '/userAddItemToCart';
     static userUpdateCartItemQuantity = '/userUpdateCartItemQuantity';
@@ -30,15 +34,15 @@ class ServerURLMapper {
     static userUpdatePersonalDetails = '/userUpdatePersonalDetails';
     static userRechargeAccountBalanceUsingCreditCard = '/userRechargeAccountBalanceUsingCreditCard';
 
+    // Purchase History Section.
+    static userGetAllPurchaseHistoryList = '/userGetAllPurchaseHistoryList';
+    static userGetPurchaseHistoryItemDetails = '/userGetPurchaseHistoryItemDetails';
+
     // Wish List Section.
     static userGetAllWishList = '/userGetAllWishList';
     static userGetAllWishListBooks = '/userGetAllWishListBooks';
     static userAddWishListItem = '/userAddWishListItem';
     static userRemoveFromWishList = '/userRemoveFromWishList';
-
-    // Purchase History Section.
-    static userGetAllPurchaseHistoryList = '/userGetAllPurchaseHistoryList';
-    static userGetPurchaseHistoryItemDetails = '/userGetPurchaseHistoryItemDetails';
 }
 
 export default ServerURLMapper;

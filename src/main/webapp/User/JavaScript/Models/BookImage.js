@@ -39,7 +39,6 @@ export default class BookImage {
     }
 
     static fromJSON(json) {
-        console.log("hello");
         if (typeof json !== 'object' || json === null) {
             throw new Error('Invalid JSON object!');
         }
@@ -49,13 +48,10 @@ export default class BookImage {
         if (typeof json.isMain !== 'boolean') {
             throw new Error('Invalid or missing isMain value!');
         }
-        const url = json.url;
-        //'http://localhost:8080/ITI-Jets-EcommApplication/Admin/Images/' + json.url;
-
 
         let decodedURL;
         try {
-            decodedURL = decodeURI(url);
+            decodedURL = decodeURI(json.url);
         } catch (error) {
             throw new Error('Could not decode URL!');
         }

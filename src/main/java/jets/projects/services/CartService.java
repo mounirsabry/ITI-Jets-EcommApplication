@@ -187,4 +187,15 @@ public class CartService {
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
         return cartItemDao.deleteAllByUserId(userId);
     }
+
+    public BigDecimal getCartSubtotal(Long userId) throws InvalidInputException, NotFoundException {
+        if (userId == null || userId <= 0) {
+            throw new InvalidInputException("Invalid user ID");
+        }
+        userDao.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+        BigDecimal subtotal = cartItemDao.calculateCartSubtotal(userId);
+        return subtotal != null ? subtotal : BigDecimal.ZERO;
+    }
+
 }
