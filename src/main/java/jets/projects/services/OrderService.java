@@ -1,5 +1,19 @@
 package jets.projects.services;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import jets.projects.client_dto.ClientOrderDto;
 import jets.projects.dao.BookDao;
 import jets.projects.dao.CartItemDao;
@@ -24,12 +38,16 @@ import jets.projects.exceptions.OutOfStockException;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.io.File;
@@ -276,37 +294,37 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    private String generateReceiptPdf(BookOrder order, BigDecimal totalPaid) throws OperationFailedException {
-        String fileName = "receipt_" + order.getOrderId() + "_" + System.currentTimeMillis() + ".pdf";
-        String filePath = RECEIPT_DIR + fileName;
-        String urlPath = RECEIPT_URL_PREFIX + fileName;
-
-        try {
-            PdfWriter writer = new PdfWriter(filePath);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
-
-            document.add(new Paragraph("Receipt for Order #" + order.getOrderId()));
-            document.add(new Paragraph("Customer: " + order.getUser().getUsername()));
-            document.add(new Paragraph("Date: " + LocalDateTime.now()));
-            document.add(new Paragraph("Items:"));
-            for (OrderItem item : order.getOrderItems()) {
-                document.add(new Paragraph(
-                        item.getBook().getTitle() + " - Quantity: " + item.getQuantity() +
-                                " - Price: $" + item.getPrice() +
-                                " - Total: $" + item.getPrice().multiply(new BigDecimal(item.getQuantity()))
-                ));
-            }
-            document.add(new Paragraph("Subtotal: $" + totalPaid.subtract(FIXED_SHIPPING_COST)));
-            document.add(new Paragraph("Shipping: $" + FIXED_SHIPPING_COST));
-            document.add(new Paragraph("Total Paid: $" + totalPaid));
-
-            document.close();
-            return urlPath;
-        } catch (Exception e) {
-            throw new OperationFailedException("Failed to generate PDF for order ID: " + order.getOrderId(), e);
-        }
-    }
+//    private String generateReceiptPdf(BookOrder order, BigDecimal totalPaid) throws OperationFailedException {
+//        String fileName = "receipt_" + order.getOrderId() + "_" + System.currentTimeMillis() + ".pdf";
+//        String filePath = RECEIPT_DIR + fileName;
+//        String urlPath = RECEIPT_URL_PREFIX + fileName;
+//
+//        try {
+//            PdfWriter writer = new PdfWriter(filePath);
+//            PdfDocument pdf = new PdfDocument(writer);
+//            Document document = new Document(pdf);
+//
+//            document.add(new Paragraph("Receipt for Order #" + order.getOrderId()));
+//            document.add(new Paragraph("Customer: " + order.getUser().getUsername()));
+//            document.add(new Paragraph("Date: " + LocalDateTime.now()));
+//            document.add(new Paragraph("Items:"));
+//            for (OrderItem item : order.getOrderItems()) {
+//                document.add(new Paragraph(
+//                        item.getBook().getTitle() + " - Quantity: " + item.getQuantity() +
+//                                " - Price: $" + item.getPrice() +
+//                                " - Total: $" + item.getPrice().multiply(new BigDecimal(item.getQuantity()))
+//                ));
+//            }
+//            document.add(new Paragraph("Subtotal: $" + totalPaid.subtract(FIXED_SHIPPING_COST)));
+//            document.add(new Paragraph("Shipping: $" + FIXED_SHIPPING_COST));
+//            document.add(new Paragraph("Total Paid: $" + totalPaid));
+//
+//            document.close();
+//            return urlPath;
+//        } catch (Exception e) {
+//            throw new OperationFailedException("Failed to generate PDF for order ID: " + order.getOrderId(), e);
+//        }
+//    }
 
     public boolean updateOrderStatus(Long orderId, String status) throws InvalidInputException, NotFoundException, OperationFailedException {
         if (orderId == null || orderId <= 0) {
@@ -428,5 +446,364 @@ public class OrderService {
         return orders.stream()
                 .map(this::convertToClientDto)
                 .collect(Collectors.toList());
+    }
+
+
+
+
+
+
+
+    private String generateReceiptPdf(BookOrder order, BigDecimal totalPaid) throws OperationFailedException {
+        // Generate unique filename with order ID and timestamp
+        String fileName = String.format("receipt_%s_%d.pdf", order.getOrderId(), System.currentTimeMillis());
+        String filePath = RECEIPT_DIR + fileName;
+        String urlPath = RECEIPT_URL_PREFIX + fileName;
+
+        try {
+            // Initialize PDF document with A4 page size
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf, PageSize.A4);
+            document.setMargins(36, 36, 36, 36); // 0.5 inch margins
+
+            // Set up fonts and colors
+            PdfFont headerFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            Color primaryColor = new DeviceRgb(41, 128, 185); // Professional blue
+            Color secondaryColor = new DeviceRgb(52, 73, 94); // Dark slate
+
+            // Company header and logo
+            Table headerTable = new Table(UnitValue.createPercentArray(new float[]{70, 30}));
+            headerTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Company info and logo
+            Cell companyCell = new Cell();
+            companyCell.setBorder(Border.NO_BORDER);
+
+            // Add company logo
+            try {
+                ImageData logoData = ImageDataFactory.create(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("logo.jpeg")).readAllBytes());
+                Image logo = new Image(logoData);
+                logo.scaleToFit(50, 50); // Scale down the logo to fit within 50x50 dimensions
+                companyCell.add(logo);
+            } catch (Exception e) {
+                System.out.println("Could not load company logo: {}"+ e.getMessage());
+            }
+
+            Paragraph companyName = new Paragraph("BOOK ALLEY")
+                    .setFont(headerFont)
+                    .setFontSize(18)
+                    .setFontColor(primaryColor);
+            Paragraph companyDetails = new Paragraph("Smart village, Cairo, Egypt\nEmail: support@bookalley.com\nPhone: 01063253263")
+                    .setFont(regularFont)
+                    .setFontSize(10);
+            companyCell.add(companyName);
+            companyCell.add(companyDetails);
+            headerTable.addCell(companyCell);
+
+            // Receipt title
+            Cell receiptTitleCell = new Cell();
+            receiptTitleCell.setBorder(Border.NO_BORDER);
+            receiptTitleCell.setTextAlignment(TextAlignment.RIGHT);
+            Paragraph receiptTitle = new Paragraph("RECEIPT")
+                    .setFont(headerFont)
+                    .setFontSize(24)
+                    .setFontColor(secondaryColor);
+            Paragraph receiptNumber = new Paragraph("Order #" + order.getOrderId())
+                    .setFont(boldFont)
+                    .setFontSize(12);
+            receiptTitleCell.add(receiptTitle);
+            receiptTitleCell.add(receiptNumber);
+            headerTable.addCell(receiptTitleCell);
+
+            document.add(headerTable);
+            document.add(new Paragraph("\n"));
+
+            // Customer and order info section
+            Table infoTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
+            infoTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Customer info
+            Cell customerCell = new Cell();
+            customerCell.setBorder(Border.NO_BORDER);
+            customerCell.add(new Paragraph("BILLED TO:")
+                    .setFont(boldFont)
+                    .setFontSize(10)
+                    .setFontColor(secondaryColor));
+            customerCell.add(new Paragraph(order.getUser().getUsername())
+                    .setFont(boldFont)
+                    .setFontSize(11));
+            customerCell.add(new Paragraph(order.getUser().getEmail())
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            customerCell.add(new Paragraph(order.getAddress())
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            infoTable.addCell(customerCell);
+
+            // Order info
+            Cell orderInfoCell = new Cell();
+            orderInfoCell.setBorder(Border.NO_BORDER);
+            orderInfoCell.setTextAlignment(TextAlignment.RIGHT);
+            orderInfoCell.add(new Paragraph("ORDER DETAILS:")
+                    .setFont(boldFont)
+                    .setFontSize(10)
+                    .setFontColor(secondaryColor));
+            orderInfoCell.add(new Paragraph("Date: " + formatDateTime(order.getOrderDate()))
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            orderInfoCell.add(new Paragraph("Payment Method: Account Balance")
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            orderInfoCell.add(new Paragraph("Delivered successfully")
+                    .setFont(boldFont)
+                    .setFontSize(10)
+                    .setFontColor(ColorConstants.GREEN));
+            infoTable.addCell(orderInfoCell);
+
+            document.add(infoTable);
+            document.add(new Paragraph("\n"));
+
+            // Horizontal line separator
+            SolidLine line = new SolidLine(1f);
+            line.setColor(primaryColor);
+            LineSeparator ls = new LineSeparator(line);
+            document.add(ls);
+            document.add(new Paragraph("\n"));
+
+            // Items table
+            Table itemsTable = new Table(UnitValue.createPercentArray(new float[]{40, 15, 15, 15, 15}));
+            itemsTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Table header
+            String[] headers = {"Product", "Price", "Quantity", "Discount", "Total"};
+            for (String header : headers) {
+                Cell headerCell = new Cell();
+                headerCell.setBackgroundColor(secondaryColor);
+                headerCell.setPadding(5);
+                Paragraph headerText = new Paragraph(header)
+                        .setFont(boldFont)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE);
+                headerCell.add(headerText);
+                itemsTable.addHeaderCell(headerCell);
+            }
+
+            // Order items
+            BigDecimal subtotal = BigDecimal.ZERO;
+            BigDecimal totalDiscount = BigDecimal.ZERO;
+
+            for (OrderItem item : order.getOrderItems()) {
+                // Calculate item totals
+                BigDecimal itemPrice = item.getPrice();
+                BigDecimal quantity = new BigDecimal(item.getQuantity());
+                BigDecimal discount = item.getDiscountPercentage().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+                BigDecimal discountAmount = itemPrice.multiply(quantity).multiply(discount).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal itemTotal = itemPrice.multiply(quantity).subtract(discountAmount).setScale(2, RoundingMode.HALF_UP);
+
+                subtotal = subtotal.add(itemPrice.multiply(quantity));
+                totalDiscount = totalDiscount.add(discountAmount);
+
+                // Product name
+                Cell productCell = new Cell();
+                productCell.setPadding(5);
+                productCell.add(new Paragraph(item.getBook().getTitle())
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                if (item.getBook().getAuthor() != null) {
+                    productCell.add(new Paragraph("by " + item.getBook().getAuthor())
+                            .setFont(regularFont)
+                            .setFontSize(8)
+                            .setFontColor(ColorConstants.DARK_GRAY));
+                }
+                itemsTable.addCell(productCell);
+
+                // Price
+                Cell priceCell = new Cell();
+                priceCell.setPadding(5);
+                priceCell.add(new Paragraph(formatCurrency(itemPrice))
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                itemsTable.addCell(priceCell);
+
+                // Quantity
+                Cell quantityCell = new Cell();
+                quantityCell.setPadding(5);
+                quantityCell.add(new Paragraph(item.getQuantity().toString())
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                itemsTable.addCell(quantityCell);
+
+                // Discount
+                Cell discountCell = new Cell();
+                discountCell.setPadding(5);
+                discountCell.add(new Paragraph(item.getDiscountPercentage() + "%")
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                itemsTable.addCell(discountCell);
+
+                // Total
+                Cell totalCell = new Cell();
+                totalCell.setPadding(5);
+                totalCell.add(new Paragraph(formatCurrency(itemTotal))
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                itemsTable.addCell(totalCell);
+            }
+
+            document.add(itemsTable);
+            document.add(new Paragraph("\n"));
+
+            // Order summary
+            Table summaryTable = new Table(UnitValue.createPercentArray(new float[]{70, 30}));
+            summaryTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Empty cell
+            Cell emptyCell = new Cell();
+            emptyCell.setBorder(Border.NO_BORDER);
+            summaryTable.addCell(emptyCell);
+
+            // Summary values
+            Cell summaryValuesCell = new Cell();
+            summaryValuesCell.setBorder(Border.NO_BORDER);
+
+            // Create inner table for alignment
+            Table innerTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
+            innerTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Subtotal
+            Cell subtotalLabelCell = new Cell();
+            subtotalLabelCell.setBorder(Border.NO_BORDER);
+            subtotalLabelCell.setPadding(2);
+            subtotalLabelCell.add(new Paragraph("Subtotal:")
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            innerTable.addCell(subtotalLabelCell);
+
+            Cell subtotalValueCell = new Cell();
+            subtotalValueCell.setBorder(Border.NO_BORDER);
+            subtotalValueCell.setPadding(2);
+            subtotalValueCell.setTextAlignment(TextAlignment.RIGHT);
+            subtotalValueCell.add(new Paragraph(formatCurrency(subtotal))
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            innerTable.addCell(subtotalValueCell);
+
+            // Total Discount
+            if (totalDiscount.compareTo(BigDecimal.ZERO) > 0) {
+                Cell discountLabelCell = new Cell();
+                discountLabelCell.setBorder(Border.NO_BORDER);
+                discountLabelCell.setPadding(2);
+                discountLabelCell.add(new Paragraph("Discount:")
+                        .setFont(regularFont)
+                        .setFontSize(10));
+                innerTable.addCell(discountLabelCell);
+
+                Cell discountValueCell = new Cell();
+                discountValueCell.setBorder(Border.NO_BORDER);
+                discountValueCell.setPadding(2);
+                discountValueCell.setTextAlignment(TextAlignment.RIGHT);
+                discountValueCell.add(new Paragraph("-" + formatCurrency(totalDiscount))
+                        .setFont(regularFont)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.RED));
+                innerTable.addCell(discountValueCell);
+            }
+
+            // Shipping
+            Cell shippingLabelCell = new Cell();
+            shippingLabelCell.setBorder(Border.NO_BORDER);
+            shippingLabelCell.setPadding(2);
+            shippingLabelCell.add(new Paragraph("Shipping:")
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            innerTable.addCell(shippingLabelCell);
+
+            Cell shippingValueCell = new Cell();
+            shippingValueCell.setBorder(Border.NO_BORDER);
+            shippingValueCell.setPadding(2);
+            shippingValueCell.setTextAlignment(TextAlignment.RIGHT);
+            shippingValueCell.add(new Paragraph(formatCurrency(order.getShippingCost()))
+                    .setFont(regularFont)
+                    .setFontSize(10));
+            innerTable.addCell(shippingValueCell);
+
+            // Add a line separator before total
+            Cell separatorCell = new Cell(1, 2);
+            separatorCell.setBorder(Border.NO_BORDER);
+            separatorCell.setPadding(2);
+            SolidLine totalLine = new SolidLine(1f);
+            totalLine.setColor(secondaryColor);
+            LineSeparator totalSeparator = new LineSeparator(totalLine);
+            separatorCell.add(totalSeparator);
+            innerTable.addCell(separatorCell);
+
+            // Total
+            Cell totalLabelCell = new Cell();
+            totalLabelCell.setBorder(Border.NO_BORDER);
+            totalLabelCell.setPadding(2);
+            totalLabelCell.add(new Paragraph("TOTAL:")
+                    .setFont(boldFont)
+                    .setFontSize(12)
+                    .setFontColor(secondaryColor));
+            innerTable.addCell(totalLabelCell);
+
+            Cell totalValueCell = new Cell();
+            totalValueCell.setBorder(Border.NO_BORDER);
+            totalValueCell.setPadding(2);
+            totalValueCell.setTextAlignment(TextAlignment.RIGHT);
+            totalValueCell.add(new Paragraph(formatCurrency(totalPaid))
+                    .setFont(boldFont)
+                    .setFontSize(12)
+                    .setFontColor(secondaryColor));
+            innerTable.addCell(totalValueCell);
+
+            summaryValuesCell.add(innerTable);
+            summaryTable.addCell(summaryValuesCell);
+
+            document.add(summaryTable);
+
+            // Footer
+            document.add(new Paragraph("\n\n"));
+            Paragraph footer = new Paragraph("Thank you for your purchase!")
+                    .setFont(boldFont)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(primaryColor);
+            document.add(footer);
+
+            Paragraph terms = new Paragraph("All sales are final. For questions or concerns about your order, " +
+                    "please contact customer service at support@bookalley.com")
+                    .setFont(regularFont)
+                    .setFontSize(8)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(ColorConstants.DARK_GRAY);
+            document.add(terms);
+
+            document.close();
+            return urlPath;
+        } catch (Exception e) {
+            System.out.println("Failed to generate receipt PDF for order "+ order.getOrderId()+ e.getMessage()+ e);
+            throw new OperationFailedException("Failed to generate PDF receipt for order ID: " + order.getOrderId(), e);
+        }
+    }
+
+    /**
+     * Formats a BigDecimal currency value to a proper currency string with dollar sign.
+     *
+     * @param amount The amount to format
+     * @return Formatted currency string
+     */
+    private String formatCurrency(BigDecimal amount) {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+        return currencyFormat.format(amount);
+    }
+
+
+    private String formatDateTime(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
+        return dateTime.format(formatter);
     }
 }
