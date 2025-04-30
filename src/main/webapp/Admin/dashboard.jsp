@@ -17,6 +17,7 @@
             <link rel="stylesheet"
                 href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <link rel="icon" type="image/x-icon" href="Assets/tabIcon.ico">
         </head>
 
         <body>

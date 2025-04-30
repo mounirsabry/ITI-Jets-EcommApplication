@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderHeader() {
     const isAuthenticated = UserAuthTracker.isAuthenticated
 
-    // Updated header structure with new order: Home | Books | Wishlist | Cart | About
+    // Updated header structure with hamburger menu
     header.innerHTML = `
       <div class="header-left">
         <div class="logo-container">
@@ -43,13 +43,19 @@ document.addEventListener("DOMContentLoaded", () => {
         <h1 class="site-title" onclick="window.location.href='${URL_Mapper.WELCOME}'">Book Alley</h1>
       </div>
 
-      <div class="header-right">
+      <button class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="header-right" id="headerRight">
         <nav class="navbar">
-          <a href="${URL_Mapper.WELCOME}"><i class="fas fa-home"></i> Home</a>
-          <a href="${URL_Mapper.PRODUCTS}"><i class="fas fa-book"></i> Books</a>
-          <a href="${URL_Mapper.WISH_LIST}" class="wishlist-link"><i class="fas fa-heart"></i> Wishlist</a>
-          <a href="${URL_Mapper.CART}" class="cart-link"><i class="fas fa-shopping-cart"></i> Cart</a>
-          <a href="${URL_Mapper.ABOUT}"><i class="fas fa-info-circle"></i> About</a>
+          <a href="${URL_Mapper.WELCOME}"><i class="fas fa-home"></i> <span class="nav-text">Home</span></a>
+          <a href="${URL_Mapper.PRODUCTS}"><i class="fas fa-book"></i> <span class="nav-text">Books</span></a>
+          <a href="${URL_Mapper.WISH_LIST}" class="wishlist-link"><i class="fas fa-heart"></i> <span class="nav-text">Wishlist</span></a>
+          <a href="${URL_Mapper.CART}" class="cart-link"><i class="fas fa-shopping-cart"></i> <span class="nav-text">Cart</span></a>
+          <a href="${URL_Mapper.ABOUT}"><i class="fas fa-info-circle"></i> <span class="nav-text">About</span></a>
         </nav>
 
         <div class="auth-actions">
@@ -58,13 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
               ? `
             <a href="${URL_Mapper.PROFILE}" class="profile-link">
               <i class="fas fa-user"></i>
-              <span>Profile</span>
+              <span class="nav-text">Profile</span>
             </a>
-            <button id="logoutButton" class="auth-button logout-button"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <button id="logoutButton" class="auth-button logout-button"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></button>
           `
               : `
-            <button id="loginButton" class="auth-button login-button"><i class="fas fa-sign-in-alt"></i> Login</button>
-            <button id="registerButton" class="auth-button register-button"><i class="fas fa-user-plus"></i> Register</button>
+            <button id="loginButton" class="auth-button login-button"><i class="fas fa-sign-in-alt"></i> <span class="nav-text">Login</span></button>
+            <button id="registerButton" class="auth-button register-button"><i class="fas fa-user-plus"></i> <span class="nav-text">Register</span></button>
           `
           }
         </div>
@@ -83,6 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
     forceIconDisplay()
     setTimeout(forceIconDisplay, 100)
 
+    // Hamburger menu toggle functionality
+    const hamburgerMenu = document.getElementById("hamburgerMenu")
+    const headerRight = document.getElementById("headerRight")
+    hamburgerMenu.addEventListener("click", () => {
+      headerRight.classList.toggle("active")
+      hamburgerMenu.classList.toggle("active")
+    })
+
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!header.contains(e.target) && headerRight.classList.contains("active")) {
+        headerRight.classList.remove("active")
+        hamburgerMenu.classList.remove("active")
+      }
+    })
+
     // Add event listeners for buttons
     if (isAuthenticated) {
       const logoutButton = header.querySelector("#logoutButton")
@@ -97,6 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
         loginButton.addEventListener("click", () => {
           document.getElementById("loginModal").classList.remove("hidden")
           document.body.style.overflow = "hidden" // Prevent scrolling when modal is open
+          headerRight.classList.remove("active") // Close menu on login click
+          hamburgerMenu.classList.remove("active")
         })
       }
 
@@ -104,6 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
         registerButton.addEventListener("click", () => {
           document.getElementById("registerModal").classList.remove("hidden")
           document.body.style.overflow = "hidden" // Prevent scrolling when modal is open
+          headerRight.classList.remove("active") // Close menu on register click
+          hamburgerMenu.classList.remove("active")
         })
       }
     }

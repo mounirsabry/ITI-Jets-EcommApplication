@@ -16,6 +16,8 @@
             <link rel="stylesheet" href="CSS/users.css">
             <link rel="stylesheet"
                 href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+            <link rel="icon" type="image/x-icon" href="Assets/tabIcon.ico">
+
         </head>
 
         <body onload="connect()">
